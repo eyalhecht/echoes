@@ -1,8 +1,9 @@
 import React from 'react';
+import { Box } from '@mui/material';
 
 function Header({height}) {
     return (
-        <div style={{
+        <Box sx={{
             height: height + 'px',
             backgroundColor: '#1877f2',
             color: 'white',
@@ -17,11 +18,11 @@ function Header({height}) {
             padding: '0 20px',
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
+            <Box sx={{ fontSize: '24px', fontWeight: 'bold' }}>
                 SocialApp
-            </div>
+            </Box>
             
-            <div style={{ 
+            <Box sx={{ 
                 flex: 1, 
                 maxWidth: '400px', 
                 margin: '0 20px' 
@@ -38,25 +39,25 @@ function Header({height}) {
                         fontSize: '14px'
                     }}
                 />
-            </div>
+            </Box>
             
-            <div style={{ display: 'flex', gap: '20px' }}>
-                <div style={{ 
+            <Box sx={{ display: 'flex', gap: '20px' }}>
+                <Box sx={{ 
                     padding: '8px 12px', 
                     cursor: 'pointer',
                     borderRadius: '4px'
                 }}>
                     Notifications
-                </div>
-                <div style={{ 
+                </Box>
+                <Box sx={{ 
                     padding: '8px 12px', 
                     cursor: 'pointer',
                     borderRadius: '4px'
                 }}>
                     Profile
-                </div>
-            </div>
-        </div>
+                </Box>
+            </Box>
+        </Box>
     );
 }
 

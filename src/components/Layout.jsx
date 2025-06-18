@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setActiveSidebarItem } from '../store/slices/uiSlice';
+import { Box } from '@mui/material';
 import Header from './Header.jsx';
 
 const generatePosts = (startId = 1, count = 10) => {
@@ -18,23 +19,23 @@ const generatePosts = (startId = 1, count = 10) => {
 
 function PostCard({ post }) {
     return (
-        <div style={{
+        <Box sx={{
             backgroundColor: 'white',
             border: '1px solid #ddd',
             borderRadius: '8px',
             padding: '16px',
             marginBottom: '16px'
         }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+            <Box sx={{ fontWeight: 'bold', marginBottom: '8px' }}>
                 {post.user}
-            </div>
-            <div style={{ marginBottom: '8px', color: '#666', fontSize: '12px' }}>
+            </Box>
+            <Box sx={{ marginBottom: '8px', color: '#666', fontSize: '12px' }}>
                 {post.timestamp}
-            </div>
-            <div style={{ lineHeight: '1.5' }}>
+            </Box>
+            <Box sx={{ lineHeight: '1.5' }}>
                 {post.content}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }
 
@@ -46,7 +47,7 @@ function Sidebar() {
     const items = ['Home', 'Profile', 'Friends', 'Messages', 'Settings'];
 
     return (
-        <div style={{
+        <Box sx={{
             width: '200px',
             height: '100vh',
             backgroundColor: 'white',
@@ -56,19 +57,19 @@ function Sidebar() {
             borderRight: '1px solid #ddd'
         }}>
             {items.map((item) => (
-                <div
+                <Box
                     key={item}
                     onClick={() => dispatch(setActiveSidebarItem(item))}
-                    style={{
+                    sx={{
                         padding: '16px',
                         cursor: 'pointer',
                         backgroundColor: activeSidebarItem === item ? '#e3f2fd' : 'transparent',
                     }}
                 >
                     {item}
-                </div>
+                </Box>
             ))}
-        </div>
+        </Box>
     );
 }
 
@@ -105,14 +106,14 @@ function MainContent() {
     };
 
     return (
-        <div style={{
+        <Box sx={{
             marginLeft: '200px',
-            marginTop: HEADER_HEIGHT,
-            minHeight: `calc(100vh - ${HEADER_HEIGHT})`,
+            marginTop: `${HEADER_HEIGHT}px`,
+            minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
             backgroundColor: '#f5f5f5',
             padding: '20px'
         }}>
-            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
                 <h1 style={{ marginBottom: '20px' }}>Home</h1>
 
                 {posts.map((post) => (
@@ -120,25 +121,25 @@ function MainContent() {
                 ))}
 
                 {loading && (
-                    <div style={{
+                    <Box sx={{
                         textAlign: 'center',
                         padding: '20px',
                         color: '#666'
                     }}>
                         Loading more posts...
-                    </div>
+                    </Box>
                 )}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }
 
 export default function Layout() {
     return (
-        <div>
+        <Box>
             <Header height={HEADER_HEIGHT} />
             <Sidebar />
             <MainContent />
-        </div>
+        </Box>
     );
 }
