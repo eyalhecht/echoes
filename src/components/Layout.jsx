@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setActiveSidebarItem } from '../store/slices/uiSlice';
 import Header from './Header.jsx';
 
 const generatePosts = (startId = 1, count = 10) => {
@@ -39,7 +41,8 @@ function PostCard({ post }) {
 const HEADER_HEIGHT = 40;
 
 function Sidebar() {
-    const [activeItem, setActiveItem] = useState('Home');
+    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
+    const dispatch = useDispatch();
     const items = ['Home', 'Profile', 'Friends', 'Messages', 'Settings'];
 
     return (
@@ -55,11 +58,11 @@ function Sidebar() {
             {items.map((item) => (
                 <div
                     key={item}
-                    onClick={() => setActiveItem(item)}
+                    onClick={() => dispatch(setActiveSidebarItem(item))}
                     style={{
                         padding: '16px',
                         cursor: 'pointer',
-                        backgroundColor: activeItem === item ? '#e3f2fd' : 'transparent',
+                        backgroundColor: activeSidebarItem === item ? '#e3f2fd' : 'transparent',
                     }}
                 >
                     {item}
