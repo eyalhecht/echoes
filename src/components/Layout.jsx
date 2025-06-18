@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Header from './Header.jsx';
 
 const generatePosts = (startId = 1, count = 10) => {
     const posts = [];
@@ -35,6 +36,8 @@ function PostCard({ post }) {
     );
 }
 
+const HEADER_HEIGHT = 40;
+
 function Sidebar() {
     const [activeItem, setActiveItem] = useState('Home');
     const items = ['Home', 'Profile', 'Friends', 'Messages', 'Settings'];
@@ -44,10 +47,10 @@ function Sidebar() {
             width: '200px',
             height: '100vh',
             backgroundColor: 'white',
-            // borderRight: '1px solid #ddd',
             position: 'fixed',
             left: 0,
-            top: 0
+            top: HEADER_HEIGHT,
+            borderRight: '1px solid #ddd'
         }}>
             {items.map((item) => (
                 <div
@@ -69,7 +72,6 @@ function Sidebar() {
 function MainContent() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
 
     // Load initial posts
     useEffect(() => {
@@ -102,7 +104,8 @@ function MainContent() {
     return (
         <div style={{
             marginLeft: '200px',
-            minHeight: '100vh',
+            marginTop: HEADER_HEIGHT,
+            minHeight: `calc(100vh - ${HEADER_HEIGHT})`,
             backgroundColor: '#f5f5f5',
             padding: '20px'
         }}>
@@ -130,6 +133,7 @@ function MainContent() {
 export default function Layout() {
     return (
         <div>
+            <Header height={HEADER_HEIGHT} />
             <Sidebar />
             <MainContent />
         </div>
