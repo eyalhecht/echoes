@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
+import LogoutButton from "./LogoutButton.jsx";
 
 function Header({height}) {
     return (
@@ -56,6 +57,7 @@ function Header({height}) {
                 }}>
                     Profile
                 </Box>
+                <LogoutButton/>
             </Box>
         </Box>
     );
