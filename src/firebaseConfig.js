@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFunctions, connectFunctionsEmulator, httpsCallable } from 'firebase/functions';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage} from 'firebase/storage';
 
 // --- YOUR ACTUAL FIREBASE PROJECT CONFIG ---
 // Replace these with the values you copied from the Firebase Console
@@ -22,6 +23,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const functions = getFunctions(app);
 export const db = getFirestore(app); // You'll need this for Firestore operations
+export const storage = getStorage(app);
 
 // --- Emulator Connection (Crucial for Local Development) ---
 // This ensures your app connects to local emulators when running in development

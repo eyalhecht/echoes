@@ -9,17 +9,38 @@ import {
     onAuthStateChanged,
 } from 'firebase/auth';
 import { auth } from '../../firebaseConfig'; // Your initialized Firebase Auth instance
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../firebaseConfig'; // Add this import for Firebase Functions
+
+// Helper function to create user profile
+const createUserProfileInFirestore = async (displayName, photoURL) => {
+    try {
+        const callable = httpsCallable(functions, 'apiGateway');
+        await callable({
+            action: 'createUserProfile',
+            payload: { displayName, photoURL }
+        });
+    } catch (error) {
+        console.error("Create Profile Error:", error);
+        // Don't throw - we don't want profile creation failure to break auth
+    }
+};
 
 // Async Thunks for Firebase Auth Operations
 const signUpWithEmail = createAsyncThunk(
     'auth/signUpWithEmail',
-    async ({ email, password }, { rejectWithValue }) => {
+    async ({ email, password, displayName }, { rejectWithValue }) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            return userCredential.user.toJSON(); // Return plain object
+            const user = userCredential.user;
+
+            // Create user profile after successful signup
+            await createUserProfileInFirestore(displayName || user.displayName, user.photoURL);
+
+            return user.toJSON();
         } catch (error) {
             console.error("Sign Up Error:", error);
-            return rejectWithValue(error.message); // Return error message
+            return rejectWithValue(error.message);
         }
     }
 );
@@ -39,11 +60,16 @@ const loginWithEmail = createAsyncThunk(
 
 const signInWithGoogle = createAsyncThunk(
     'auth/signInWithGoogle',
-    async (_, { rejectWithValue }) => { // No payload needed for Google sign-in
+    async (_, { rejectWithValue }) => {
         try {
             const provider = new GoogleAuthProvider();
             const userCredential = await signInWithPopup(auth, provider);
-            return userCredential.user.toJSON();
+            const user = userCredential.user;
+
+            // Create user profile after successful Google sign-in
+            await createUserProfileInFirestore(user.displayName, user.photoURL);
+
+            return user.toJSON();
         } catch (error) {
             console.error("Google Sign-In Error:", error);
             return rejectWithValue(error.message);

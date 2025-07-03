@@ -4,13 +4,14 @@ import { setActiveSidebarItem } from '../store/slices/uiSlice';
 import { Box } from '@mui/material';
 import Header from './Header.jsx';
 import Home from './Home.jsx';
+import UploadPost from "./UploadPost.jsx";
 
 const HEADER_HEIGHT = 40;
 
 function Sidebar() {
     const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
     const dispatch = useDispatch();
-    const items = ['Home', 'Profile', 'Friends', 'Messages', 'Settings'];
+    const items = ['Home', 'Profile', 'Friends', 'Upload', 'Settings'];
 
     return (
         <Box sx={{
@@ -51,8 +52,8 @@ function MainContent() {
                 return <Box>Profile Page Coming Soon...</Box>;
             case 'Friends':
                 return <Box>Friends Page Coming Soon...</Box>;
-            case 'Messages':
-                return <Box>Messages Page Coming Soon...</Box>;
+            case 'Upload':
+                return <UploadPost>Upload Page Coming Soon...</UploadPost>;
             case 'Settings':
                 return <Box>Settings Page Coming Soon...</Box>;
             default:
