@@ -14,9 +14,9 @@ function Sidebar() {
 
     return (
         <Box sx={{
-            width: '200px',
+            width: '220px',
             height: '100vh',
-            backgroundColor: 'white',
+            backgroundColor: 'grey',
             position: 'fixed',
             left: 0,
             top: HEADER_HEIGHT,
@@ -65,7 +65,7 @@ function MainContent() {
             marginLeft: '200px',
             marginTop: `${HEADER_HEIGHT}px`,
             minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
-            backgroundColor: '#f5f5f5',
+            backgroundColor: 'grey',
             padding: '20px'
         }}>
             {renderContent()}
