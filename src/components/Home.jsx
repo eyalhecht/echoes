@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
+import {callApiGateway} from "../firebaseConfig.js";
+import PostCard from "./PostCard.jsx";
 
 const generatePosts = (startId = 1, count = 10) => {
     const posts = [];
@@ -14,27 +16,6 @@ const generatePosts = (startId = 1, count = 10) => {
     return posts;
 };
 
-function PostCard({ post }) {
-    return (
-        <Box sx={{
-            backgroundColor: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '16px'
-        }}>
-            <Box sx={{ fontWeight: 'bold', marginBottom: '8px' }}>
-                {post.user}
-            </Box>
-            <Box sx={{ marginBottom: '8px', color: '#666', fontSize: '12px' }}>
-                {post.timestamp}
-            </Box>
-            <Box sx={{ lineHeight: '1.5' }}>
-                {post.content}
-            </Box>
-        </Box>
-    );
-}
 
 function Home() {
     const [posts, setPosts] = useState([]);
@@ -42,7 +23,18 @@ function Home() {
 
     // Load initial posts
     useEffect(() => {
-        setPosts(generatePosts(1, 10));
+        const getPosts = async () => {
+            const response = await callApiGateway({
+                action: 'getFeed',
+                payload: {
+                    limit: 10,
+                    lastPostId: null // Start from beginning
+                }
+            });
+            setPosts(response.data.posts)
+            console.log("posts", response);
+        }
+        getPosts();
     }, []);
 
     // Infinite scroll handler
@@ -72,8 +64,8 @@ function Home() {
         <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
             <h1 style={{ marginBottom: '20px' }}>Home</h1>
 
-            {posts.map((post) => (
-                <PostCard key={post.id} post={post} />
+            {posts.map((post, index) => (
+                <PostCard key={index} post={post} />
             ))}
 
             {loading && (

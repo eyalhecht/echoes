@@ -42,7 +42,6 @@ function Sidebar() {
 
 function MainContent() {
     const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
-    console.log(activeSidebarItem);
 
     const renderContent = () => {
         switch (activeSidebarItem) {
