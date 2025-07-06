@@ -16,20 +16,24 @@ import {
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage, auth, functions} from "../firebaseConfig.js";
 import {httpsCallable} from "firebase/functions";
+import {GeoPoint} from "firebase/firestore";
+import LocationPickerModal from './LocationPickerModal'; // Import the new modal component
 
 const UploadPost = () => {
     const [description, setDescription] = useState('');
     const [type, setType] = useState('photo'); // Default to 'photo'
     const [files, setFiles] = useState([]); // Array to store multiple files
     const [filePreviews, setFilePreviews] = useState([]); // Array for file previews
-    const [location, setLocation] = useState('');
+    const [location, setLocation] = useState(null); // This will now display coordinates
     const [years, setYears] = useState([]); // Array for years
     const [currentYearInput, setCurrentYearInput] = useState(''); // For year input field
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState(null);
+    const [isMapModalOpen, setIsMapModalOpen] = useState(false); // State for map modal
 
     const fileInputRef = useRef(null);
     const handleDescriptionChange = (event) => {
@@ -39,9 +43,6 @@ const UploadPost = () => {
         setType(event.target.value);
         setFiles([]);
         setFilePreviews([]);
-    };
-    const handleLocationChange = (event) => {
-        setLocation(event.target.value);
     };
     const handleYearInputChange = (event) => {
         setCurrentYearInput(event.target.value);
@@ -129,7 +130,7 @@ const UploadPost = () => {
                     description: description.trim(),
                     type: type,
                     fileUrls: fileUrls, // Array of download URLs from Storage or YouTube URL(s)
-                    location: location.trim(),
+                    location: location ? new GeoPoint(location.lat, location.lng) : null,
                     year: years, // Array of years (numbers)
                     // Backend will handle userId, likesCount, commentsCount, bookmarksCount, createdAt, updatedAt
                 }
@@ -144,7 +145,7 @@ const UploadPost = () => {
             setType('photo'); // Reset to default type
             setFiles([]);
             setFilePreviews([]);
-            setLocation('');
+            setLocation(null);
             setYears([]);
             setCurrentYearInput('');
             // You might want to display a success message to the user, e.g., using a Snackbar
@@ -305,17 +306,23 @@ const UploadPost = () => {
                 />
             )}
 
-            {/* Location Input */}
-            <TextField
-                label="Location (e.g., City, Country)"
-                fullWidth
-                variant="outlined"
-                value={location}
-                onChange={handleLocationChange}
-                sx={{ mb: 3 }}
-                disabled={isUploading}
-                placeholder="Where was this taken/found?"
-            />
+            <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <IconButton
+                    color="primary"
+                    onClick={() => {
+                        setIsMapModalOpen(true);
+                    }}
+                    disabled={isUploading}
+                    aria-label="select location on map"
+                >
+                    <LocationOnIcon />
+                </IconButton>
+            </Box>
+            {location && (
+                <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                    📍 {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                </Typography>
+            )}
 
             {/* Year(s) Input and Display */}
             <Box sx={{ mb: 3 }}>
@@ -371,6 +378,16 @@ const UploadPost = () => {
             >
                 {isUploading ? <CircularProgress size={24} color="inherit" /> : 'Create Post'}
             </Button>
+            <LocationPickerModal
+                open={isMapModalOpen}
+                onClose={() => {
+                    setIsMapModalOpen(false);
+                }}
+                onSelectLocation={(coords) => {
+                    setLocation(coords);
+                }}
+                initialLocation={{ lat: 40.7128, lng: -74.0060 }} // Pass current selected coordinates to center the map
+            />
         </Paper>
     );
 };

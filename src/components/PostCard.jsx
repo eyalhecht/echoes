@@ -298,7 +298,7 @@ function PostCard({ post }) {
                             width: 400,
                             bgcolor: 'white',
                         }}>
-                            <PostMap/>
+                            <PostMap center={location}/>
 
                         </Box>
                     </Modal>
