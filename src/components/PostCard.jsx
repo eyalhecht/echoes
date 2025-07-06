@@ -5,6 +5,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
 import { format } from 'date-fns'; // For better date formatting
 import { useSelector } from 'react-redux';
 import { callApiGateway } from '../firebaseConfig'; // Adjust path as needed
@@ -15,7 +16,10 @@ function PostCard({ post }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [liked, setLiked] = useState(post.likedByCurrentUser);
     const [likesCount, setLikesCount] = useState(post.likesCount || 0);
-    const [isUpdating, setIsUpdating] = useState(false);
+    const [isLikeUpdating, setIsLikeUpdating] = useState(false);
+    const [bookmarked, setBookmarked] = useState(post.bookmarkedByCurrentUser || false);
+    const [bookmarksCount, setBookmarksCount] = useState(post.bookmarksCount || 0);
+    const [isBookmarkUpdating, setIsBookmarkUpdating] = useState(false);
 
     const {
         id: postId,
@@ -27,7 +31,6 @@ function PostCard({ post }) {
         location,
         year,
         commentsCount,
-        bookmarksCount,
         createdAt,
         // postId, userId, updatedAt are also there but not directly displayed here
     } = post;
@@ -48,13 +51,13 @@ function PostCard({ post }) {
 
 
     const handleLikeToggle = async () => {
-        if (!postId || !user?.uid || isUpdating) return;
+        if (!postId || !user?.uid || isLikeUpdating) return;
 
         const originalLiked = liked;
         const originalCount = likesCount;
 
         try {
-            setIsUpdating(true);
+            setIsLikeUpdating(true);
             // Optimistic update
             setLiked(!liked);
             setLikesCount(prev => !liked ? prev + 1 : Math.max(0, prev - 1));
@@ -78,7 +81,46 @@ function PostCard({ post }) {
             }
 
         } finally {
-            setIsUpdating(false);
+            setIsLikeUpdating(false);
+        }
+    };
+
+    const handleBookmarkToggle = async () => {
+        if (!postId || !user?.uid || isBookmarkUpdating) return;
+
+        const originalBookmarked = bookmarked;
+        const originalCount = bookmarksCount;
+
+        try {
+            setIsBookmarkUpdating(true);
+
+            // Optimistic update
+            setBookmarked(!bookmarked);
+            setBookmarksCount(prev => !bookmarked ? prev + 1 : Math.max(0, prev - 1));
+
+            await callApiGateway({
+                action: 'toggleBookmark',
+                payload: { postId }
+            });
+
+        } catch (error) {
+            console.error("Error toggling bookmark:", error);
+
+            // Revert optimistic update on error
+            setBookmarked(originalBookmarked);
+            setBookmarksCount(originalCount);
+
+            // Handle specific error cases
+            if (error.code === 'unauthenticated') {
+                alert('Please log in to bookmark posts');
+            } else if (error.code === 'not-found') {
+                alert('Post not found');
+            } else {
+                alert('Failed to update bookmark. Please try again.');
+            }
+
+        } finally {
+            setIsBookmarkUpdating(false);
         }
     };
 
@@ -212,8 +254,17 @@ function PostCard({ post }) {
                     </IconButton>
                     <Typography variant="body2">{commentsCount}</Typography>
 
-                    <IconButton aria-label="bookmark">
-                        <BookmarkBorderIcon />
+                    <IconButton
+                        aria-label="bookmark"
+                        onClick={handleBookmarkToggle}
+                        sx={{
+                            color: bookmarked ? '#1976d2' : 'inherit',
+                            '&:disabled': {
+                                opacity: 0.6
+                            }
+                        }}
+                    >
+                        {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
                     </IconButton>
                     <Typography variant="body2">{bookmarksCount}</Typography>
                 </Box>
