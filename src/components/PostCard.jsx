@@ -2,14 +2,23 @@ import React, { useState } from 'react';
 import { Box, Typography, Avatar, Card, CardHeader, CardContent, CardMedia, IconButton, Button } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { format } from 'date-fns'; // For better date formatting
+import { useSelector } from 'react-redux';
+import { callApiGateway } from '../firebaseConfig'; // Adjust path as needed
 
 function PostCard({ post }) {
+    const { user } = useSelector(state => state.auth);
+
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-    // Destructure properties from the post object, matching your schema and backend additions
+    const [liked, setLiked] = useState(post.likedByCurrentUser);
+    const [likesCount, setLikesCount] = useState(post.likesCount || 0);
+    const [isUpdating, setIsUpdating] = useState(false);
+
     const {
+        id: postId,
         userDisplayName,
         userProfilePicUrl,
         description,
@@ -17,7 +26,6 @@ function PostCard({ post }) {
         files, // This will be an array of URLs, or a single YouTube URL
         location,
         year,
-        likesCount,
         commentsCount,
         bookmarksCount,
         createdAt,
@@ -38,7 +46,42 @@ function PostCard({ post }) {
     // Format the timestamp for display
     const formattedTimestamp = "time here"
 
-    // Determine the media to display
+
+    const handleLikeToggle = async () => {
+        if (!postId || !user?.uid || isUpdating) return;
+
+        const originalLiked = liked;
+        const originalCount = likesCount;
+
+        try {
+            setIsUpdating(true);
+            // Optimistic update
+            setLiked(!liked);
+            setLikesCount(prev => !liked ? prev + 1 : Math.max(0, prev - 1));
+
+            await callApiGateway({
+                action: 'likePost',
+                payload: { postId }
+            });
+
+        } catch (error) {
+            console.error("Error toggling like:", error);
+
+            // Revert to original state
+            setLiked(originalLiked);
+            setLikesCount(originalCount);
+
+            if (error.code === 'unauthenticated') {
+                alert('Please log in to like posts');
+            } else {
+                alert('Failed to update like. Please try again.');
+            }
+
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     const renderMedia = () => {
         if (!files || files.length === 0) {
             return null; // No files to display
@@ -150,8 +193,17 @@ function PostCard({ post }) {
                 )}
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton aria-label="like">
-                        <FavoriteIcon sx={{ color: 'red' }} />
+                    <IconButton
+                        aria-label="like"
+                        onClick={handleLikeToggle}
+                        sx={{
+                            color: liked ? 'red' : 'inherit',
+                            '&:disabled': {
+                                opacity: 0.6
+                            }
+                        }}
+                    >
+                        {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                     </IconButton>
                     <Typography variant="body2">{likesCount}</Typography>
 
