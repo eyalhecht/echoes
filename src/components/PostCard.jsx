@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Typography, Avatar, Card, CardHeader, CardContent, CardMedia, IconButton } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Avatar, Card, CardHeader, CardContent, CardMedia, IconButton, Button } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
@@ -7,6 +7,7 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { format } from 'date-fns'; // For better date formatting
 
 function PostCard({ post }) {
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     // Destructure properties from the post object, matching your schema and backend additions
     const {
         userDisplayName,
@@ -22,6 +23,17 @@ function PostCard({ post }) {
         createdAt,
         // postId, userId, updatedAt are also there but not directly displayed here
     } = post;
+
+    const MAX_DESCRIPTION_LENGTH = 150;
+    const shouldTruncate = description?.length > MAX_DESCRIPTION_LENGTH;
+
+    const getDisplayedText = () => {
+        if (!description) return '';
+        if (!shouldTruncate || isDescriptionExpanded) {
+            return description;
+        }
+        return description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
+    };
 
     // Format the timestamp for display
     const formattedTimestamp = "time here"
@@ -107,9 +119,35 @@ function PostCard({ post }) {
             />
             {renderMedia()}
             <CardContent>
-                <Typography variant="body1" color="text.primary" sx={{ marginBottom: '16px' }}>
-                    {description}
+                <Typography
+                    variant="body1"
+                    color="text.primary"
+                    sx={{
+                        marginBottom: shouldTruncate ? '8px' : '16px',
+                        whiteSpace: 'pre-wrap' // Preserve line breaks
+                    }}
+                >
+                    {getDisplayedText()}
                 </Typography>
+
+                {shouldTruncate && (
+                    <Button
+                        variant="text"
+                        size="small"
+                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        sx={{
+                            padding: 0,
+                            marginBottom: '16px',
+                            textTransform: 'none',
+                            '&:hover': {
+                                backgroundColor: 'transparent',
+                                textDecoration: 'underline'
+                            }
+                        }}
+                    >
+                        {isDescriptionExpanded ? 'Read less' : 'Read more'}
+                    </Button>
+                )}
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <IconButton aria-label="like">
