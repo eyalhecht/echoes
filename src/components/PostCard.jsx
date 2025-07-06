@@ -1,14 +1,27 @@
 import React, { useState } from 'react';
-import { Box, Typography, Avatar, Card, CardHeader, CardContent, CardMedia, IconButton, Button } from '@mui/material';
+import {
+    Box,
+    Typography,
+    Avatar,
+    Card,
+    CardHeader,
+    CardContent,
+    CardMedia,
+    IconButton,
+    Button,
+    Modal
+} from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { format } from 'date-fns'; // For better date formatting
 import { useSelector } from 'react-redux';
-import { callApiGateway } from '../firebaseConfig'; // Adjust path as needed
+import { callApiGateway } from '../firebaseConfig';
+import PostMap from "./PostMap.jsx"; // Adjust path as needed
 
 function PostCard({ post }) {
     const { user } = useSelector(state => state.auth);
@@ -20,6 +33,7 @@ function PostCard({ post }) {
     const [bookmarked, setBookmarked] = useState(post.bookmarkedByCurrentUser || false);
     const [bookmarksCount, setBookmarksCount] = useState(post.bookmarksCount || 0);
     const [isBookmarkUpdating, setIsBookmarkUpdating] = useState(false);
+    const [locationModal, setLocationModal] = useState(false);
 
     const {
         id: postId,
@@ -267,6 +281,27 @@ function PostCard({ post }) {
                         {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
                     </IconButton>
                     <Typography variant="body2">{bookmarksCount}</Typography>
+                    <IconButton onClick={()=> setLocationModal(true)} aria-label="comment">
+                        <LocationOnIcon />
+                    </IconButton>
+                    <Modal
+                        open={locationModal}
+                        onClose={()=> setLocationModal(false)}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 400,
+                            bgcolor: 'white',
+                        }}>
+                            <PostMap/>
+
+                        </Box>
+                    </Modal>
                 </Box>
             </CardContent>
         </Card>
