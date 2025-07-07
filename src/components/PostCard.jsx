@@ -19,20 +19,22 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { format } from 'date-fns'; // For better date formatting
-import { useSelector } from 'react-redux';
-import { callApiGateway } from '../firebaseConfig';
+import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
 import PostMap from "./PostMap.jsx"; // Adjust path as needed
 
 function PostCard({ post }) {
-    const { user } = useSelector(state => state.auth);
+    const {
+        liked,
+        likesCount,
+        isLikeUpdating,
+        bookmarked,
+        bookmarksCount,
+        isBookmarkUpdating,
+        handleLikeToggle,
+        handleBookmarkToggle,
+    } = usePostInteractions(post);
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-    const [liked, setLiked] = useState(post.likedByCurrentUser);
-    const [likesCount, setLikesCount] = useState(post.likesCount || 0);
-    const [isLikeUpdating, setIsLikeUpdating] = useState(false);
-    const [bookmarked, setBookmarked] = useState(post.bookmarkedByCurrentUser || false);
-    const [bookmarksCount, setBookmarksCount] = useState(post.bookmarksCount || 0);
-    const [isBookmarkUpdating, setIsBookmarkUpdating] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
 
     const {
@@ -62,81 +64,6 @@ function PostCard({ post }) {
 
     // Format the timestamp for display
     const formattedTimestamp = "time here"
-
-
-    const handleLikeToggle = async () => {
-        if (!postId || !user?.uid || isLikeUpdating) return;
-
-        const originalLiked = liked;
-        const originalCount = likesCount;
-
-        try {
-            setIsLikeUpdating(true);
-            // Optimistic update
-            setLiked(!liked);
-            setLikesCount(prev => !liked ? prev + 1 : Math.max(0, prev - 1));
-
-            await callApiGateway({
-                action: 'likePost',
-                payload: { postId }
-            });
-
-        } catch (error) {
-            console.error("Error toggling like:", error);
-
-            // Revert to original state
-            setLiked(originalLiked);
-            setLikesCount(originalCount);
-
-            if (error.code === 'unauthenticated') {
-                alert('Please log in to like posts');
-            } else {
-                alert('Failed to update like. Please try again.');
-            }
-
-        } finally {
-            setIsLikeUpdating(false);
-        }
-    };
-
-    const handleBookmarkToggle = async () => {
-        if (!postId || !user?.uid || isBookmarkUpdating) return;
-
-        const originalBookmarked = bookmarked;
-        const originalCount = bookmarksCount;
-
-        try {
-            setIsBookmarkUpdating(true);
-
-            // Optimistic update
-            setBookmarked(!bookmarked);
-            setBookmarksCount(prev => !bookmarked ? prev + 1 : Math.max(0, prev - 1));
-
-            await callApiGateway({
-                action: 'toggleBookmark',
-                payload: { postId }
-            });
-
-        } catch (error) {
-            console.error("Error toggling bookmark:", error);
-
-            // Revert optimistic update on error
-            setBookmarked(originalBookmarked);
-            setBookmarksCount(originalCount);
-
-            // Handle specific error cases
-            if (error.code === 'unauthenticated') {
-                alert('Please log in to bookmark posts');
-            } else if (error.code === 'not-found') {
-                alert('Post not found');
-            } else {
-                alert('Failed to update bookmark. Please try again.');
-            }
-
-        } finally {
-            setIsBookmarkUpdating(false);
-        }
-    };
 
     const renderMedia = () => {
         if (!files || files.length === 0) {
