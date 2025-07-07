@@ -225,7 +225,7 @@ function PostCard({ post }) {
                             width: 400,
                             bgcolor: 'white',
                         }}>
-                            <PostMap center={{ lat: location._latitude, lng: location._longitude }}/>
+                            <PostMap center={{ lat: location?._latitude, lng: location?._longitude }}/>
 
                         </Box>
                     </Modal>
