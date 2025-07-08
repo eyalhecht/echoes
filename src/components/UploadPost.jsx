@@ -121,8 +121,7 @@ const UploadPost = () => {
                 fileUrls = files; // Pass the YouTube URL(s) as is
             }
 
-            // --- Step 2: Call the Backend Cloud Function to create the post ---
-
+            // --- Step 2: Call the Backendd Cloud Function to create the post ---
             // The payload for the backend function
             const payload = {
                 action: 'createPost', // Specify the action for your apiGateway
