@@ -21,6 +21,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { format } from 'date-fns'; // For better date formatting
 import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
 import PostMap from "./PostMap.jsx"; // Adjust path as needed
+import PostDetailView from "./PostDetailView.jsx"; // Adjust path as needed
 
 function PostCard({ post }) {
     const {
@@ -36,6 +37,7 @@ function PostCard({ post }) {
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
+    const [detailViewOpen, setDetailViewOpen] = useState(false);
 
     const {
         id: postId,
@@ -109,7 +111,9 @@ function PostCard({ post }) {
     };
 
     return (
-        <Card sx={{
+        <>
+        <Card
+            sx={{
             maxWidth: 600, // Max width for a typical post card
             margin: '16px auto', // Center the card and add some vertical spacing
             borderRadius: '12px',
@@ -143,7 +147,17 @@ function PostCard({ post }) {
                     </>
                 }
             />
+            <Box
+                tabIndex={0}
+                onKeyDown={(e)=>{
+                    if (e.key === ' ') {
+                        setDetailViewOpen(true)
+                    }
+                }}
+                onClick={() => setDetailViewOpen(true)}
+            >
             {renderMedia()}
+            </Box>
             <CardContent>
                 <Typography
                     variant="body1"
@@ -232,6 +246,14 @@ function PostCard({ post }) {
                 </Box>
             </CardContent>
         </Card>
+    {detailViewOpen && (
+        <PostDetailView
+            post={post}
+            open={detailViewOpen}
+            onClose={() => setDetailViewOpen(false)}
+        />
+    )}
+    </>
     );
 }
 
