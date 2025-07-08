@@ -1,0 +1,67 @@
+---
+config:
+  layout: fixed
+---
+
+flowchart TD
+    FIRESTORE["Firestore Database"] --> USERS["users collection"]
+    FIRESTORE --> POSTS["posts collection"]
+
+    USERS --> USER_DOC["users/{userId}<br/>username: string<br/>displayName: string<br/>email: string<br/>bio: string<br/>profilePictureUrl: string<br/>postsCount: number<br/>createdAt: timestamp<br/>updatedAt: timestamp"]
+
+    USER_DOC --> USER_POSTS["posts subcollection<br/>- Reference to user's posts"]
+    USER_DOC --> USER_LIKES["likes subcollection<br/>- Posts user has liked"]
+    USER_DOC --> USER_BOOKMARKS["bookmarks subcollection<br/>- Posts user has bookmarked"]
+    USER_DOC --> USER_FOLLOWING["following subcollection<br/>- Users this user follows"]
+    USER_DOC --> USER_FOLLOWERS["followers subcollection<br/>- Users who follow this user"]
+
+    USER_POSTS --> USER_POST_DOC["posts/{postId}<br/>createdAt: timestamp"]
+    USER_LIKES --> USER_LIKE_DOC["likes/{postId}<br/>createdAt: timestamp"]
+    USER_BOOKMARKS --> USER_BOOKMARK_DOC["bookmarks/{postId}<br/>createdAt: timestamp"]
+    USER_FOLLOWING --> USER_FOLLOWING_DOC["following/{targetUserId}<br/>createdAt: timestamp"]
+    USER_FOLLOWERS --> USER_FOLLOWER_DOC["followers/{followerUserId}<br/>createdAt: timestamp"]
+
+    POSTS --> POST_DOC["posts/{postId}<br/>userId: string<br/>type: string (photo/video/document/item/youtube)<br/>description: string<br/>files: array<br/>primaryFileUrl: string<br/>hashtags: array<br/>location: string<br/>yearTag: string<br/>likesCount: number<br/>commentsCount: number<br/>bookmarksCount: number<br/>createdAt: timestamp<br/>updatedAt: timestamp"]
+
+    POST_DOC --> POST_LIKES["likes subcollection<br/>- Users who liked this post"]
+    POST_DOC --> POST_COMMENTS["comments subcollection<br/>- Comments on this post"]
+
+    POST_LIKES --> POST_LIKE_DOC["likes/{userId}<br/>createdAt: timestamp"]
+    POST_COMMENTS --> POST_COMMENT_DOC["comments/{commentId}<br/>userId: string<br/>text: string<br/>userAvatar: string<br/>userInitials: string<br/>userName: string<br/>createdAt: timestamp"]
+
+%% Relationships
+    USER_POST_DOC -. references .-> POST_DOC
+    USER_LIKE_DOC -. references .-> POST_DOC
+    USER_BOOKMARK_DOC -. references .-> POST_DOC
+    POST_DOC -. created by .-> USER_DOC
+    POST_LIKE_DOC -. references .-> USER_DOC
+    POST_COMMENT_DOC -. created by .-> USER_DOC
+    USER_FOLLOWING_DOC -. references .-> USER_DOC
+    USER_FOLLOWER_DOC -. references .-> USER_DOC
+
+%% Classes for styling
+    USERS:::collections
+    POSTS:::collections
+    USER_DOC:::documents
+    POST_DOC:::documents
+
+    USER_POSTS:::collections
+    USER_LIKES:::collections
+    USER_BOOKMARKS:::collections
+    USER_FOLLOWING:::collections
+    USER_FOLLOWERS:::collections
+
+    USER_POST_DOC:::documents
+    USER_LIKE_DOC:::documents
+    USER_BOOKMARK_DOC:::documents
+    USER_FOLLOWING_DOC:::documents
+    USER_FOLLOWER_DOC:::documents
+
+    POST_LIKES:::collections
+    POST_COMMENTS:::collections
+
+    POST_LIKE_DOC:::documents
+    POST_COMMENT_DOC:::documents
+
+    classDef collections fill:white,stroke:black,stroke-width:1px;
+    classDef documents fill:white,stroke:black,stroke-width:1px;

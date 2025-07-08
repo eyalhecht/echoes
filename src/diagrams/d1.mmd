@@ -1,0 +1,104 @@
+---
+config:
+  layout: fixed
+---
+flowchart TD
+ subgraph subGraph1["User Actions & Required Updates"]
+        ACTION_NEWPOST["Create New Post"]
+        ACTION_LIKE["Like/Unlike Post"]
+        ACTION_COMMENT["Add/Delete Comment"]
+        ACTION_BOOKMARK["Bookmark/Unbookmark Post"]
+        ACTION_FOLLOW["Follow/Unfollow User"]
+        ACTION_UPDATEPROFILE["Update User Profile"]
+  end
+ subgraph subGraph2["Post Creation Flow"]
+        UPDATE_POST["Create post document in posts collection"]
+        UPDATE_USERPOSTS["Add postId to users/{userId}/posts/{postId}"]
+        INCREMENT_POSTCOUNT["Increment postsCount in user document"]
+  end
+ subgraph subGraph3["Like Flow"]
+        CHECK_LIKE{"Already liked?"}
+        ADD_POSTLIKE["Add to posts/{postId}/likes/{userId}"]
+        DELETE_POSTLIKE["Delete from posts/{postId}/likes/{userId}"]
+        ADD_USERLIKE["Add to users/{userId}/likes/{postId}"]
+        DELETE_USERLIKE["Delete from users/{userId}/likes/{postId}"]
+        INCREMENT_LIKECOUNT["Increment likesCount in post document"]
+        DECREMENT_LIKECOUNT["Decrement likesCount in post document"]
+  end
+ subgraph subGraph4["Comment Flow"]
+        CHECK_COMMENT{"Adding or Deleting?"}
+        ADD_COMMENT["Add to posts/{postId}/comments/{commentId}"]
+        DELETE_COMMENT["Delete from posts/{postId}/comments/{commentId}"]
+        INCREMENT_COMMENTCOUNT["Increment commentsCount in post document"]
+        DECREMENT_COMMENTCOUNT["Decrement commentsCount in post document"]
+  end
+ subgraph subGraph5["Bookmark Flow"]
+        CHECK_BOOKMARK{"Already bookmarked?"}
+        ADD_BOOKMARK["Add to users/{userId}/bookmarks/{postId}"]
+        DELETE_BOOKMARK["Delete from users/{userId}/bookmarks/{postId}"]
+        INCREMENT_BOOKMARKCOUNT["Increment bookmarksCount in post document"]
+        DECREMENT_BOOKMARKCOUNT["Decrement bookmarksCount in post document"]
+  end
+ subgraph subGraph6["Follow Flow"]
+        CHECK_FOLLOW{"Already following?"}
+        ADD_FOLLOWING["Add to users/{userId}/following/{targetUserId}"]
+        DELETE_FOLLOWING["Delete from users/{userId}/following/{targetUserId}"]
+        ADD_FOLLOWER["Add to users/{targetUserId}/followers/{userId}"]
+        DELETE_FOLLOWER["Delete from users/{targetUserId}/followers/{userId}"]
+  end
+ subgraph subGraph7["Profile Update Flow"]
+        UPDATE_USERDATA["Update fields in users/{userId}"]
+        UPDATE_USERNAME["Update username display in UI components"]
+  end
+ subgraph subGraph8["Query Patterns"]
+        QUERY_HOMEFEED["Home Feed Query"]
+        GET_USER_FOLLOWING["Get all users/{userId}/following/{*}"]
+        FETCH_FOLLOWED_POSTS["Fetch posts where userId in following list
+        or use users/{userId}/feed/ subcollection"]
+        QUERY_PROFILE["Profile/User Posts Query"]
+        GET_USER_POSTS["Query users/{userId}/posts/{*}"]
+        FETCH_USERPOST_DETAILS["Fetch post details for each postId"]
+        QUERY_LIKES["User Likes Query"]
+        GET_USER_LIKES["Query users/{userId}/likes/{*}"]
+        FETCH_LIKEDPOST_DETAILS["Fetch post details for each postId"]
+        QUERY_BOOKMARKS["User Bookmarks Query"]
+        GET_USER_BOOKMARKS["Query users/{userId}/bookmarks/{*}"]
+        FETCH_BOOKMARKEDPOST_DETAILS["Fetch post details for each postId"]
+  end
+    ACTION_NEWPOST --> UPDATE_POST
+    UPDATE_POST --> UPDATE_USERPOSTS
+    UPDATE_USERPOSTS --> INCREMENT_POSTCOUNT
+    ACTION_LIKE --> CHECK_LIKE
+    CHECK_LIKE -- No --> ADD_POSTLIKE
+    CHECK_LIKE -- Yes --> DELETE_POSTLIKE
+    ADD_POSTLIKE --> ADD_USERLIKE
+    DELETE_POSTLIKE --> DELETE_USERLIKE
+    ADD_USERLIKE --> INCREMENT_LIKECOUNT
+    DELETE_USERLIKE --> DECREMENT_LIKECOUNT
+    ACTION_COMMENT --> CHECK_COMMENT
+    CHECK_COMMENT -- Adding --> ADD_COMMENT
+    CHECK_COMMENT -- Deleting --> DELETE_COMMENT
+    ADD_COMMENT --> INCREMENT_COMMENTCOUNT
+    DELETE_COMMENT --> DECREMENT_COMMENTCOUNT
+    ACTION_BOOKMARK --> CHECK_BOOKMARK
+    CHECK_BOOKMARK -- No --> ADD_BOOKMARK
+    CHECK_BOOKMARK -- Yes --> DELETE_BOOKMARK
+    ADD_BOOKMARK --> INCREMENT_BOOKMARKCOUNT
+    DELETE_BOOKMARK --> DECREMENT_BOOKMARKCOUNT
+    ACTION_FOLLOW --> CHECK_FOLLOW
+    CHECK_FOLLOW -- No --> ADD_FOLLOWING
+    CHECK_FOLLOW -- Yes --> DELETE_FOLLOWING
+    ADD_FOLLOWING --> ADD_FOLLOWER
+    DELETE_FOLLOWING --> DELETE_FOLLOWER
+    ADD_FOLLOWER --> UPDATE_COUNTS_ADD
+    DELETE_FOLLOWER --> UPDATE_COUNTS_DELETE
+    ACTION_UPDATEPROFILE --> UPDATE_USERDATA
+    UPDATE_USERDATA -- If username changed --> UPDATE_USERNAME
+    QUERY_HOMEFEED --> GET_USER_FOLLOWING
+    GET_USER_FOLLOWING --> FETCH_FOLLOWED_POSTS
+    QUERY_PROFILE --> GET_USER_POSTS
+    GET_USER_POSTS --> FETCH_USERPOST_DETAILS
+    QUERY_LIKES --> GET_USER_LIKES
+    GET_USER_LIKES --> FETCH_LIKEDPOST_DETAILS
+    QUERY_BOOKMARKS --> GET_USER_BOOKMARKS
+    GET_USER_BOOKMARKS --> FETCH_BOOKMARKEDPOST_DETAILS

@@ -1,137 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setActiveSidebarItem } from '../store/slices/uiSlice';
+import { Box } from '@mui/material';
+import Header from './Header.jsx';
+import Home from './Home.jsx';
+import UploadPost from "./UploadPost.jsx";
 
-const generatePosts = (startId = 1, count = 10) => {
-    const posts = [];
-    for (let i = 0; i < count; i++) {
-        posts.push({
-            id: startId + i,
-            user: `User ${startId + i}`,
-            content: `This is post content number ${startId + i}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
-            timestamp: `${Math.floor(Math.random() * 24)} hours ago`
-        });
-    }
-    return posts;
-};
-
-function PostCard({ post }) {
-    return (
-        <div style={{
-            backgroundColor: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '16px'
-        }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-                {post.user}
-            </div>
-            <div style={{ marginBottom: '8px', color: '#666', fontSize: '12px' }}>
-                {post.timestamp}
-            </div>
-            <div style={{ lineHeight: '1.5' }}>
-                {post.content}
-            </div>
-        </div>
-    );
-}
+const HEADER_HEIGHT = 40;
 
 function Sidebar() {
-    const [activeItem, setActiveItem] = useState('Home');
-    const items = ['Home', 'Profile', 'Friends', 'Messages', 'Settings'];
+    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
+    const dispatch = useDispatch();
+    const items = ['Home', 'Profile', 'Friends', 'Upload', 'Settings'];
 
     return (
-        <div style={{
-            width: '200px',
+        <Box sx={{
+            width: '220px',
             height: '100vh',
-            backgroundColor: 'white',
-            // borderRight: '1px solid #ddd',
+            backgroundColor: 'grey',
             position: 'fixed',
             left: 0,
-            top: 0
+            top: HEADER_HEIGHT,
+            borderRight: '1px solid #ddd'
         }}>
             {items.map((item) => (
-                <div
+                <Box
                     key={item}
-                    onClick={() => setActiveItem(item)}
-                    style={{
+                    onClick={() => dispatch(setActiveSidebarItem(item))}
+                    sx={{
                         padding: '16px',
                         cursor: 'pointer',
-                        backgroundColor: activeItem === item ? '#e3f2fd' : 'transparent',
+                        backgroundColor: activeSidebarItem === item ? '#e3f2fd' : 'transparent',
                     }}
                 >
                     {item}
-                </div>
+                </Box>
             ))}
-        </div>
+        </Box>
     );
 }
 
 function MainContent() {
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
+    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
 
-    // Load initial posts
-    useEffect(() => {
-        setPosts(generatePosts(1, 10));
-    }, []);
-
-    // Infinite scroll handler
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop >=
-                document.documentElement.offsetHeight - 1000 && !loading) {
-                loadMorePosts();
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [loading]);
-
-    const loadMorePosts = () => {
-        setLoading(true);
-        // Simulate API call delay
-        setTimeout(() => {
-            const newPosts = generatePosts(posts.length + 1, 5);
-            setPosts(prevPosts => [...prevPosts, ...newPosts]);
-            setLoading(false);
-        }, 1000);
+    const renderContent = () => {
+        switch (activeSidebarItem) {
+            case 'Home':
+                return <Home />;
+            case 'Profile':
+                return <Box>Profile Page Coming Soon...</Box>;
+            case 'Friends':
+                return <Box>Friends Page Coming Soon...</Box>;
+            case 'Upload':
+                return <UploadPost>Upload Page Coming Soon...</UploadPost>;
+            case 'Settings':
+                return <Box>Settings Page Coming Soon...</Box>;
+            default:
+                return <Home />;
+        }
     };
 
     return (
-        <div style={{
+        <Box sx={{
             marginLeft: '200px',
-            minHeight: '100vh',
-            backgroundColor: '#f5f5f5',
+            marginTop: `${HEADER_HEIGHT}px`,
+            minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+            backgroundColor: 'grey',
             padding: '20px'
         }}>
-            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-                <h1 style={{ marginBottom: '20px' }}>Home</h1>
-
-                {posts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                ))}
-
-                {loading && (
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '20px',
-                        color: '#666'
-                    }}>
-                        Loading more posts...
-                    </div>
-                )}
-            </div>
-        </div>
+            {renderContent()}
+        </Box>
     );
 }
 
 export default function Layout() {
     return (
-        <div>
+        <Box>
+            <Header height={HEADER_HEIGHT} />
             <Sidebar />
             <MainContent />
-        </div>
+        </Box>
     );
 }

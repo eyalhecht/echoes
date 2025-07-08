@@ -1,0 +1,75 @@
+// src/components/Auth/Login.jsx
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom'; // <--- Import useNavigate and Link
+import { loginWithEmail, signInWithGoogle} from "../store/slices/authSlice.js";
+
+function Login() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate(); // <--- Initialize useNavigate hook
+    const { loading, error } = useSelector(state => state.auth);
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleEmailLogin = async (e) => {
+        e.preventDefault();
+        try {
+            await dispatch(loginWithEmail({ email, password })).unwrap();
+            navigate('/dashboard'); // <--- Redirect to dashboard on success
+        } catch (err) {
+            console.error("Login component caught error:", err);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            await dispatch(signInWithGoogle()).unwrap();
+            navigate('/dashboard'); // <--- Redirect to dashboard on success
+        } catch (err) {
+            console.error("Google Login component caught error:", err);
+        }
+    };
+
+    return (
+        <div style={{textAlign: 'center', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', maxWidth: '400px', margin: '20px auto'}}>
+            <h3>Login to Echoes</h3>
+            <form onSubmit={handleEmailLogin}>
+                <div style={{marginBottom: '10px'}}>
+                    <label htmlFor="email" style={{display: 'block', marginBottom: '5px'}}>Email:</label>
+                    <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        style={{width: '90%', padding: '8px'}}
+                    />
+                </div>
+                <div style={{marginBottom: '15px'}}>
+                    <label htmlFor="password" style={{display: 'block', marginBottom: '5px'}}>Password:</label>
+                    <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        style={{width: '90%', padding: '8px'}}
+                    />
+                </div>
+                <button type="submit" disabled={loading} style={{padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
+                    {loading ? 'Logging In...' : 'Login with Email'}
+                </button>
+            </form>
+            <p style={{margin: '15px 0'}}>OR</p>
+            <button onClick={handleGoogleLogin} disabled={loading} style={{padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
+                {loading ? 'Signing In...' : 'Login with Google'}
+            </button>
+
+            {error && <p style={{ color: 'red', marginTop: '15px' }}>Error: {error}</p>}
+            <p style={{marginTop: '20px'}}>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+        </div>
+    );
+}
+
+export default Login;
