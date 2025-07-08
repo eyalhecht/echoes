@@ -62,7 +62,6 @@ function Home() {
 
     return (
         <Box sx={{ maxWidth: '600px', margin: '0 auto' }}>
-            <h1 style={{ marginBottom: '20px' }}>Home</h1>
 
             {posts.map((post, index) => (
                 <PostCard key={index} post={post} />

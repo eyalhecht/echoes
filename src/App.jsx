@@ -67,13 +67,6 @@ function App() {
         return () => clearTimeout(timer); // Clean up the timer
     }, [dispatch]); // Effect depends on dispatch
 
-    // Show a full-page loading indicator while the initial authentication state is being determined
-    if (authLoading) {
-        return <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2em' }}>
-            Loading application... Please wait.
-        </div>;
-    }
-
     return (
         <>
             {authError && <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center' }}>Authentication Error: {authError}</p>}

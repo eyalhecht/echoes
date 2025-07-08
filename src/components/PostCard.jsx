@@ -9,18 +9,158 @@ import {
     CardMedia,
     IconButton,
     Button,
-    Modal
+    Modal,
+    styled
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { format } from 'date-fns'; // For better date formatting
-import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
-import PostMap from "./PostMap.jsx"; // Adjust path as needed
+import { format } from 'date-fns';
+import { usePostInteractions } from '../hooks/usePostInteractions';
+import PostMap from "./PostMap.jsx";
+import CloseIcon from "@mui/icons-material/Close";
+
+// Memphis-style components - Different approach
+const MemphisCard = styled(Card)(({ theme }) => ({
+    maxWidth: 600,
+    margin: '30px auto',
+    borderRadius: 0,
+    backgroundColor: '#F0F8FF',
+    position: 'relative',
+    overflow: 'visible',
+    boxShadow: 'none',
+    '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: -15,
+        left: -15,
+        right: 15,
+        bottom: 15,
+        background: 'repeating-linear-gradient(45deg, #FFB6C1, #FFB6C1 10px, #87CEEB 10px, #87CEEB 20px)',
+        zIndex: -2,
+    },
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        top: -8,
+        left: -8,
+        right: 8,
+        bottom: 8,
+        backgroundColor: '#000',
+        zIndex: -1,
+    }
+}));
+
+const MemphisHeader = styled(CardHeader)(({ theme }) => ({
+    backgroundColor: '#FFD700',
+    borderBottom: '4px solid #000',
+    '& .MuiCardHeader-avatar': {
+        marginRight: '20px',
+    }
+}));
+
+const BrutalAvatar = styled(Avatar)(({ theme }) => ({
+    width: 56,
+    height: 56,
+    fontSize: '24px',
+    fontFamily: '"Arial Black", sans-serif',
+    backgroundColor: '#FF1493',
+    color: '#000',
+    border: '3px solid #000',
+    boxShadow: '4px 4px 0px #000',
+}));
+
+const GeometricDecoration = styled(Box)(({ theme }) => ({
+    position: 'absolute',
+    width: '60px',
+    height: '60px',
+    backgroundColor: '#40E0D0',
+    clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+    border: '3px solid #000',
+}));
+
+const InteractionBar = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
+    padding: '12px',
+    backgroundColor: '#98FB98',
+    borderTop: '4px solid #000',
+    position: 'relative',
+    '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '4px',
+        background: 'repeating-linear-gradient(90deg, #000 0px, #000 5px, transparent 5px, transparent 10px)',
+    }
+}));
+
+const NeobrutalButton = styled(IconButton)(({ active, color = '#FFD700' }) => ({
+    backgroundColor: active ? color : '#FFF',
+    border: '3px solid #000',
+    borderRadius: '50%',
+    padding: '10px',
+    transition: 'all 0.1s',
+    '&:hover': {
+        backgroundColor: color,
+        transform: 'translate(-2px, -2px) rotate(15deg)',
+        boxShadow: '4px 4px 0px #000',
+    },
+    '&:active': {
+        transform: 'translate(0, 0)',
+        boxShadow: '2px 2px 0px #000',
+    }
+}));
+
+const StatsBox = styled(Box)(({ theme }) => ({
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '32px',
+    height: '32px',
+    padding: '0 8px',
+    backgroundColor: '#FFF',
+    border: '2px solid #000',
+    fontFamily: '"Courier New", monospace',
+    fontWeight: 'bold',
+    fontSize: '14px',
+    position: 'relative',
+    clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)',
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: '2px',
+        backgroundColor: '#FFD700',
+        clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)',
+        opacity: 0.3,
+        zIndex: -1,
+    }
+}));
+
+const ReadMoreButton = styled(Button)(({ theme }) => ({
+    borderRadius: 0,
+    padding: '8px 20px',
+    fontFamily: '"Arial Black", sans-serif',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    backgroundColor: '#FF69B4',
+    color: '#000',
+    border: '3px solid #000',
+    boxShadow: '3px 3px 0px #000',
+    '&:hover': {
+        backgroundColor: '#FF1493',
+        transform: 'translate(-1px, -1px)',
+        boxShadow: '4px 4px 0px #000',
+    },
+}));
 
 function PostCard({ post }) {
     const {
@@ -43,12 +183,11 @@ function PostCard({ post }) {
         userProfilePicUrl,
         description,
         type,
-        files, // This will be an array of URLs, or a single YouTube URL
+        files,
         location,
         year,
         commentsCount,
         createdAt,
-        // postId, userId, updatedAt are also there but not directly displayed here
     } = post;
 
     const MAX_DESCRIPTION_LENGTH = 150;
@@ -70,38 +209,82 @@ function PostCard({ post }) {
             return null; // No files to display
         }
 
-        const firstFile = files[0]; // For simplicity, display the first file/URL
+        const firstFile = files[0];
+        const mediaContainerStyle = {
+            position: 'relative',
+            backgroundColor: '#000',
+            padding: '4px',
+            border: '4px solid #000',
+            mb: 0,
+        };
 
         switch (type) {
             case 'photo':
-            case 'document': // Display documents as images for now, or you'd use an icon
-            case 'item': // Similar to document, perhaps just show an image
-                return <CardMedia component="img" image={firstFile} alt="Post media" sx={{ maxHeight: 400, objectFit: 'contain', margin: 'auto' }} />;
-            case 'video':
-                // For videos, use the <video> tag
+            case 'document':
+            case 'item':
                 return (
-                    <CardMedia component="video" controls src={firstFile} sx={{ maxHeight: 400, width: '100%' }} />
+                    <Box sx={mediaContainerStyle}>
+                        <CardMedia
+                            component="img"
+                            image={firstFile}
+                            alt="Post media"
+                            sx={{
+                                maxHeight: 400,
+                                width: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                bottom: 10,
+                                right: 10,
+                                backgroundColor: '#FFD700',
+                                padding: '4px 12px',
+                                border: '3px solid #000',
+                                fontFamily: '"Arial Black", sans-serif',
+                                fontSize: '12px',
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            {type}
+                        </Box>
+                    </Box>
+                );
+            case 'video':
+                return (
+                    <Box sx={mediaContainerStyle}>
+                        <CardMedia
+                            component="video"
+                            controls
+                            src={firstFile}
+                            sx={{
+                                maxHeight: 400,
+                                width: '100%',
+                            }}
+                        />
+                    </Box>
                 );
             case 'youtube':
-                // For YouTube, embed using an iframe
-                // You'll need to extract the video ID from the googleusercontent.com/youtube.com/2 URL if it's not a standard youtube.com/watch?v=...
-                // Assuming firstFile is the direct embed URL or extractable video ID
-                // const youtubeEmbedUrl = firstFile.includes('youtube.com/embed/')
-                //     ? firstFile
-                //     : `https://www.youtube.com/embed/${firstFile.split('/').pop()}`; // Basic extraction
+                const getYouTubeEmbedUrl = (url) => {
+                    const videoIdMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+                    const videoId = videoIdMatch ? videoIdMatch[1] : url.split('/').pop();
+                    return `https://www.youtube.com/embed/${videoId}`;
+                };
 
                 return (
-                    <CardMedia>
+                    <Box sx={mediaContainerStyle}>
                         <iframe
                             width="100%"
                             height="315"
-                            src={youtubeEmbedUrl}
+                            src={getYouTubeEmbedUrl(firstFile)}
                             title="YouTube video player"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
-                        ></iframe>
-                    </CardMedia>
+                            style={{ display: 'block' }}
+                        />
+                    </Box>
                 );
             default:
                 return null;
@@ -109,129 +292,244 @@ function PostCard({ post }) {
     };
 
     return (
-        <Card sx={{
-            maxWidth: 600, // Max width for a typical post card
-            margin: '16px auto', // Center the card and add some vertical spacing
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            backgroundColor: 'white',
-        }}>
-            <CardHeader
-                avatar={
-                    <Avatar src={userProfilePicUrl || ''} alt={userDisplayName ? userDisplayName.charAt(0) : 'U'} />
-                }
-                action={
-                    <IconButton aria-label="settings">
-                        <MoreVertIcon />
-                    </IconButton>
-                }
-                title={
-                    <Typography variant="subtitle1" fontWeight="bold">
-                        {userDisplayName || 'Anonymous User'}
-                    </Typography>
-                }
-                subheader={
-                    <>
-                        <Typography variant="body2" color="text.secondary">
-                            {formattedTimestamp} {location && `• ${location}`}
-                        </Typography>
-                        {year && year.length > 0 && (
-                            <Typography variant="caption" color="text.secondary">
-                                Year(s): {year.join(', ')}
-                            </Typography>
-                        )}
-                    </>
-                }
-            />
-            {renderMedia()}
-            <CardContent>
-                <Typography
-                    variant="body1"
-                    color="text.primary"
+        <>
+            <MemphisCard>
+                {/* Geometric decorations */}
+                <GeometricDecoration sx={{ top: -20, right: 30 }} />
+                <Box
                     sx={{
-                        marginBottom: shouldTruncate ? '8px' : '16px',
-                        whiteSpace: 'pre-wrap' // Preserve line breaks
+                        position: 'absolute',
+                        top: -25,
+                        left: 40,
+                        width: 50,
+                        height: 50,
+                        backgroundColor: '#9370DB',
+                        borderRadius: '50%',
+                        border: '3px solid #000',
+                        zIndex: 2,
+                    }}
+                />
+
+                <MemphisHeader
+                    avatar={
+                        <BrutalAvatar
+                            src={userProfilePicUrl || ''}
+                            alt={userDisplayName}
+                        >
+                            {!userProfilePicUrl && (userDisplayName ? userDisplayName.charAt(0).toUpperCase() : 'U')}
+                        </BrutalAvatar>
+                    }
+                    action={
+                        <IconButton
+                            sx={{
+                                backgroundColor: '#87CEEB',
+                                border: '3px solid #000',
+                                borderRadius: 0,
+                                '&:hover': {
+                                    backgroundColor: '#00BFFF',
+                                }
+                            }}
+                        >
+                            <MoreVertIcon />
+                        </IconButton>
+                    }
+                    title={
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontFamily: '"Arial Black", sans-serif',
+                                textTransform: 'uppercase',
+                                letterSpacing: '-1px',
+                                textShadow: '2px 2px 0px #FFF',
+                            }}
+                        >
+                            {userDisplayName || 'Anonymous'}
+                        </Typography>
+                    }
+                    subheader={
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.5 }}>
+                            <Typography
+                                sx={{
+                                    fontFamily: '"Courier New", monospace',
+                                    backgroundColor: '#000',
+                                    color: '#FFF',
+                                    padding: '2px 8px',
+                                    fontSize: '12px',
+                                }}
+                            >
+                                {formattedTimestamp}
+                            </Typography>
+                            {year && year.length > 0 && (
+                                <Typography
+                                    sx={{
+                                        backgroundColor: '#FF1493',
+                                        padding: '2px 8px',
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        border: '2px solid #000',
+                                    }}
+                                >
+                                    {year.join('-')}
+                                </Typography>
+                            )}
+                        </Box>
+                    }
+                />
+
+                {renderMedia()}
+
+                <CardContent
+                    sx={{
+                        backgroundColor: '#FFF',
+                        position: 'relative',
+                        padding: 3,
                     }}
                 >
-                    {getDisplayedText()}
-                </Typography>
-
-                {shouldTruncate && (
-                    <Button
-                        variant="text"
-                        size="small"
-                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                    {/* Decorative dots pattern */}
+                    <Box
                         sx={{
-                            padding: 0,
-                            marginBottom: '16px',
-                            textTransform: 'none',
-                            '&:hover': {
-                                backgroundColor: 'transparent',
-                                textDecoration: 'underline'
-                            }
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            width: 100,
+                            height: 100,
+                            backgroundImage: 'radial-gradient(circle, #FFB6C1 20%, transparent 20%)',
+                            backgroundSize: '15px 15px',
+                            opacity: 0.5,
+                        }}
+                    />
+
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            marginBottom: 2,
+                            whiteSpace: 'pre-wrap',
+                            fontFamily: '"Georgia", serif',
+                            fontSize: '16px',
+                            lineHeight: 1.8,
+                            position: 'relative',
+                            zIndex: 1,
                         }}
                     >
-                        {isDescriptionExpanded ? 'Read less' : 'Read more'}
-                    </Button>
-                )}
+                        {getDisplayedText()}
+                    </Typography>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton
-                        aria-label="like"
+                    {shouldTruncate && (
+                        <ReadMoreButton
+                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                            sx={{ mb: 2 }}
+                        >
+                            {isDescriptionExpanded ? '← Show Less' : 'Read More →'}
+                        </ReadMoreButton>
+                    )}
+                </CardContent>
+
+                <InteractionBar>
+                    <NeobrutalButton
+                        active={liked}
                         onClick={handleLikeToggle}
-                        sx={{
-                            color: liked ? 'red' : 'inherit',
-                            '&:disabled': {
-                                opacity: 0.6
-                            }
-                        }}
+                        disabled={isLikeUpdating}
+                        color="#FF69B4"
                     >
                         {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                    </IconButton>
-                    <Typography variant="body2">{likesCount}</Typography>
+                    </NeobrutalButton>
+                    <StatsBox>{likesCount}</StatsBox>
 
-                    <IconButton aria-label="comment">
+                    <NeobrutalButton color="#87CEEB">
                         <ChatBubbleOutlineIcon />
-                    </IconButton>
-                    <Typography variant="body2">{commentsCount}</Typography>
+                    </NeobrutalButton>
+                    <StatsBox>{commentsCount || 0}</StatsBox>
 
-                    <IconButton
-                        aria-label="bookmark"
+                    <NeobrutalButton
+                        active={bookmarked}
                         onClick={handleBookmarkToggle}
-                        sx={{
-                            color: bookmarked ? '#1976d2' : 'inherit',
-                            '&:disabled': {
-                                opacity: 0.6
-                            }
-                        }}
+                        disabled={isBookmarkUpdating}
+                        color="#9370DB"
                     >
                         {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                    </IconButton>
-                    <Typography variant="body2">{bookmarksCount}</Typography>
-                    <IconButton onClick={()=> setLocationModal(true)} aria-label="comment">
-                        <LocationOnIcon />
-                    </IconButton>
-                    <Modal
-                        open={locationModal}
-                        onClose={()=> setLocationModal(false)}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                    >
-                        <Box sx={{
+                    </NeobrutalButton>
+                    <StatsBox>{bookmarksCount}</StatsBox>
+
+                    {location && (
+                        <NeobrutalButton
+                            onClick={() => setLocationModal(true)}
+                            color="#40E0D0"
+                            sx={{ ml: 'auto' }}
+                        >
+                            <LocationOnIcon />
+                        </NeobrutalButton>
+                    )}
+                </InteractionBar>
+            </MemphisCard>
+
+            {/* Location Modal */}
+            {location && (
+                <Modal
+                    open={locationModal}
+                    onClose={() => setLocationModal(false)}
+                    BackdropProps={{
+                        sx: {
+                            backgroundColor: 'rgba(255, 215, 0, 0.5)',
+                        }
+                    }}
+                >
+                    <Box
+                        sx={{
                             position: 'absolute',
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
-                            width: 400,
-                            bgcolor: 'white',
-                        }}>
-                            <PostMap center={{ lat: location?._latitude, lng: location?._longitude }}/>
-
+                            width: { xs: '90%', sm: 500 },
+                            backgroundColor: '#F0F8FF',
+                            border: '5px solid #000',
+                            boxShadow: '10px 10px 0px #FF1493',
+                            '&:focus': { outline: 'none' }
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                backgroundColor: '#40E0D0',
+                                p: 2,
+                                borderBottom: '5px solid #000',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                            }}
+                        >
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontFamily: '"Arial Black", sans-serif',
+                                    textTransform: 'uppercase',
+                                    textShadow: '2px 2px 0px #000',
+                                    color: '#FFF'
+                                }}
+                            >
+                                Location
+                            </Typography>
+                            <IconButton
+                                onClick={() => setLocationModal(false)}
+                                sx={{
+                                    backgroundColor: '#FFD700',
+                                    border: '3px solid #000',
+                                    borderRadius: 0,
+                                    '&:hover': {
+                                        backgroundColor: '#FFA500',
+                                    }
+                                }}
+                            >
+                                <CloseIcon />
+                            </IconButton>
                         </Box>
-                    </Modal>
-                </Box>
-            </CardContent>
-        </Card>
+                        <PostMap
+                            center={{ lat: location?._lat, lng: location?._long }}
+                            height="400px"
+                            zoom={15}
+                        />
+                    </Box>
+                </Modal>
+            )}
+        </>
     );
 }
 
