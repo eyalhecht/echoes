@@ -33,7 +33,6 @@ const PostMap = ({
     }, []);
 
     return (
-        <LoadScript googleMapsApiKey={import.meta.env.VITE_MAPS_API_KEY} >
             <GoogleMap
                 mapContainerStyle={mapContainerStyle}
                 center={center}
@@ -79,7 +78,6 @@ const PostMap = ({
                     </InfoWindow>
                 )}
             </GoogleMap>
-        </LoadScript>
     );
 };
 
