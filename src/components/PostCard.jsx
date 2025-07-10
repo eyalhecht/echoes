@@ -33,7 +33,7 @@ function PostCard({ post }) {
         isBookmarkUpdating,
         handleLikeToggle,
         handleBookmarkToggle,
-    } = usePostInteractions(post);
+    } = usePostInteractions(post.id);
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);

@@ -35,7 +35,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         isBookmarkUpdating,
         handleLikeToggle,
         handleBookmarkToggle,
-    } = usePostInteractions(post);
+    } = usePostInteractions(post.id);
 
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([
