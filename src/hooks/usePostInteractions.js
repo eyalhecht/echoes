@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
 import { callApiGateway } from '../firebaseConfig';
+import {useAuthStore} from "../stores/useAuthStore.js";
 
 export const usePostInteractions = (post) => {
-    const { user } = useSelector(state => state.auth);
+    const { user } = useAuthStore();
 
     // Like state
     const [liked, setLiked] = useState(post.likedByCurrentUser || false);

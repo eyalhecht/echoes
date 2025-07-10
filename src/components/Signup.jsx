@@ -1,13 +1,10 @@
-// src/components/Auth/Signup.jsx
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom'; // <--- Import useNavigate and Link
-import { signUpWithEmail} from "../store/slices/authSlice.js";
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuthStore } from "../stores/useAuthStore.js";
 
 function Signup() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate(); // <--- Initialize useNavigate hook
-    const { loading, error } = useSelector(state => state.auth);
+    const { loading, error } = useAuthStore();
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -15,7 +12,7 @@ function Signup() {
     const handleEmailSignup = async (e) => {
         e.preventDefault();
         try {
-            await dispatch(signUpWithEmail({ email, password })).unwrap();
+            await useAuthStore.getState().signUpWithEmail({ email, password });
             navigate('/dashboard'); // <--- Redirect to dashboard on success
         } catch (err) {
             console.error("Signup component caught error:", err);

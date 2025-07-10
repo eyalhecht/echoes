@@ -1,22 +1,17 @@
-// src/components/Auth/LogoutButton.jsx
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom'; // <--- Import useNavigate
-import { logout} from "../store/slices/authSlice.js";
+import { useNavigate } from 'react-router-dom';
+import {useAuthStore} from "../stores/useAuthStore.js";
 
 function LogoutButton() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate(); // <--- Initialize useNavigate hook
-    const { loading, error } = useSelector(state => state.auth);
+    const navigate = useNavigate();
+    const { loading, error } = useAuthStore();
 
     const handleLogout = async () => {
         try {
-            await dispatch(logout()).unwrap();
-            navigate('/login'); // <--- Redirect to login after logout
+            await useAuthStore.getState().logout();
+            navigate('/login');
         } catch (err) {
             console.error("Logout component caught error:", err);
-            // Even if logout fails, you might want to force a redirect or clear local state
-            // depending on the severity of the error.
         }
     };
 

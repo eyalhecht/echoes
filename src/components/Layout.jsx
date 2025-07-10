@@ -1,16 +1,15 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setActiveSidebarItem } from '../store/slices/uiSlice';
 import { Box } from '@mui/material';
 import Header from './Header.jsx';
 import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
+import useUiStore from "../stores/useUiStore.js";
 
 const HEADER_HEIGHT = 40;
 
 function Sidebar() {
-    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
-    const dispatch = useDispatch();
+    const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
+    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const items = ['Home', 'Profile', 'Friends', 'Upload', 'Settings'];
 
     return (
@@ -26,7 +25,7 @@ function Sidebar() {
             {items.map((item) => (
                 <Box
                     key={item}
-                    onClick={() => dispatch(setActiveSidebarItem(item))}
+                    onClick={() => setActiveSidebarItem(item)}
                     sx={{
                         padding: '16px',
                         cursor: 'pointer',
@@ -41,7 +40,7 @@ function Sidebar() {
 }
 
 function MainContent() {
-    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
+    const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
 
     const renderContent = () => {
         switch (activeSidebarItem) {
