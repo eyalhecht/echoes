@@ -21,7 +21,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { format } from 'date-fns'; // For better date formatting
 import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
 import PostMap from "./PostMap.jsx"; // Adjust path as needed
-import PostDetailView from "./PostDetailView.jsx"; // Adjust path as needed
+import PostDetailView from "./PostDetailView.jsx";
+import useUiStore from "../stores/useUiStore.js"; // Adjust path as needed
 
 function PostCard({ post }) {
     const {
@@ -38,6 +39,8 @@ function PostCard({ post }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
     const [detailViewOpen, setDetailViewOpen] = useState(false);
+    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
+    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
     const {
         id: postId,
@@ -49,6 +52,7 @@ function PostCard({ post }) {
         location,
         year,
         commentsCount,
+        userId,
         createdAt,
         // postId, userId, updatedAt are also there but not directly displayed here
     } = post;
@@ -63,6 +67,11 @@ function PostCard({ post }) {
         }
         return description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
     };
+
+    const handleNameClick = (userId) => {
+        setActiveSidebarItem('Profile')
+        setActiveProfileView(userId)
+    }
 
     // Format the timestamp for display
     const formattedTimestamp = "time here"
@@ -130,7 +139,8 @@ function PostCard({ post }) {
                     </IconButton>
                 }
                 title={
-                    <Typography variant="subtitle1" fontWeight="bold">
+                    <Typography sx={{cursor: 'pointer'}} onClick={() => handleNameClick(userId)} variant="subtitle1"
+                                fontWeight="bold">
                         {userDisplayName || 'Anonymous User'}
                     </Typography>
                 }

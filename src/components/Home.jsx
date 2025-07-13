@@ -1,22 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import {callApiGateway} from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
-
-const generatePosts = (startId = 1, count = 10) => {
-    const posts = [];
-    for (let i = 0; i < count; i++) {
-        posts.push({
-            id: startId + i,
-            user: `User ${startId + i}`,
-            content: `This is post content number ${startId + i}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
-            timestamp: `${Math.floor(Math.random() * 24)} hours ago`
-        });
-    }
-    return posts;
-};
-
 
 function Home() {
     const { posts, setPosts, setPostsLoading, postsLoading } = useUiStore();

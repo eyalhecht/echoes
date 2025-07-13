@@ -4,13 +4,25 @@ import Header from './Header.jsx';
 import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
 import useUiStore from "../stores/useUiStore.js";
+import Profile from "./Profile.jsx";
+import {useAuthStore} from "../stores/useAuthStore.js";
 
 const HEADER_HEIGHT = 40;
 
 function Sidebar() {
+    const currentUser = useAuthStore(state => state.user);
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const items = ['Home', 'Profile', 'Friends', 'Upload', 'Settings'];
+    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+    const items = [
+        { name: 'Home', callback: () => {} },
+        { name: 'Profile', callback: () => {
+                setActiveProfileView(currentUser.uid)
+            }},
+        { name: 'Friends', callback: () => {} },
+        { name: 'Upload', callback: () => {} },
+        { name: 'Settings', callback: () => {} },
+    ];
 
     return (
         <Box sx={{
@@ -24,15 +36,18 @@ function Sidebar() {
         }}>
             {items.map((item) => (
                 <Box
-                    key={item}
-                    onClick={() => setActiveSidebarItem(item)}
+                    key={item.name}
+                    onClick={() => {
+                        item.callback();
+                        setActiveSidebarItem(item.name)
+                    }}
                     sx={{
                         padding: '16px',
                         cursor: 'pointer',
-                        backgroundColor: activeSidebarItem === item ? '#e3f2fd' : 'transparent',
+                        backgroundColor: activeSidebarItem === item.name ? '#e3f2fd' : 'transparent',
                     }}
                 >
-                    {item}
+                    {item.name}
                 </Box>
             ))}
         </Box>
@@ -41,13 +56,15 @@ function Sidebar() {
 
 function MainContent() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
+    const activeProfileView = useUiStore((state) => state.activeProfileView);
+    const currentUser = useAuthStore(state => state.user);
 
     const renderContent = () => {
         switch (activeSidebarItem) {
             case 'Home':
                 return <Home />;
             case 'Profile':
-                return <Box>Profile Page Coming Soon...</Box>;
+                return <Profile targetUserId={activeProfileView || currentUser.uid} />;
             case 'Friends':
                 return <Box>Friends Page Coming Soon...</Box>;
             case 'Upload':

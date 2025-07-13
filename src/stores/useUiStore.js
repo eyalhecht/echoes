@@ -4,6 +4,8 @@ import { callApiGateway } from '../firebaseConfig';
 const useUiStore = create((set, get) => ({
     activeSidebarItem: 'Home',
     setActiveSidebarItem: (item) => set({ activeSidebarItem: item }),
+    activeProfileView: null,
+    setActiveProfileView: (item) => set({ activeProfileView: item }),
     posts: [],
     postsLoading: false,
     postsError: null,
