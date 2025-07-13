@@ -9,7 +9,7 @@ import {
     CardMedia,
     IconButton,
     Button,
-    Modal
+    Modal, ButtonBase
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -139,10 +139,25 @@ function PostCard({ post }) {
                     </IconButton>
                 }
                 title={
-                    <Typography sx={{cursor: 'pointer'}} onClick={() => handleNameClick(userId)} variant="subtitle1"
-                                fontWeight="bold">
-                        {userDisplayName || 'Anonymous User'}
-                    </Typography>
+                    <ButtonBase
+                        onClick={() => handleNameClick(userId)}
+                        sx={{
+                            padding: 0,
+                            justifyContent: 'flex-start',
+                            '&:hover': {
+                                backgroundColor: 'transparent',
+                            }
+                        }}
+                    >
+                        <Typography tabIndex={0} variant="subtitle1" fontWeight="bold"
+                                    sx={{
+                                        cursor: 'pointer',
+                                        color: 'inherit' // Ensures the text color comes from the parent
+                                    }}
+                        >
+                            {userDisplayName || 'Anonymous User'}
+                        </Typography>
+                    </ButtonBase>
                 }
                 subheader={
                     <>
@@ -232,27 +247,29 @@ function PostCard({ post }) {
                         {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
                     </IconButton>
                     <Typography variant="body2">{bookmarksCount}</Typography>
-                    <IconButton onClick={()=> setLocationModal(true)} aria-label="comment">
-                        <LocationOnIcon />
-                    </IconButton>
-                    <Modal
-                        open={locationModal}
-                        onClose={()=> setLocationModal(false)}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                    >
-                        <Box sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 400,
-                            bgcolor: 'white',
-                        }}>
-                            <PostMap center={{ lat: location?._latitude, lng: location?._longitude }}/>
+                    {location && <Box>
+                        <IconButton onClick={() => setLocationModal(true)} aria-label="comment">
+                            <LocationOnIcon/>
+                        </IconButton>
+                        <Modal
+                            open={locationModal}
+                            onClose={() => setLocationModal(false)}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                        >
+                            <Box sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: 400,
+                                bgcolor: 'white',
+                            }}>
+                                <PostMap center={{lat: location?._latitude, lng: location?._longitude}}/>
 
-                        </Box>
-                    </Modal>
+                            </Box>
+                        </Modal>
+                    </Box>}
                 </Box>
             </CardContent>
         </Card>
