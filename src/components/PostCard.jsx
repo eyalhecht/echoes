@@ -18,7 +18,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { format } from 'date-fns'; // For better date formatting
+import {format, formatDistanceToNowStrict, isToday, isYesterday} from 'date-fns'; // For better date formatting
 import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
 import PostMap from "./PostMap.jsx"; // Adjust path as needed
 import PostDetailView from "./PostDetailView.jsx";
@@ -68,13 +68,27 @@ function PostCard({ post }) {
         return description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
     };
 
+    const formatFirebaseTimestamp = (firebaseTimestamp) => {
+        if (!firebaseTimestamp || typeof firebaseTimestamp._seconds !== 'number') {
+            return 'Invalid Date';
+        }
+        const date = new Date(firebaseTimestamp._seconds * 1000 + firebaseTimestamp._nanoseconds / 1000000);
+        const now = new Date();
+        if (isToday(date)) {
+            return formatDistanceToNowStrict(date, { addSuffix: true });
+        } else if (isYesterday(date)) {
+            return `Yesterday at ${format(date, 'h:mm a')}`;
+        } else if (Math.abs(date.getTime() - now.getTime()) < 7 * 24 * 60 * 60 * 1000) {
+            return format(date, 'EEEE \'at\' h:mm a'); // E.g., "Monday at 10:00 AM"
+        } else {
+            return format(date, 'MMM dd, yyyy'); // E.g., "Jul 15, 2025"
+        }
+    };
+
     const handleNameClick = (userId) => {
         setActiveSidebarItem('Profile')
         setActiveProfileView(userId)
     }
-
-    // Format the timestamp for display
-    const formattedTimestamp = "time here"
 
     const renderMedia = () => {
         if (!files || files.length === 0) {
@@ -162,7 +176,7 @@ function PostCard({ post }) {
                 subheader={
                     <>
                         <Typography variant="body2" color="text.secondary">
-                            {formattedTimestamp} {location && `• ${location}`}
+                            {formatFirebaseTimestamp(createdAt)}
                         </Typography>
                         {year && year.length > 0 && (
                             <Typography variant="caption" color="text.secondary">

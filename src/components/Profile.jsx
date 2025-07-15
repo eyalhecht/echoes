@@ -66,14 +66,14 @@ const Profile = ({targetUserId}) => {
             }
 
             try {
-                const response = await callApiGateway({
-                    action: 'getUserPosts',
-                    payload: {
-                        userId: targetUserId, // Make sure to pass the userId!
-                        limit: 20
-                    }
-                });
-                console.log("Fetched user posts data:", response.data); // Log the actual data
+                // const response = await callApiGateway({
+                //     action: 'getUserPosts',
+                //     payload: {
+                //         userId: targetUserId, // Make sure to pass the userId!
+                //         limit: 20
+                //     }
+                // });
+                // console.log("Fetched user posts data:", response.data); // Log the actual data
                 // You would then typically update your state with this data
                 // For example, if you're managing user-specific posts locally in the component:
                 // setProfilePosts(response.data.posts);
