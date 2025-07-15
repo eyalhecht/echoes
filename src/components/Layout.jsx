@@ -26,8 +26,8 @@ function MainContent() {
                 return <Box>Friends Page Coming Soon...</Box>;
             case 'Upload':
                 return <UploadPost>Upload Page Coming Soon...</UploadPost>;
-            case 'Settings':
-                return <Box>Settings Page Coming Soon...</Box>;
+            case 'Bookmarks':
+                return <Box>Bookmarks Page Coming Soon...</Box>;
             default:
                 return <Home />;
         }
