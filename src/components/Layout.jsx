@@ -6,53 +6,10 @@ import UploadPost from "./UploadPost.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import Profile from "./Profile.jsx";
 import {useAuthStore} from "../stores/useAuthStore.js";
+import Sidebar from "./Sidebar.jsx";
 
 const HEADER_HEIGHT = 40;
 
-function Sidebar() {
-    const currentUser = useAuthStore(state => state.user);
-    const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
-    const items = [
-        { name: 'Home', callback: () => {} },
-        { name: 'Profile', callback: () => {
-                setActiveProfileView(currentUser.uid)
-            }},
-        { name: 'Friends', callback: () => {} },
-        { name: 'Upload', callback: () => {} },
-        { name: 'Settings', callback: () => {} },
-    ];
-
-    return (
-        <Box sx={{
-            width: '220px',
-            height: '100vh',
-            backgroundColor: 'grey',
-            position: 'fixed',
-            left: 0,
-            top: HEADER_HEIGHT,
-            borderRight: '1px solid #ddd'
-        }}>
-            {items.map((item) => (
-                <Box
-                    key={item.name}
-                    onClick={() => {
-                        item.callback();
-                        setActiveSidebarItem(item.name)
-                    }}
-                    sx={{
-                        padding: '16px',
-                        cursor: 'pointer',
-                        backgroundColor: activeSidebarItem === item.name ? '#e3f2fd' : 'transparent',
-                    }}
-                >
-                    {item.name}
-                </Box>
-            ))}
-        </Box>
-    );
-}
 
 function MainContent() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
