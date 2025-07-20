@@ -16,9 +16,21 @@ const useUiStore = create((set, get) => ({
     addPost: (post) => set((state) => ({
         posts: [post, ...state.posts]
     })),
-    deletePost: (postId) => set((state) => ({
-        posts: state.posts.filter(post => post.id !== postId)
-    })),
+    deletePost: async (postId) => {
+        try {
+            const response = await callApiGateway({
+                action: 'deletePost',
+                payload: { postId: postId }
+            });
+            if (response.data.postId) {
+                set((state) => ({
+                    posts: state.posts.filter(post => post.id !== response.data.postId)
+                }));
+            }
+        } catch (error) {
+            console.error('Failed to delete post:', error);
+        }
+    },
 
     getLastPost: () => set((state)=>{
         return state.posts.length > 0 ? state.posts[state.posts.length - 1] : null;
