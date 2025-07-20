@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
     Box,
     Button,
@@ -11,11 +11,10 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    Chip,
+    Autocomplete,
 } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage, auth, functions} from "../firebaseConfig.js";
@@ -29,13 +28,25 @@ const UploadPost = () => {
     const [files, setFiles] = useState([]); // Array to store multiple files
     const [filePreviews, setFilePreviews] = useState([]); // Array for file previews
     const [location, setLocation] = useState(null); // This will now display coordinates
-    const [years, setYears] = useState([]); // Array for years
-    const [currentYearInput, setCurrentYearInput] = useState(''); // For year input field
+    const [selectedYear, setSelectedYear] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState(null);
     const [isMapModalOpen, setIsMapModalOpen] = useState(false); // State for map modal
 
     const fileInputRef = useRef(null);
+
+    const yearOptions = useMemo(() => {
+        const currentYear = new Date().getFullYear();
+        const maxYear = currentYear - 5; // 5 years before current year
+        const minYear = 1900;
+
+        const years = [];
+        for (let year = maxYear; year >= minYear; year--) {
+            years.push(year);
+        }
+        return years;
+    }, []);
+
     const handleDescriptionChange = (event) => {
         setDescription(event.target.value);
     };
@@ -44,22 +55,12 @@ const UploadPost = () => {
         setFiles([]);
         setFilePreviews([]);
     };
-    const handleYearInputChange = (event) => {
-        setCurrentYearInput(event.target.value);
+
+    const handleYearSelect = (event, newValue) => {
+        setSelectedYear(newValue);
+        setError(null);
     };
-    const handleAddYear = () => {
-        const yearValue = parseInt(currentYearInput, 10);
-        if (!isNaN(yearValue) && yearValue > 0 && !years.includes(yearValue)) {
-            setYears((prevYears) => [...prevYears, yearValue].sort((a, b) => a - b));
-            setCurrentYearInput('');
-            setError(null);
-        } else if (currentYearInput.trim() !== '') {
-            setError('Please enter a valid, non-duplicate year.');
-        }
-    };
-    const handleDeleteYear = (yearToDelete) => {
-        setYears((prevYears) => prevYears.filter((year) => year !== yearToDelete));
-    };
+
     const handleFileChange = (event) => {
         const newFiles = Array.from(event.target.files);
         if (newFiles.length > 0) {
@@ -130,7 +131,7 @@ const UploadPost = () => {
                     type: type,
                     fileUrls: fileUrls, // Array of download URLs from Storage or YouTube URL(s)
                     location: location ? new GeoPoint(location.lat, location.lng) : null,
-                    year: years, // Array of years (numbers)
+                    year: selectedYear ? [selectedYear] : [], // Convert single year to array for backend compatibility
                     // Backend will handle userId, likesCount, commentsCount, bookmarksCount, createdAt, updatedAt
                 }
             };
@@ -145,8 +146,7 @@ const UploadPost = () => {
             setFiles([]);
             setFilePreviews([]);
             setLocation(null);
-            setYears([]);
-            setCurrentYearInput('');
+            setSelectedYear(null);
             // You might want to display a success message to the user, e.g., using a Snackbar
             alert(response.data.message || 'Post uploaded successfully!');
 
@@ -322,40 +322,45 @@ const UploadPost = () => {
                 </Typography>
             )}
 
-            {/* Year(s) Input and Display */}
             <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                    Year(s)
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                    <TextField
-                        label="Add Year"
-                        type="number"
-                        value={currentYearInput}
-                        onChange={handleYearInputChange}
-                        onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                                handleAddYear();
-                            }
-                        }}
-                        sx={{ flexGrow: 1 }}
-                        disabled={isUploading}
-                        placeholder="e.g., 2023"
-                    />
-                    <IconButton onClick={handleAddYear} color="primary" disabled={isUploading}>
-                        <AddCircleOutlineIcon />
-                    </IconButton>
-                </Box>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {years.map((year, index) => (
-                        <Chip
-                            key={index}
-                            label={year}
-                            onDelete={() => handleDeleteYear(year)}
+                <Autocomplete
+                    value={selectedYear}
+                    onChange={handleYearSelect}
+                    options={yearOptions}
+                    getOptionLabel={(option) => option.toString()}
+                    isOptionEqualToValue={(option, value) => option === value}
+                    filterOptions={(options, { inputValue }) => {
+                        return options.filter(option =>
+                            option.toString().includes(inputValue)
+                        );
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label={`Year (1900 - ${new Date().getFullYear() - 5})`}
+                            placeholder="Type to search or select a year..."
                             disabled={isUploading}
                         />
-                    ))}
-                </Box>
+                    )}
+                    disabled={isUploading}
+                    noOptionsText="No matching years"
+                    clearOnEscape
+                    selectOnFocus
+                    handleHomeEndKeys
+                    isClearable
+                />
+
+                {!selectedYear && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        Select the year when this photo was taken (optional)
+                    </Typography>
+                )}
+
+                {selectedYear && (
+                    <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
+                        Selected year: {selectedYear}
+                    </Typography>
+                )}
             </Box>
 
             {/* Error Message */}
@@ -376,6 +381,7 @@ const UploadPost = () => {
             >
                 {isUploading ? <CircularProgress size={24} color="inherit" /> : 'Create Post'}
             </Button>
+
             <LocationPickerModal
                 open={isMapModalOpen}
                 onClose={() => {
