@@ -193,7 +193,6 @@ const UploadPost = () => {
                 placeholder="What would you like to share?"
             />
 
-            {/* Post Type Selection */}
             <FormControl fullWidth variant="outlined" sx={{ mb: 3 }} disabled={isUploading}>
                 <InputLabel id="post-type-label">Post Type</InputLabel>
                 <Select
@@ -204,10 +203,10 @@ const UploadPost = () => {
                     label="Post Type"
                 >
                     <MenuItem value="photo">Photo</MenuItem>
-                    <MenuItem value="video">Video</MenuItem>
-                    <MenuItem value="document">Document</MenuItem>
-                    <MenuItem value="item">Item</MenuItem>
-                    <MenuItem value="youtube">YouTube Link</MenuItem>
+                    {/*<MenuItem value="video">Video</MenuItem>*/}
+                    {/*<MenuItem value="document">Document</MenuItem>*/}
+                    {/*<MenuItem value="item">Item</MenuItem>*/}
+                    {/*<MenuItem value="youtube">YouTube Link</MenuItem>*/}
                 </Select>
             </FormControl>
 
