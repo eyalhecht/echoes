@@ -1,60 +1,33 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setActiveSidebarItem } from '../store/slices/uiSlice';
 import { Box } from '@mui/material';
 import Header from './Header.jsx';
 import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
+import useUiStore from "../stores/useUiStore.js";
+import Profile from "./Profile.jsx";
+import {useAuthStore} from "../stores/useAuthStore.js";
+import Sidebar from "./Sidebar.jsx";
 
 const HEADER_HEIGHT = 40;
 
-function Sidebar() {
-    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
-    const dispatch = useDispatch();
-    const items = ['Home', 'Profile', 'Friends', 'Upload', 'Settings'];
-
-    return (
-        <Box sx={{
-            width: '220px',
-            height: '100vh',
-            backgroundColor: 'grey',
-            position: 'fixed',
-            left: 0,
-            top: HEADER_HEIGHT,
-            borderRight: '1px solid #ddd'
-        }}>
-            {items.map((item) => (
-                <Box
-                    key={item}
-                    onClick={() => dispatch(setActiveSidebarItem(item))}
-                    sx={{
-                        padding: '16px',
-                        cursor: 'pointer',
-                        backgroundColor: activeSidebarItem === item ? '#e3f2fd' : 'transparent',
-                    }}
-                >
-                    {item}
-                </Box>
-            ))}
-        </Box>
-    );
-}
 
 function MainContent() {
-    const activeSidebarItem = useSelector(state => state.ui.activeSidebarItem);
+    const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
+    const activeProfileView = useUiStore((state) => state.activeProfileView);
+    const currentUser = useAuthStore(state => state.user);
 
     const renderContent = () => {
         switch (activeSidebarItem) {
             case 'Home':
                 return <Home />;
             case 'Profile':
-                return <Box>Profile Page Coming Soon...</Box>;
+                return <Profile targetUserId={activeProfileView || currentUser.uid} />;
             case 'Friends':
                 return <Box>Friends Page Coming Soon...</Box>;
             case 'Upload':
                 return <UploadPost>Upload Page Coming Soon...</UploadPost>;
-            case 'Settings':
-                return <Box>Settings Page Coming Soon...</Box>;
+            case 'Bookmarks':
+                return <Box>Bookmarks Page Coming Soon...</Box>;
             default:
                 return <Home />;
         }

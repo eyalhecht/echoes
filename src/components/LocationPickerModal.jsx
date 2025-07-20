@@ -94,7 +94,6 @@ const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation 
                 </Box>
 
                 <Box sx={{ width: '100%', height: '500px', position: 'relative' }}>
-                    <LoadScript googleMapsApiKey={"AIzaSyCTki4LpvWWJ-iFsHViXDL3VE0pk3tOiIU"}>
                         <GoogleMap
                             mapContainerStyle={mapContainerStyle}
                             center={mapCenter}
@@ -104,7 +103,6 @@ const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation 
                             onUnmount={onUnmount}
                             onDragEnd={onDragEnd}
                         />
-                    </LoadScript>
 
                     {/* Static pin in the center of the map */}
                     <Box

@@ -1,10 +1,7 @@
 // src/App.jsx
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {Routes, Route, Navigate, Link} from 'react-router-dom'; // <--- Import Routing components
 
-// Import your Redux Thunk for listening to auth changes
-import { startListeningForAuthChanges } from './store/slices/authSlice';
 
 // Import your Firebase services for the initial connection tests (if you still want them)
 import { auth, db, callApiGateway } from './firebaseConfig.js';
@@ -14,15 +11,15 @@ import Layout from './components/Layout.jsx'; // This will be the protected cont
 import Login from "./components/Login.jsx";
 import Signup from "./components/Signup.jsx";
 import ProtectedRoute from './components/ProtectedRoute.jsx'; // Your gatekeeper component
+import {useAuthStore} from "./stores/useAuthStore.js"; // Your gatekeeper component
 
 function App() {
-    const dispatch = useDispatch();
-    const { loading: authLoading, isAuthenticated, error: authError } = useSelector(state => state.auth);
+    const { loading: authLoading, isAuthenticated, error: authError } = useAuthStore();
 
     // This useEffect sets up the Firebase Auth listener and runs optional connection tests.
     useEffect(() => {
         console.log("App.jsx: Setting up Firebase Auth listener via Redux...");
-        dispatch(startListeningForAuthChanges());
+        useAuthStore.getState().startListeningForAuthChanges();
 
         // --- Optional: Initial Firebase Service Connection Tests ---
         // These run once on app load to confirm your Firebase project setup (Firestore, Functions).
@@ -65,7 +62,7 @@ function App() {
         }, 1500);
 
         return () => clearTimeout(timer); // Clean up the timer
-    }, [dispatch]); // Effect depends on dispatch
+    }, []);
 
     // Show a full-page loading indicator while the initial authentication state is being determined
     if (authLoading) {

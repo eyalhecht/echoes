@@ -1,13 +1,10 @@
-// src/components/Auth/Login.jsx
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom'; // <--- Import useNavigate and Link
-import { loginWithEmail, signInWithGoogle} from "../store/slices/authSlice.js";
+import { useNavigate, Link } from 'react-router-dom';
+import {useAuthStore} from "../stores/useAuthStore.js";
 
 function Login() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate(); // <--- Initialize useNavigate hook
-    const { loading, error } = useSelector(state => state.auth);
+    const navigate = useNavigate();
+    const { loading, error } = useAuthStore();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -15,8 +12,8 @@ function Login() {
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-            await dispatch(loginWithEmail({ email, password })).unwrap();
-            navigate('/dashboard'); // <--- Redirect to dashboard on success
+            await useAuthStore.getState().loginWithEmail({ email, password });
+            navigate('/dashboard');
         } catch (err) {
             console.error("Login component caught error:", err);
         }
@@ -24,7 +21,7 @@ function Login() {
 
     const handleGoogleLogin = async () => {
         try {
-            await dispatch(signInWithGoogle()).unwrap();
+            await useAuthStore.getState().signInWithGoogle();
             navigate('/dashboard'); // <--- Redirect to dashboard on success
         } catch (err) {
             console.error("Google Login component caught error:", err);
