@@ -12,15 +12,16 @@ import {
     Select,
     MenuItem,
     Autocomplete,
+    Chip,
 } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
-import LocationOnIcon from '@mui/icons-material/LocationOn'; // Import location icon
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 import {storage, auth, functions} from "../firebaseConfig.js";
 import {httpsCallable} from "firebase/functions";
 import {GeoPoint} from "firebase/firestore";
-import LocationPickerModal from './LocationPickerModal'; // Import the new modal component
+import LocationPickerModal from './LocationPickerModal';
 
 const UploadPost = () => {
     const [description, setDescription] = useState('');
@@ -175,7 +176,10 @@ const UploadPost = () => {
                 mx: 'auto', // Center the component
             }}
         >
-            <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
+            <Typography variant="h4" gutterBottom align="center" sx={{
+                mb: 4,
+                fontWeight: 600,
+            }}>
                 Create New Post
             </Typography>
 
@@ -188,12 +192,26 @@ const UploadPost = () => {
                 variant="outlined"
                 value={description}
                 onChange={handleDescriptionChange}
-                sx={{ mb: 3 }}
+                sx={{
+                    mb: 3,
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        transition: 'all 0.2s ease-in-out',
+                        '&:hover': {
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        },
+                        '&.Mui-focused': {
+                            boxShadow: '0 4px 20px rgba(25,118,210,0.2)',
+                        }
+                    }
+                }}
                 disabled={isUploading}
-                placeholder="What would you like to share?"
+                placeholder="Describe your post"
             />
 
-            <FormControl fullWidth variant="outlined" sx={{ mb: 3 }} disabled={isUploading}>
+            <FormControl fullWidth variant="outlined" sx={{
+                mb: 3,
+            }} disabled={isUploading}>
                 <InputLabel id="post-type-label">Post Type</InputLabel>
                 <Select
                     labelId="post-type-label"
@@ -231,6 +249,23 @@ const UploadPost = () => {
                                 component="span"
                                 startIcon={<PhotoCameraIcon />}
                                 disabled={isUploading}
+                                sx={{
+                                    borderRadius: 2,
+                                    textTransform: 'none',
+                                    fontWeight: 500,
+                                    px: 3,
+                                    py: 1.5,
+                                    border: '2px dashed',
+                                    borderColor: 'primary.main',
+                                    backgroundColor: 'rgba(25,118,210,0.04)',
+                                    transition: 'all 0.2s ease-in-out',
+                                    '&:hover': {
+                                        borderColor: 'primary.dark',
+                                        backgroundColor: 'rgba(25,118,210,0.08)',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 4px 12px rgba(25,118,210,0.2)',
+                                    }
+                                }}
                             >
                                 Upload {type === 'photo' ? 'Image(s)' : type === 'video' ? 'Video(s)' : 'File(s)'}
                             </Button>
@@ -243,9 +278,30 @@ const UploadPost = () => {
                     </Box>
                     {/* File Previews */}
                     {filePreviews.length > 0 && (
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1, border: '1px dashed #ccc', p: 1, borderRadius: 1 }}>
+                        <Box sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 2,
+                            mt: 2,
+                            p: 2,
+                            borderRadius: 2,
+                            backgroundColor: 'rgba(0,0,0,0.02)',
+                            border: '1px solid rgba(0,0,0,0.08)'
+                        }}>
                             {filePreviews.map((previewUrl, index) => (
-                                <Box key={index} sx={{ position: 'relative', width: 80, height: 80, overflow: 'hidden', borderRadius: 1 }}>
+                                <Box key={index} sx={{
+                                    position: 'relative',
+                                    width: 90,
+                                    height: 90,
+                                    overflow: 'hidden',
+                                    borderRadius: 2,
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                    transition: 'all 0.2s ease-in-out',
+                                    '&:hover': {
+                                        transform: 'scale(1.05)',
+                                        boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                                    }
+                                }}>
                                     {type === 'photo' && (
                                         <img
                                             src={previewUrl}
@@ -304,23 +360,63 @@ const UploadPost = () => {
                 />
             )}
 
-            <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <IconButton
-                    color="primary"
-                    onClick={() => {
-                        setIsMapModalOpen(true);
-                    }}
-                    disabled={isUploading}
-                    aria-label="select location on map"
-                >
-                    <LocationOnIcon />
-                </IconButton>
+            {/* Location Section */}
+            <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                    <Button
+                        variant="outlined"
+                        size="large"
+                        startIcon={<LocationOnIcon />}
+                        onClick={() => setIsMapModalOpen(true)}
+                        disabled={isUploading}
+                        sx={{
+                            minWidth: 'auto',
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 500,
+                            '&:hover': {
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(25,118,210,0.2)',
+                            }
+                        }}
+                    >
+                        {location ? 'Change' : 'Select'} Location
+                    </Button>
+                </Box>
+
+                {location && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                        <Chip
+                            icon={<LocationOnIcon />}
+                            label={`${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+                            color="primary"
+                            variant="filled"
+                            size="small"
+                            onDelete={() => setLocation(null)}
+                            disabled={isUploading}
+                            sx={{
+                                borderRadius: 2,
+                                fontWeight: 500,
+                                '& .MuiChip-deleteIcon': {
+                                    transition: 'all 0.2s ease-in-out',
+                                    '&:hover': {
+                                        transform: 'scale(1.2)',
+                                    }
+                                }
+                            }}
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                            Location selected
+                        </Typography>
+                    </Box>
+                )}
+
+                {!location && (
+                    <Typography variant="body2" color="text.secondary">
+                        Optional: Select where this post is about
+                    </Typography>
+                )}
             </Box>
-            {location && (
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                    📍 {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
-                </Typography>
-            )}
 
             <Box sx={{ mb: 3 }}>
                 <Autocomplete
@@ -340,6 +436,18 @@ const UploadPost = () => {
                             label={`Year (1900 - ${new Date().getFullYear() - 5})`}
                             placeholder="Type to search or select a year..."
                             disabled={isUploading}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2,
+                                    transition: 'all 0.2s ease-in-out',
+                                    '&:hover': {
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    },
+                                    '&.Mui-focused': {
+                                        boxShadow: '0 4px 20px rgba(25,118,210,0.2)',
+                                    }
+                                }
+                            }}
                         />
                     )}
                     disabled={isUploading}
@@ -377,7 +485,27 @@ const UploadPost = () => {
                 fullWidth
                 onClick={handleUploadPost}
                 disabled={isUploading || (!description.trim() && files.length === 0)}
-                sx={{ height: 50, mt: 2 }}
+                sx={{
+                    height: 56,
+                    mt: 3,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+                    boxShadow: '0 4px 16px rgba(25,118,210,0.3)',
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 8px 24px rgba(25,118,210,0.4)',
+                        background: 'linear-gradient(45deg, #1565c0 30%, #1e88e5 90%)',
+                    },
+                    '&:disabled': {
+                        background: 'rgba(0,0,0,0.12)',
+                        transform: 'none',
+                        boxShadow: 'none',
+                    }
+                }}
             >
                 {isUploading ? <CircularProgress size={24} color="inherit" /> : 'Create Post'}
             </Button>
