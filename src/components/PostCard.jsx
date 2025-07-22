@@ -9,7 +9,10 @@ import {
     CardMedia,
     IconButton,
     Button,
-    Modal, ButtonBase
+    Modal,
+    ButtonBase,
+    Menu,
+    MenuItem
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -18,11 +21,13 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import DeleteIcon from '@mui/icons-material/Delete';
 import {format, formatDistanceToNowStrict, isToday, isYesterday} from 'date-fns'; // For better date formatting
 import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
 import PostMap from "./PostMap.jsx"; // Adjust path as needed
 import PostDetailView from "./PostDetailView.jsx";
-import useUiStore from "../stores/useUiStore.js"; // Adjust path as needed
+import useUiStore from "../stores/useUiStore.js";
+import {useAuthStore} from "../stores/useAuthStore.js";
 
 function PostCard({ post }) {
     const {
@@ -39,8 +44,11 @@ function PostCard({ post }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
     const [detailViewOpen, setDetailViewOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null); // State for menu anchor
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+    const deletePost = useUiStore(state => state.deletePost);
+    const currentUser = useAuthStore((state) => state.user);
 
     const {
         id: postId,
@@ -89,6 +97,15 @@ function PostCard({ post }) {
         setActiveSidebarItem('Profile')
         setActiveProfileView(userId)
     }
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDeleteClick = async () => {
+        await deletePost(postId);
+        handleMenuClose();
+    };
 
     const renderMedia = () => {
         if (!files || files.length === 0) {
@@ -148,9 +165,26 @@ function PostCard({ post }) {
                     <Avatar src={userProfilePicUrl || ''} alt={userDisplayName ? userDisplayName.charAt(0) : 'U'} />
                 }
                 action={
-                    <IconButton aria-label="settings">
-                        <MoreVertIcon />
-                    </IconButton>
+                    <>
+                        <IconButton aria-label="settings" onClick={(event) => {
+                            setAnchorEl(event.currentTarget);
+                        }}>
+                            <MoreVertIcon />
+                        </IconButton>
+
+                            {currentUser?.uid && userId === currentUser.uid && (
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                    disableScrollLock
+                                >
+                                <MenuItem onClick={handleDeleteClick}>
+                                    <DeleteIcon sx={{ mr: 1 }} /> Delete Post
+                                </MenuItem>
+                                </Menu>
+                            )}
+                    </>
                 }
                 title={
                     <ButtonBase
