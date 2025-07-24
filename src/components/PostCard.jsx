@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -12,22 +12,27 @@ import {
     Modal,
     ButtonBase,
     Menu,
-    MenuItem
+    MenuItem,
+    TextField,
+    List, ListItem, ListItemText, ListItemAvatar, Divider,
+    Collapse
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import BookmarkIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/BookmarkBorder'; // Corrected bookmark icon
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {format, formatDistanceToNowStrict, isToday, isYesterday} from 'date-fns'; // For better date formatting
-import { usePostInteractions } from '../hooks/usePostInteractions'; // Import the hook
-import PostMap from "./PostMap.jsx"; // Adjust path as needed
+import SendIcon from '@mui/icons-material/Send';
+import {format, formatDistanceToNowStrict, isToday, isYesterday} from 'date-fns';
+import { usePostInteractions } from '../hooks/usePostInteractions';
+import PostMap from "./PostMap.jsx";
 import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import {useAuthStore} from "../stores/useAuthStore.js";
+import {callApiGateway} from "../firebaseConfig.js";
 
 function PostCard({ post }) {
     const {
@@ -50,6 +55,13 @@ function PostCard({ post }) {
     const deletePost = useUiStore(state => state.deletePost);
     const currentUser = useAuthStore((state) => state.user);
 
+    const [comments, setComments] = useState([]);
+    const [newCommentText, setNewCommentText] = useState('');
+    const [isCommentsLoading, setIsCommentsLoading] = useState(false);
+    const [commentError, setCommentError] = useState(null);
+    const [showComments, setShowComments] = useState(false); // Controls visibility of comments section
+    const [hasCommentsFetched, setHasCommentsFetched] = useState(false); // Tracks if comments have been fetched for this post
+
     const {
         id: postId,
         userDisplayName,
@@ -59,7 +71,7 @@ function PostCard({ post }) {
         files, // This will be an array of URLs, or a single YouTube URL
         location,
         year,
-        commentsCount,
+        commentsCount: actualCommentsCount,
         userId,
         createdAt,
         // postId, userId, updatedAt are also there but not directly displayed here
@@ -148,6 +160,67 @@ function PostCard({ post }) {
             default:
                 return null;
         }
+    };
+
+    const fetchComments = useCallback(async () => {
+        setIsCommentsLoading(true);
+        setCommentError(null);
+        try {
+            const result = await callApiGateway({
+                action: 'getComments',
+                payload: {
+                    postId
+                }
+            });
+            const processedComments = result.data.comments.map(comment => ({
+                ...comment,
+                createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : comment.createdAt
+            }));
+            console.log(processedComments)
+
+            setComments(processedComments);
+            setHasCommentsFetched(true);
+        } catch (err) {
+            console.error("Error fetching comments via Cloud Function:", err);
+            if (err.code && err.message) {
+                setCommentError(`Failed to load comments: ${err.message}`);
+            } else {
+                setCommentError("Failed to load comments due to an unexpected error.");
+            }
+        } finally {
+            setIsCommentsLoading(false);
+        }
+    }, [postId]);
+    const handleAddComment = async () => {
+        if (!newCommentText.trim() || !currentUser) {
+            setCommentError("Comment cannot be empty and you must be logged in.");
+            return;
+        }
+
+        try {
+            await callApiGateway({
+                action: 'addComment',
+                payload: {
+                    postId,
+                    text: newCommentText.trim()
+                }
+            });
+            setNewCommentText('');
+            setCommentError(null);
+
+            fetchComments();
+
+        } catch (err) {
+            console.error("Error adding comment:", err);
+            setCommentError("Failed to add comment.");
+        }
+    };
+
+    const handleToggleComments = () => {
+        if (!showComments && !hasCommentsFetched) {
+            fetchComments();
+        }
+        setShowComments(!showComments);
     };
 
     return (
@@ -277,10 +350,10 @@ function PostCard({ post }) {
                     </IconButton>
                     <Typography variant="body2">{likesCount}</Typography>
 
-                    <IconButton aria-label="comment">
-                        <ChatBubbleOutlineIcon />
-                    </IconButton>
-                    <Typography variant="body2">{commentsCount}</Typography>
+                        <IconButton aria-label="comment" onClick={handleToggleComments}>
+                            <ChatBubbleOutlineIcon />
+                        </IconButton>
+                        <Typography variant="body2">{actualCommentsCount}</Typography> {/* Using actualCommentsCount from post prop */}
 
                     <IconButton
                         aria-label="bookmark"
@@ -319,6 +392,86 @@ function PostCard({ post }) {
                         </Modal>
                     </Box>}
                 </Box>
+
+                    <Collapse in={showComments}>
+                        <Box sx={{ mt: 3, borderTop: '1px solid #eee', pt: 2 }}>
+                            <Typography variant="h6" gutterBottom>Comments</Typography>
+                            {isCommentsLoading && <Typography variant="body2" color="text.secondary">Loading comments...</Typography>}
+                            {commentError && <Typography variant="body2" color="error">{commentError}</Typography>}
+
+                            {!isCommentsLoading && !commentError && comments.length === 0 && (
+                                <Typography variant="body2" color="text.secondary">No comments yet. Be the first to comment!</Typography>
+                            )}
+
+                            <List sx={{ maxHeight: 200, overflowY: 'auto', mb: 2 }}>
+                                {comments.map((comment) => (
+                                    <React.Fragment key={comment.id}>
+                                        <ListItem alignItems="flex-start">
+                                            <ListItemAvatar>
+                                                <Avatar alt={comment.userDisplayName?.charAt(0) || 'U'} src={comment.userProfilePicUrl || ''} />
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                onClick={() => handleNameClick(comment.userId)}
+                                                primary={
+                                                    <ButtonBase
+                                                        component="span"
+                                                        variant="subtitle2"
+                                                        color="text.primary"
+                                                        fontWeight="bold"
+                                                        sx={{ display: 'inline' }}
+                                                    >
+                                                        {comment.userDisplayName || 'Anonymous'}
+                                                    </ButtonBase>
+                                                }
+                                                secondary={
+                                                    <React.Fragment>
+                                                        <Typography
+                                                            sx={{ display: 'block' }}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            {comment.text}
+                                                        </Typography>
+                                                        <Typography
+                                                            component="span"
+                                                            variant="caption"
+                                                            color="text.secondary"
+                                                        >
+                                                            {formatFirebaseTimestamp(comment.createdAt)}
+                                                        </Typography>
+                                                    </React.Fragment>
+                                                }
+                                            />
+                                        </ListItem>
+                                        <Divider variant="inset" component="li" />
+                                    </React.Fragment>
+                                ))}
+                            </List>
+
+                            {currentUser && (
+                                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        size="small"
+                                        placeholder="Add a comment..."
+                                        value={newCommentText}
+                                        onChange={(e) => setNewCommentText(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleAddComment();
+                                            }
+                                        }}
+                                    />
+                                    <IconButton color="primary" onClick={handleAddComment} disabled={!newCommentText.trim()}>
+                                        <SendIcon />
+                                    </IconButton>
+                                </Box>
+                            )}
+                        </Box>
+                    </Collapse>
             </CardContent>
         </Card>
     {detailViewOpen && (
