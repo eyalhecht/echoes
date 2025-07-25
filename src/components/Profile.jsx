@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, CircularProgress, Avatar } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Avatar, Paper } from '@mui/material';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
@@ -118,64 +118,101 @@ const Profile = ({ targetUserId }) => {
     }
 
     return (
-        <Box sx={{ maxWidth: '800px', margin: '0 auto', p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, borderBottom: '1px solid #eee', pb: 2 }}>
-                <Avatar
-                    src={profileData?.profilePictureUrl || '/default-avatar.png'}
-                    alt={profileData.displayName}
-                    sx={{ width: 100, height: 100, mr: 3 }}
-                />
-                <Box>
-                    <Typography variant="h4" component="h1">{profileData.displayName}</Typography>
-                    <Typography variant="body1" color="text.secondary">@{profileData.username || 'user'}</Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>{profileData.bio || 'No bio available.'}</Typography>
-                    <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                        <Typography variant="body2">
-                            <strong>{profileData.postsCount || 0}</strong> posts
-                        </Typography>
-                        <Typography variant="body2">
-                            <strong>{profileData.followersCount || 0}</strong> followers
-                        </Typography>
-                        <Typography variant="body2">
-                            <strong>{profileData.followingCount || 0}</strong> following
-                        </Typography>
-                    </Box>
-                    {/* Follow/Unfollow Button */}
-                    {!isCurrentUserProfile && currentUser?.uid && (
-                        <Button
-                            variant="contained"
-                            color={isFollowing ? 'secondary' : 'primary'}
-                            onClick={handleToggleFollow}
-                            disabled={followActionLoading}
-                            sx={{ mt: 2 }}
-                        >
-                            {followActionLoading ? (
-                                <CircularProgress size={24} />
-                            ) : (
-                                isFollowing ? 'Unfollow' : 'Follow'
+        <Box sx={{ maxWidth: '900px', margin: '0 auto', p: 0 }}>
+            <Paper sx={{
+                p: 3,
+                mx: 2,
+                borderRadius: '12px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                position: 'relative',
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
+                    <Avatar
+                        src={profileData?.profilePictureUrl || '/default-avatar.png'}
+                        alt={profileData.displayName}
+                        sx={{
+                            width: 100,
+                            height: 100,
+                            border: '4px solid white',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                        }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
+                                {profileData.displayName}
+                            </Typography>
+                            {!isCurrentUserProfile && currentUser?.uid && (
+                                <Button
+                                    variant={isFollowing ? 'outlined' : 'contained'}
+                                    color="primary"
+                                    onClick={handleToggleFollow}
+                                    disabled={followActionLoading}
+                                    sx={{ minWidth: '100px' }}
+                                >
+                                    {followActionLoading ? (
+                                        <CircularProgress size={20} />
+                                    ) : (
+                                        isFollowing ? 'Unfollow' : 'Follow'
+                                    )}
+                                </Button>
                             )}
-                        </Button>
-                    )}
+                        </Box>
+
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                            @{profileData.username || 'user'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 3, color: '#666' }}>
+                            {profileData.bio || 'No bio available.'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 4 }}>
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c2c2c' }}>
+                                    {profileData.postsCount || 0}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Posts
+                                </Typography>
+                            </Box>
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c2c2c' }}>
+                                    {profileData.followersCount || 0}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Followers
+                                </Typography>
+                            </Box>
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c2c2c' }}>
+                                    {profileData.followingCount || 0}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Following
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Box>
                 </Box>
+            </Paper>
+
+            <Box sx={{ p: 2, mt: 2 }}>
+                {userPostsLoading ? (
+                    <Box sx={{ textAlign: 'center', py: 4 }}>
+                        <CircularProgress size={30} />
+                        <Typography color="text.secondary" sx={{ mt: 1 }}>Loading posts...</Typography>
+                    </Box>
+                ) : userPosts.length === 0 ? (
+                    <Paper sx={{ p: 4, textAlign: 'center', backgroundColor: '#f9f9f9' }}>
+                        <Typography sx={{ color: '#666' }}>
+                            {isCurrentUserProfile ? "You haven't posted anything yet." : `${profileData.displayName} hasn't posted anything yet.`}
+                        </Typography>
+                    </Paper>
+                ) : (
+                    userPosts.map((post) => (
+                        <PostCard key={post.id} post={post} />
+                    ))
+                )}
             </Box>
-
-            {/* User Posts Section */}
-            <Typography variant="h5" component="h2" sx={{ mb: 3 }}>Posts</Typography>
-
-            {userPostsLoading ? (
-                <Box sx={{ textAlign: 'center', py: 3 }}>
-                    <CircularProgress size={30} />
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>Loading posts...</Typography>
-                </Box>
-            ) : userPosts.length === 0 ? (
-                <Typography sx={{ textAlign: 'center', color: '#666' }}>
-                    {isCurrentUserProfile ? "You haven't posted anything yet." : `${profileData.displayName} hasn't posted anything yet.`}
-                </Typography>
-            ) : (
-                userPosts.map((post) => (
-                    <PostCard key={post.id} post={post} />
-                ))
-            )}
         </Box>
     );
 };
