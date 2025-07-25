@@ -82,62 +82,95 @@ const PostDetailView = ({ post, open, onClose }) => {
         <Dialog
             open={open}
             onClose={onClose}
-            maxWidth="md"
+            maxWidth="xl"
             fullWidth
             PaperProps={{
                 sx: { height: '90vh' }
             }}
         >
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    p: 2,
-                    borderBottom: 1,
-                    borderColor: 'divider'
-                }}>
-                    <Avatar src={userProfilePicUrl} sx={{ mr: 2 }}>
-                        {userDisplayName?.charAt(0)}
-                    </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="subtitle1" fontWeight="bold">
-                            {userDisplayName}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            {formattedTimestamp}
-                        </Typography>
-                    </Box>
-                    <IconButton onClick={onClose}>
+            <DialogContent sx={{ p: 0, height: '100%', overflow: 'hidden' }}>
+                <Box sx={{ display: 'flex', height: '100%', position: 'relative' }}>
+                    <IconButton
+                        onClick={onClose}
+                        sx={{
+                            position: 'absolute',
+                            top: 16,
+                            right: 16,
+                            zIndex: 10,
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                            color: 'white',
+                            '&:hover': {
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                            }
+                        }}
+                    >
                         <CloseIcon />
                     </IconButton>
-                </Box>
-
-                <DialogContent sx={{ flex: 1, overflow: 'auto', p: 0 }}>
-                    {/* Media */}
                     {files && files[0] && (
-                        <Box sx={{ backgroundColor: 'black', display: 'flex', justifyContent: 'center' }}>
+                        <Box sx={{
+                            flex: 1,
+                            backgroundColor: 'black',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRight: 1,
+                            borderColor: 'divider'
+                        }}>
                             {type === 'photo' && (
                                 <CardMedia
                                     component="img"
                                     image={files[0]}
                                     alt="Post media"
-                                    sx={{ maxHeight: 500, width: 'auto' }}
+                                    sx={{
+                                        maxHeight: '100%',
+                                        maxWidth: '100%',
+                                        width: 'auto',
+                                        height: 'auto',
+                                        objectFit: 'contain'
+                                    }}
                                 />
                             )}
                             {type === 'video' && (
                                 <video
                                     controls
                                     src={files[0]}
-                                    style={{ maxHeight: 500, width: 'auto' }}
+                                    style={{
+                                        maxHeight: '100%',
+                                        maxWidth: '100%',
+                                        width: 'auto',
+                                        height: 'auto'
+                                    }}
                                 />
                             )}
                         </Box>
                     )}
 
-                    <Box sx={{ p: 2 }}>
-                        <Typography variant="body1" sx={{ mb: 2 }}>
-                            {description}
-                        </Typography>
+                    <Box sx={{
+                        flex: files && files[0] ? 1 : 2,
+                        display: 'flex',
+                        maxWidth: "400px",
+                        flexDirection: 'column',
+                        overflow: 'auto'
+                    }}>
+                        <Box sx={{ p: 2 }}>
+                            {/* User info at the top of right panel */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                <Avatar src={userProfilePicUrl} sx={{ mr: 2 }}>
+                                    {userDisplayName?.charAt(0)}
+                                </Avatar>
+                                <Box>
+                                    <Typography variant="subtitle1" fontWeight="bold">
+                                        {userDisplayName}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {formattedTimestamp}
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                {description}
+                            </Typography>
 
                         <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                             <IconButton onClick={handleLikeToggle} disabled={isLikeUpdating}>
@@ -183,34 +216,35 @@ const PostDetailView = ({ post, open, onClose }) => {
                             ))}
                         </List>
 
-                        {/* Comment input */}
-                        <TextField
-                            fullWidth
-                            placeholder="Add a comment..."
-                            value={comment}
-                            onChange={(e) => setComment(e.target.value)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleCommentSubmit();
-                                }
-                            }}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={handleCommentSubmit}
-                                            disabled={!comment.trim()}
-                                        >
-                                            <SendIcon />
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
+                            {/* Comment input */}
+                            <TextField
+                                fullWidth
+                                placeholder="Add a comment..."
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleCommentSubmit();
+                                    }
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                onClick={handleCommentSubmit}
+                                                disabled={!comment.trim()}
+                                            >
+                                                <SendIcon />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </Box>
                     </Box>
-                </DialogContent>
-            </Box>
+                </Box>
+            </DialogContent>
         </Dialog>
     );
 };
