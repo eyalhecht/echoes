@@ -36,8 +36,9 @@ function MainContent() {
     return (
         <Box sx={{
             marginLeft: '200px',
-            marginTop: `${HEADER_HEIGHT}px`,
-            minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+            // marginTop: `${HEADER_HEIGHT}px`,
+            // minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+            minHeight: `100vh`,
             backgroundColor: 'grey',
             padding: '20px'
         }}>
@@ -49,7 +50,7 @@ function MainContent() {
 export default function Layout() {
     return (
         <Box>
-            <Header height={HEADER_HEIGHT} />
+            {/*<Header height={HEADER_HEIGHT} />*/}
             <Sidebar />
             <MainContent />
         </Box>

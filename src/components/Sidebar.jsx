@@ -1,13 +1,25 @@
 import React from 'react';
-import { Box, Typography, Avatar } from '@mui/material';
+import { Box, Typography, Avatar, CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import useUiStore from "../stores/useUiStore.js";
 import {useAuthStore} from "../stores/useAuthStore.js";
 
 function Sidebar() {
+    const navigate = useNavigate();
     const currentUser = useAuthStore(state => state.user);
+    const { loading } = useAuthStore();
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+
+    const handleLogout = async () => {
+        try {
+            await useAuthStore.getState().logout();
+            navigate('/login');
+        } catch (err) {
+            console.error("Logout component caught error:", err);
+        }
+    };
 
     const items = [
         {
@@ -35,13 +47,19 @@ function Sidebar() {
             icon: '➕',
             callback: () => {}
         },
+        {
+            name: 'Logout',
+            icon: '🚪',
+            callback: handleLogout,
+            isLoading: loading
+        },
     ];
 
     return (
         <Box sx={{
             width: '220px',
             height: '100vh',
-            backgroundColor: '#f5f1e8', // Warm beige/cream like in the image
+            backgroundColor: '#f5f1e8',
             color: '#2d2d2d',
             position: 'fixed',
             left: 0,
@@ -88,11 +106,11 @@ function Sidebar() {
                             display: 'flex',
                             alignItems: 'center',
                             padding: '12px 24px',
-                            cursor: item.isHeader ? 'default' : 'pointer',
+                            cursor: 'pointer',
                             backgroundColor: activeSidebarItem === item.name ? '#e8dcc0' : 'transparent',
                             borderLeft: activeSidebarItem === item.name ? '3px solid #8B4513' : '3px solid transparent',
                             '&:hover': {
-                                backgroundColor: item.isHeader ? 'transparent' : '#e8dcc0',
+                                backgroundColor: '#e8dcc0',
                             },
                             transition: 'all 0.2s ease-in-out',
                             position: 'relative'
@@ -129,23 +147,30 @@ function Sidebar() {
                         key={item.name}
                         onClick={() => {
                             item.callback();
-                            setActiveSidebarItem(item.name);
+                            if (item.name !== 'Logout') {
+                                setActiveSidebarItem(item.name);
+                            }
                         }}
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
                             padding: '12px 24px',
-                            cursor: 'pointer',
+                            cursor: item.isLoading ? 'not-allowed' : 'pointer',
+                            opacity: item.isLoading ? 0.6 : 1,
                             '&:hover': {
-                                backgroundColor: '#e8dcc0',
+                                backgroundColor: item.isLoading ? 'transparent' : '#e8dcc0',
                             },
                             transition: 'background-color 0.2s ease-in-out',
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Typography sx={{ fontSize: '14px', color: '#8B4513' }}>
-                                {item.icon}
-                            </Typography>
+                            {item.isLoading ? (
+                                <CircularProgress size={14} sx={{ color: '#8B4513' }} />
+                            ) : (
+                                <Typography sx={{ fontSize: '14px', color: '#8B4513' }}>
+                                    {item.icon}
+                                </Typography>
+                            )}
                             <Typography
                                 variant="body2"
                                 sx={{
@@ -154,7 +179,7 @@ function Sidebar() {
                                     fontWeight: '500'
                                 }}
                             >
-                                {item.name}
+                                {item.isLoading && item.name === 'Logout' ? 'Logging out...' : item.name}
                             </Typography>
                         </Box>
                     </Box>

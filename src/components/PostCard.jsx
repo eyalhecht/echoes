@@ -287,7 +287,7 @@ function PostCard({ post }) {
                         </Typography>
                         {year && year.length > 0 && (
                             <Typography variant="caption" color="text.secondary">
-                                Year(s): {year.join(', ')}
+                                Year: {year.join(', ')}
                             </Typography>
                         )}
                     </>
