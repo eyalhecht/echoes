@@ -1,9 +1,7 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material'; // Import Typography for consistent text styling
+import { Box, Typography, Avatar } from '@mui/material';
 import useUiStore from "../stores/useUiStore.js";
 import {useAuthStore} from "../stores/useAuthStore.js";
-
-const HEADER_HEIGHT = 40;
 
 function Sidebar() {
     const currentUser = useAuthStore(state => state.user);
@@ -12,48 +10,156 @@ function Sidebar() {
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
     const items = [
-        { name: 'Home', callback: () => {} },
-        { name: 'Profile', callback: () => {
+        {
+            name: 'Home',
+            icon: '📰',
+            callback: () => {}
+        },
+        {
+            name: 'Profile',
+            icon: '👤',
+            callback: () => {
                 setActiveProfileView(currentUser.uid)
-            }},
-        { name: 'Bookmarks', callback: () => {} },
-        { name: 'Upload', callback: () => {} },
+            }
+        },
+        {
+            name: 'Bookmarks',
+            icon: '🔍',
+            callback: () => {}
+        },
+    ];
+
+    const actionItems = [
+        {
+            name: 'Upload',
+            icon: '➕',
+            callback: () => {}
+        },
     ];
 
     return (
         <Box sx={{
             width: '220px',
-            height: `calc(100vh - ${HEADER_HEIGHT}px)`,
-            backgroundColor: '#1877f2',
-            color: 'white',
+            height: '100vh',
+            backgroundColor: '#f5f1e8', // Warm beige/cream like in the image
+            color: '#2d2d2d',
             position: 'fixed',
             left: 0,
-            top: HEADER_HEIGHT,
-            boxShadow: '2px 0 4px rgba(0,0,0,0.1)' // Optional: add subtle shadow for depth
+            top: 0,
+            padding: '20px 0',
+            overflow: 'hidden'
         }}>
-            {items.map((item) => (
-                <Box
-                    key={item.name}
-                    onClick={() => {
-                        item.callback();
-                        setActiveSidebarItem(item.name)
-                    }}
+            <Box sx={{
+                padding: '0 24px 24px 24px',
+                borderBottom: '1px solid #e8dcc0',
+                marginBottom: '16px'
+            }}>
+                <Typography
+                    variant="h6"
                     sx={{
-                        padding: '16px',
-                        cursor: 'pointer',
-                        backgroundColor: activeSidebarItem === item.name ? 'rgba(255, 255, 255, 0.15)' : 'transparent', // Slightly lighter tint for active
-                        '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                        },
-                        fontWeight: activeSidebarItem === item.name ? 'bold' : 'normal',
-                        transition: 'background-color 0.2s ease-in-out', // Smooth transition for hover/active
+                        fontWeight: 'bold',
+                        color: '#2d2d2d',
+                        fontSize: '18px',
+                        letterSpacing: '0.5px'
                     }}
                 >
-                    <Typography variant="body1" sx={{ color: 'inherit' }}>
-                        {item.name}
-                    </Typography>
-                </Box>
-            ))}
+                    ECHOES
+                </Typography>
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: '#666',
+                        fontSize: '12px'
+                    }}
+                >
+                    Your social workspace
+                </Typography>
+            </Box>
+
+            <Box sx={{ marginBottom: '24px' }}>
+                {items.map((item) => (
+                    <Box
+                        key={item.name}
+                        onClick={() => {
+                            item.callback();
+                            setActiveSidebarItem(item.name);
+                        }}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '12px 24px',
+                            cursor: item.isHeader ? 'default' : 'pointer',
+                            backgroundColor: activeSidebarItem === item.name ? '#e8dcc0' : 'transparent',
+                            borderLeft: activeSidebarItem === item.name ? '3px solid #8B4513' : '3px solid transparent',
+                            '&:hover': {
+                                backgroundColor: item.isHeader ? 'transparent' : '#e8dcc0',
+                            },
+                            transition: 'all 0.2s ease-in-out',
+                            position: 'relative'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
+                            <Typography sx={{ fontSize: '16px' }}>
+                                {item.icon}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: activeSidebarItem === item.name ? '#2d2d2d' : '#555',
+                                    fontWeight: activeSidebarItem === item.name ? '600' : '400',
+                                    fontSize: '14px'
+                                }}
+                            >
+                                {item.name}
+                            </Typography>
+                        </Box>
+                    </Box>
+                ))}
+            </Box>
+
+            <Box sx={{
+                height: '1px',
+                backgroundColor: '#e8dcc0',
+                margin: '16px 24px'
+            }} />
+
+            <Box>
+                {actionItems.map((item) => (
+                    <Box
+                        key={item.name}
+                        onClick={() => {
+                            item.callback();
+                            setActiveSidebarItem(item.name);
+                        }}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '12px 24px',
+                            cursor: 'pointer',
+                            '&:hover': {
+                                backgroundColor: '#e8dcc0',
+                            },
+                            transition: 'background-color 0.2s ease-in-out',
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <Typography sx={{ fontSize: '14px', color: '#8B4513' }}>
+                                {item.icon}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: '#8B4513',
+                                    fontSize: '13px',
+                                    fontWeight: '500'
+                                }}
+                            >
+                                {item.name}
+                            </Typography>
+                        </Box>
+                    </Box>
+                ))}
+            </Box>
         </Box>
     );
 }
