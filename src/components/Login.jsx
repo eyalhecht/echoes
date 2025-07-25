@@ -28,39 +28,50 @@ function Login() {
         }
     };
 
+    const handleGitHubLogin = async () => {
+        try {
+            await useAuthStore.getState().signInWithGitHub();
+            navigate('/dashboard'); // <--- Redirect to dashboard on success
+        } catch (err) {
+            console.error("Google Login component caught error:", err);
+        }
+    };
+
     return (
         <div style={{textAlign: 'center', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', maxWidth: '400px', margin: '20px auto'}}>
             <h3>Login to Echoes</h3>
-            <form onSubmit={handleEmailLogin}>
-                <div style={{marginBottom: '10px'}}>
-                    <label htmlFor="email" style={{display: 'block', marginBottom: '5px'}}>Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        style={{width: '90%', padding: '8px'}}
-                    />
-                </div>
-                <div style={{marginBottom: '15px'}}>
-                    <label htmlFor="password" style={{display: 'block', marginBottom: '5px'}}>Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        style={{width: '90%', padding: '8px'}}
-                    />
-                </div>
-                <button type="submit" disabled={loading} style={{padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
-                    {loading ? 'Logging In...' : 'Login with Email'}
-                </button>
-            </form>
-            <p style={{margin: '15px 0'}}>OR</p>
+            {/*<form onSubmit={handleEmailLogin}>*/}
+            {/*    <div style={{marginBottom: '10px'}}>*/}
+            {/*        <label htmlFor="email" style={{display: 'block', marginBottom: '5px'}}>Email:</label>*/}
+            {/*        <input*/}
+            {/*            type="email"*/}
+            {/*            id="email"*/}
+            {/*            value={email}*/}
+            {/*            onChange={(e) => setEmail(e.target.value)}*/}
+            {/*            required*/}
+            {/*            style={{width: '90%', padding: '8px'}}*/}
+            {/*        />*/}
+            {/*    </div>*/}
+            {/*    <div style={{marginBottom: '15px'}}>*/}
+            {/*        <label htmlFor="password" style={{display: 'block', marginBottom: '5px'}}>Password:</label>*/}
+            {/*        <input*/}
+            {/*            type="password"*/}
+            {/*            id="password"*/}
+            {/*            value={password}*/}
+            {/*            onChange={(e) => setPassword(e.target.value)}*/}
+            {/*            required*/}
+            {/*            style={{width: '90%', padding: '8px'}}*/}
+            {/*        />*/}
+            {/*    </div>*/}
+            {/*    <button type="submit" disabled={loading} style={{padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>*/}
+            {/*        {loading ? 'Logging In...' : 'Login with Email'}*/}
+            {/*    </button>*/}
+            {/*</form>*/}
             <button onClick={handleGoogleLogin} disabled={loading} style={{padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
                 {loading ? 'Signing In...' : 'Login with Google'}
+            </button>
+            <button onClick={handleGitHubLogin} disabled={loading} style={{padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}>
+                {loading ? 'Signing In...' : 'Login with GitHub'}
             </button>
 
             {error && <p style={{ color: 'red', marginTop: '15px' }}>Error: {error}</p>}
