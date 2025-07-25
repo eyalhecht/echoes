@@ -21,7 +21,7 @@ import {useNavigate} from "react-router-dom";
 // Custom styled components
 const GradientBox = styled(Box)(({ theme }) => ({
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #ff6b35 0%, #e74c3c 25%, #8e44ad 75%, #3498db 100%)',
+    background: 'linear-gradient(135deg, #000000 0%, #ffffff 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -126,19 +126,19 @@ function Login() {
                 <GlassCard>
                     <CardContent sx={{ p: 4 }}>
                         <Box textAlign="center" mb={4}>
-                            <BrandAvatar>
-                                <svg width="32" height="32" fill="white" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="1.5" fill="white"/>
-                                    <path d="M16 8c2.2 2.2 2.2 5.8 0 8"
-                                          stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.8"/>
-                                    <path d="M19 5c4.4 4.4 4.4 11.6 0 16"
-                                          stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
-                                    <path d="M8 16c-2.2-2.2-2.2-5.8 0-8"
-                                          stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.8"/>
-                                    <path d="M5 19c-4.4-4.4-4.4-11.6 0-16"
-                                          stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
-                                </svg>
-                            </BrandAvatar>
+                            {/*<BrandAvatar>*/}
+                            {/*    <svg width="32" height="32" fill="white" viewBox="0 0 24 24">*/}
+                            {/*        <circle cx="12" cy="12" r="1.5" fill="white"/>*/}
+                            {/*        <path d="M16 8c2.2 2.2 2.2 5.8 0 8"*/}
+                            {/*              stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.8"/>*/}
+                            {/*        <path d="M19 5c4.4 4.4 4.4 11.6 0 16"*/}
+                            {/*              stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>*/}
+                            {/*        <path d="M8 16c-2.2-2.2-2.2-5.8 0-8"*/}
+                            {/*              stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.8"/>*/}
+                            {/*        <path d="M5 19c-4.4-4.4-4.4-11.6 0-16"*/}
+                            {/*              stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>*/}
+                            {/*    </svg>*/}
+                            {/*</BrandAvatar>*/}
                             <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
                                 Echoes
                             </Typography>
