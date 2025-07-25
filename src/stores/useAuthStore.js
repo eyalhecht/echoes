@@ -5,6 +5,7 @@ import {
     signInWithEmailAndPassword,
     signInWithPopup,
     GoogleAuthProvider,
+    GithubAuthProvider,
     signOut,
     onAuthStateChanged,
 } from 'firebase/auth';
@@ -62,6 +63,20 @@ export const useAuthStore = create((set) => ({
             set({ user: user.toJSON(), isAuthenticated: true, loading: false });
         } catch (error) {
             console.error("Google Sign-In Error:", error);
+            set({ error: error.message, loading: false });
+        }
+    },
+
+    signInWithGitHub: async () => {
+        set({ loading: true, error: null });
+        try {
+            const provider = new GithubAuthProvider();
+            const userCredential = await signInWithPopup(auth, provider);
+            const user = userCredential.user;
+            await createUserProfileInFirestore(user.displayName, user.photoURL);
+            set({ user: user.toJSON(), isAuthenticated: true, loading: false });
+        } catch (error) {
+            console.error("GitHub Sign-In Error:", error);
             set({ error: error.message, loading: false });
         }
     },

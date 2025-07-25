@@ -5,6 +5,7 @@ import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import Profile from "./Profile.jsx";
+import MapPostsView from "./MapPostsView.jsx"; // Import the new component
 import {useAuthStore} from "../stores/useAuthStore.js";
 import Sidebar from "./Sidebar.jsx";
 
@@ -22,6 +23,8 @@ function MainContent() {
                 return <Home />;
             case 'Profile':
                 return <Profile targetUserId={activeProfileView || currentUser.uid} />;
+            case 'Map':
+                return <MapPostsView />;
             case 'Friends':
                 return <Box>Friends Page Coming Soon...</Box>;
             case 'Upload':
@@ -36,8 +39,9 @@ function MainContent() {
     return (
         <Box sx={{
             marginLeft: '200px',
-            marginTop: `${HEADER_HEIGHT}px`,
-            minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+            // marginTop: `${HEADER_HEIGHT}px`,
+            // minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+            minHeight: `100vh`,
             backgroundColor: 'grey',
             padding: '20px'
         }}>
@@ -49,7 +53,7 @@ function MainContent() {
 export default function Layout() {
     return (
         <Box>
-            <Header height={HEADER_HEIGHT} />
+            {/*<Header height={HEADER_HEIGHT} />*/}
             <Sidebar />
             <MainContent />
         </Box>

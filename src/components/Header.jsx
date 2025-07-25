@@ -31,7 +31,7 @@ function Header({ height }) {
             color: 'white',
             position: 'fixed',
             top: 0,
-            left: 0,
+            left: 220,
             right: 0,
             zIndex: 1000,
             display: 'flex',

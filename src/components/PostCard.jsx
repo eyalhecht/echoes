@@ -121,47 +121,74 @@ function PostCard({ post }) {
 
     const renderMedia = () => {
         if (!files || files.length === 0) {
-            return null; // No files to display
+            return null;
         }
 
-        const firstFile = files[0]; // For simplicity, display the first file/URL
+        const firstFile = files[0];
 
         switch (type) {
             case 'photo':
-            case 'document': // Display documents as images for now, or you'd use an icon
-            case 'item': // Similar to document, perhaps just show an image
-                return <CardMedia component="img" image={firstFile} alt="Post media" sx={{ maxHeight: 400, objectFit: 'contain', margin: 'auto' }} />;
-            case 'video':
-                // For videos, use the <video> tag
+            case 'document':
+            case 'item':
                 return (
-                    <CardMedia component="video" controls src={firstFile} sx={{ maxHeight: 400, width: '100%' }} />
+                    <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                        <CardMedia
+                            component="img"
+                            image={firstFile}
+                            alt="Post media"
+                            sx={{ maxHeight: 400, objectFit: 'contain', margin: 'auto', width: '100%' }}
+                        />
+                        {year && year.length > 0 && (
+                            <Box sx={{
+                                position: 'absolute',
+                                bottom: 8,
+                                right: 8,
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                color: 'white',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backdropFilter: 'blur(4px)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)'
+                            }}>
+                                {year.join(', ')}
+                            </Box>
+                        )}
+                    </Box>
                 );
-            case 'youtube':
-                // For YouTube, embed using an iframe
-                // You'll need to extract the video ID from the googleusercontent.com/youtube.com/2 URL if it's not a standard youtube.com/watch?v=...
-                // Assuming firstFile is the direct embed URL or extractable video ID
-                // const youtubeEmbedUrl = firstFile.includes('youtube.com/embed/')
-                //     ? firstFile
-                //     : `https://www.youtube.com/embed/${firstFile.split('/').pop()}`; // Basic extraction
-
+            case 'video':
                 return (
-                    <CardMedia>
-                        <iframe
-                            width="100%"
-                            height="315"
-                            src={youtubeEmbedUrl}
-                            title="YouTube video player"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        ></iframe>
-                    </CardMedia>
+                    <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                        <CardMedia
+                            component="video"
+                            controls
+                            src={firstFile}
+                            sx={{ maxHeight: 400, width: '100%' }}
+                        />
+                        {year && year.length > 0 && (
+                            <Box sx={{
+                                position: 'absolute',
+                                bottom: 48, // Higher up to avoid video controls
+                                right: 8,
+                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                                color: 'white',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                backdropFilter: 'blur(4px)',
+                                border: '1px solid rgba(255, 255, 255, 0.2)'
+                            }}>
+                                {year.join(', ')}
+                            </Box>
+                        )}
+                    </Box>
                 );
             default:
                 return null;
         }
     };
-
     const fetchComments = useCallback(async () => {
         setIsCommentsLoading(true);
         setCommentError(null);
@@ -285,11 +312,6 @@ function PostCard({ post }) {
                         <Typography variant="body2" color="text.secondary">
                             {formatFirebaseTimestamp(createdAt)}
                         </Typography>
-                        {year && year.length > 0 && (
-                            <Typography variant="caption" color="text.secondary">
-                                Year(s): {year.join(', ')}
-                            </Typography>
-                        )}
                     </>
                 }
             />
