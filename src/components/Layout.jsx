@@ -5,6 +5,7 @@ import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import Profile from "./Profile.jsx";
+import MapPostsView from "./MapPostsView.jsx"; // Import the new component
 import {useAuthStore} from "../stores/useAuthStore.js";
 import Sidebar from "./Sidebar.jsx";
 
@@ -22,6 +23,8 @@ function MainContent() {
                 return <Home />;
             case 'Profile':
                 return <Profile targetUserId={activeProfileView || currentUser.uid} />;
+            case 'Map':
+                return <MapPostsView />;
             case 'Friends':
                 return <Box>Friends Page Coming Soon...</Box>;
             case 'Upload':

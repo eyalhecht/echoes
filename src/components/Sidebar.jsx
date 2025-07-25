@@ -35,8 +35,13 @@ function Sidebar() {
             }
         },
         {
+            name: 'Map',
+            icon: '🗺️',
+            callback: () => {}
+        },
+        {
             name: 'Bookmarks',
-            icon: '🔍',
+            icon: '🔖',
             callback: () => {}
         },
     ];
