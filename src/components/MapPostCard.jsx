@@ -11,6 +11,9 @@ import {
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from 'date-fns';
 import PostDetailView from './PostDetailView.jsx';
 import useUiStore from "../stores/useUiStore.js";
@@ -30,7 +33,10 @@ const MapPostCard = ({
     const {
         liked,
         likesCount,
-        handleLikeToggle
+        bookmarked,
+        bookmarksCount,
+        handleLikeToggle,
+        handleBookmarkToggle
     } = usePostInteractions(post.id);
 
     const {
@@ -41,7 +47,8 @@ const MapPostCard = ({
         files,
         userId,
         createdAt,
-        distanceKm
+        distanceKm,
+        commentsCount
     } = post;
 
     const formatFirebaseTimestamp = (firebaseTimestamp) => {
@@ -68,12 +75,16 @@ const MapPostCard = ({
     };
 
     const handleCardClick = () => {
+        // Open PostDetailView when card is clicked
+        setDetailViewOpen(true);
+        
+        // Also trigger map interaction if provided
         if (onCardClick) {
             onCardClick(post);
         }
     };
 
-    const truncateText = (text, maxLength = 80) => {
+    const truncateText = (text, maxLength = 100) => {
         if (!text) return '';
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
@@ -84,10 +95,10 @@ const MapPostCard = ({
             <Card
                 sx={{
                     width: '100%',
-                    height: 140,
+                    height: 180,
                     cursor: 'pointer',
-                    mb: 1,
-                    borderRadius: '8px',
+                    mb: 2,
+                    borderRadius: '12px',
                     boxShadow: isSelected ? '0 4px 16px rgba(25, 118, 210, 0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
                     border: isSelected ? '2px solid #1976d2' : '1px solid #e0e0e0',
                     transition: 'all 0.2s ease',
@@ -101,14 +112,14 @@ const MapPostCard = ({
                 onMouseEnter={() => onCardHover && onCardHover(post)}
                 onMouseLeave={() => onCardLeave && onCardLeave()}
             >
-                <CardContent sx={{ p: 1.5, height: '100%', '&:last-child': { pb: 1.5 } }}>
-                    <Box sx={{ display: 'flex', height: '100%', gap: 1.5 }}>
+                <CardContent sx={{ p: 2, height: '100%', '&:last-child': { pb: 2 } }}>
+                    <Box sx={{ display: 'flex', height: '100%', gap: 2 }}>
                         {/* Image */}
                         <Box
                             sx={{
-                                width: 80,
-                                height: 80,
-                                borderRadius: '6px',
+                                width: 120,
+                                height: 120,
+                                borderRadius: '8px',
                                 overflow: 'hidden',
                                 flexShrink: 0,
                                 backgroundColor: '#f5f5f5',
@@ -128,7 +139,7 @@ const MapPostCard = ({
                                     }}
                                 />
                             ) : (
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography variant="body2" color="text.secondary">
                                     No image
                                 </Typography>
                             )}
@@ -136,12 +147,12 @@ const MapPostCard = ({
 
                         {/* Content */}
                         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                            {/* Header */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                <Avatar 
-                                    src={userProfilePicUrl || ''} 
+                            {/* Header with user info */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                                <Avatar
+                                    src={userProfilePicUrl || ''}
                                     alt={userDisplayName ? userDisplayName.charAt(0) : 'U'}
-                                    sx={{ width: 24, height: 24 }}
+                                    sx={{ width: 32, height: 32 }}
                                 />
                                 <ButtonBase
                                     onClick={handleNameClick}
@@ -155,23 +166,47 @@ const MapPostCard = ({
                                         }
                                     }}
                                 >
-                                    <Typography 
-                                        variant="subtitle2" 
-                                        fontWeight="bold"
+                                    <Typography
+                                        variant="subtitle1"
+                                        fontWeight="600"
                                         sx={{
                                             cursor: 'pointer',
                                             color: 'inherit',
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
+                                            whiteSpace: 'nowrap',
+                                            fontSize: '16px'
                                         }}
                                     >
                                         {userDisplayName || 'Anonymous User'}
                                     </Typography>
                                 </ButtonBase>
+                            </Box>
+
+                            {/* Description */}
+                            <Typography
+                                variant="body1"
+                                color="text.primary"
+                                sx={{
+                                    mb: 1.5,
+                                    flex: 1,
+                                    overflow: 'hidden',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    lineHeight: 1.4,
+                                    fontSize: '14px'
+                                }}
+                            >
+                                {truncateText(description, 100)}
+                            </Typography>
+
+                            {/* Interactions Row */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                                {/* Like */}
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <IconButton 
-                                        size="small" 
+                                    <IconButton
+                                        size="medium"
                                         sx={{ p: 0.5 }}
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -179,55 +214,51 @@ const MapPostCard = ({
                                         }}
                                     >
                                         {liked ? (
-                                            <FavoriteIcon sx={{ fontSize: 16, color: 'red' }} />
+                                            <FavoriteIcon sx={{ fontSize: 20, color: 'red' }} />
                                         ) : (
-                                            <FavoriteBorderIcon sx={{ fontSize: 16 }} />
+                                            <FavoriteBorderIcon sx={{ fontSize: 20 }} />
                                         )}
                                     </IconButton>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
                                         {likesCount}
+                                    </Typography>
+                                </Box>
+
+                                {/* Comments */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <ChatBubbleOutlineIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                                        {commentsCount || 0}
+                                    </Typography>
+                                </Box>
+
+                                {/* Bookmark */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <IconButton
+                                        size="medium"
+                                        sx={{ p: 0.5 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleBookmarkToggle();
+                                        }}
+                                    >
+                                        {bookmarked ? (
+                                            <BookmarkIcon sx={{ fontSize: 20, color: '#1976d2' }} />
+                                        ) : (
+                                            <BookmarkBorderIcon sx={{ fontSize: 20 }} />
+                                        )}
+                                    </IconButton>
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                                        {bookmarksCount}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            {/* Description */}
-                            <Typography 
-                                variant="body2" 
-                                color="text.primary"
-                                sx={{ 
-                                    mb: 0.5,
-                                    flex: 1,
-                                    overflow: 'hidden',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    lineHeight: 1.3
-                                }}
-                            >
-                                {truncateText(description)}
-                            </Typography>
-
-                            {/* Footer */}
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="caption" color="text.secondary">
-                                    📍 {distanceKm ? `${distanceKm.toFixed(1)}km` : 'Unknown'} • {formatFirebaseTimestamp(createdAt)}
+                            {/* Footer with timestamp */}
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '13px' }}>
+                                    {formatFirebaseTimestamp(createdAt)}
                                 </Typography>
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setDetailViewOpen(true);
-                                    }}
-                                    sx={{
-                                        fontSize: '10px',
-                                        padding: '2px 8px',
-                                        minWidth: 'auto',
-                                        height: 24
-                                    }}
-                                >
-                                    View Full
-                                </Button>
                             </Box>
                         </Box>
                     </Box>
