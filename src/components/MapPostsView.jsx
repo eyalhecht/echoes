@@ -163,17 +163,6 @@ console.log("asd")
                                             lng: post.location._longitude
                                         }}
                                         onClick={() => handleMarkerClick(post)}
-                                        icon={{
-                                            url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                                                <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                                                    <circle cx="16" cy="12" r="18" fill="#1976d2" stroke="white" stroke-width="2"/>
-                                                    <path d="M16 4 L16 20 L8 12 Z" fill="#1976d2"/>
-                                                    <text x="16" y="16" text-anchor="middle" fill="white" font-size="10">📷</text>
-                                                </svg>
-                                            `)}`,
-                                            scaledSize: new window.google.maps.Size(32, 32),
-                                            anchor: new window.google.maps.Point(16, 32)
-                                        }}
                                     />
                                 )
                             ))}
