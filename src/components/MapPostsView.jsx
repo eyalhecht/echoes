@@ -207,7 +207,7 @@ const MapPostsView = () => {
 
             <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
                 <Box sx={{
-                    width: '40%', 
+                    width: '55%', 
                     borderRight: 1, 
                     borderColor: 'divider',
                     display: 'flex',

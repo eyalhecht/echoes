@@ -27,6 +27,8 @@ const MapPostCard = ({
     onCardLeave 
 }) => {
     const [detailViewOpen, setDetailViewOpen] = useState(false);
+    const [imageHeight, setImageHeight] = useState(180); // Increased default height
+    const [imageLoaded, setImageLoaded] = useState(false);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
@@ -84,6 +86,38 @@ const MapPostCard = ({
         }
     };
 
+    const handleImageLoad = (event) => {
+        const img = event.target;
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+        
+        if (naturalWidth && naturalHeight) {
+            // Calculate card width (approximately 220px for 2-column masonry in 55% panel)
+            const cardWidth = 220;
+            const aspectRatio = naturalHeight / naturalWidth;
+            
+            // Different height ranges based on image orientation - increased for larger cards
+            let calculatedHeight;
+            
+            if (aspectRatio > 1.4) {
+                // Tall/Portrait images: 220-350px
+                calculatedHeight = Math.min(Math.max(cardWidth * aspectRatio, 220), 350);
+            } else if (aspectRatio < 0.7) {
+                // Wide/Landscape images: 100-180px  
+                calculatedHeight = Math.min(Math.max(cardWidth * aspectRatio, 100), 180);
+            } else {
+                // Square-ish images: 160-260px
+                calculatedHeight = Math.min(Math.max(cardWidth * aspectRatio, 160), 260);
+            }
+            
+            setImageHeight(calculatedHeight);
+            setImageLoaded(true);
+            
+            // Debug logging to see the variety
+            console.log(`Image ${post.id}: ${naturalWidth}x${naturalHeight}, ratio: ${aspectRatio.toFixed(2)}, height: ${calculatedHeight}px`);
+        }
+    };
+
     const truncateText = (text, maxLength = 100) => {
         if (!text) return '';
         if (text.length <= maxLength) return text;
@@ -102,10 +136,6 @@ const MapPostCard = ({
                     border: isSelected ? '2px solid #1976d2' : '1px solid #e0e0e0',
                     transition: 'all 0.2s ease',
                     backgroundColor: isSelected ? '#f3f8ff' : 'white',
-                    '&:hover': {
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                        transform: 'translateY(-1px)',
-                    },
                     overflow: 'hidden'
                 }}
                 onClick={handleCardClick}
@@ -114,21 +144,25 @@ const MapPostCard = ({
             >
                 <Box
                     sx={{
-                        height: 160,
+                        height: imageHeight,
                         width: '100%',
                         position: 'relative',
                         backgroundColor: '#f5f5f5',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        minHeight: 100 // Ensure minimum height even for very wide images
                     }}
                 >
                     {files && files[0] ? (
                         <img
                             src={files[0]}
                             alt="Post preview"
+                            onLoad={handleImageLoad}
                             style={{
                                 width: '100%',
                                 height: '100%',
                                 objectFit: 'cover',
+                                transition: 'opacity 0.3s ease',
+                                opacity: imageLoaded ? 1 : 0.7
                             }}
                         />
                     ) : (
