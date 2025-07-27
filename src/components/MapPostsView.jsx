@@ -5,12 +5,14 @@ import {
     Typography,
     CircularProgress,
     Alert,
-    Fab
+    Fab,
+    Divider
 } from '@mui/material';
 import {
     MyLocation as MyLocationIcon,
 } from '@mui/icons-material';
 import { callApiGateway } from '../firebaseConfig.js';
+import MapPostCard from './MapPostCard.jsx';
 
 const MapPostsView = () => {
     const [posts, setPosts] = useState([]);
@@ -20,8 +22,10 @@ const MapPostsView = () => {
     const [radiusKm, setRadiusKm] = useState(5);
     const [postType, setPostType] = useState('all');
     const [selectedPost, setSelectedPost] = useState(null);
+    const [hoveredPost, setHoveredPost] = useState(null);
     const [map, setMap] = useState(null);
     const debounceTimer = useRef(null);
+    const cardRefs = useRef({});
 
     const mapContainerStyle = {
         width: '100%',
@@ -104,6 +108,36 @@ const MapPostsView = () => {
     const handleMarkerClick = useCallback((post) => {
         setSelectedPost(post);
         console.log('Marker clicked:', post.userDisplayName);
+        
+        // Scroll to corresponding card
+        if (cardRefs.current[post.id]) {
+            cardRefs.current[post.id].scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }, []);
+
+    const handleCardClick = useCallback((post) => {
+        setSelectedPost(post);
+        
+        if (map && post.location?._latitude && post.location?._longitude) {
+            const position = {
+                lat: post.location._latitude,
+                lng: post.location._longitude
+            };
+            map.panTo(position);
+        }
+        
+        console.log('Card clicked:', post.userDisplayName);
+    }, [map]);
+
+    const handleCardHover = useCallback((post) => {
+        setHoveredPost(post);
+    }, []);
+
+    const handleCardLeave = useCallback(() => {
+        setHoveredPost(null);
     }, []);
 
     const getCurrentLocation = useCallback(() => {
@@ -115,6 +149,9 @@ const MapPostsView = () => {
                         lng: position.coords.longitude
                     };
                     setMapCenter(newCenter);
+                    if (map) {
+                        map.panTo(newCenter);
+                    }
                     fetchPosts(newCenter, radiusKm);
                 },
                 (error) => {
@@ -123,7 +160,7 @@ const MapPostsView = () => {
                 }
             );
         }
-    }, [fetchPosts, radiusKm]);
+    }, [fetchPosts, radiusKm, map]);
 
     // Initial load
     useEffect(() => {
@@ -136,71 +173,155 @@ const MapPostsView = () => {
                 <Typography variant="h5" gutterBottom>
                     Explore Posts by Location
                 </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {posts.length} posts found in this area
+                </Typography>
             </Box>
 
             <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-                <Box sx={{ flex: 2, position: 'relative' }}>
-                        <GoogleMap
-                            mapContainerStyle={mapContainerStyle}
-                            center={mapCenter}
-                            zoom={12}
-                            options={mapOptions}
-                            onLoad={onLoad}
-                            onUnmount={onUnmount}
-                            onDragEnd={handleMapChange}
-                            onZoomChanged={handleMapChange}
-                        >
-                            {/* Markers */}
-                            {posts.map((post) => (
-                                post.location?._latitude && post.location?._longitude && (
-                                    <Marker
-                                        key={post.id}
-                                        position={{
-                                            lat: post.location._latitude,
-                                            lng: post.location._longitude
-                                        }}
-                                        onClick={() => handleMarkerClick(post)}
-                                    />
-                                )
-                            ))}
+                <Box sx={{
+                    width: '40%', 
+                    borderRight: 1, 
+                    borderColor: 'divider',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                    <Box sx={{ p: 2, bgcolor: '#fafafa', borderBottom: 1, borderColor: 'divider' }}>
+                        <Typography variant="h6" gutterBottom>
+                            Posts in Area
+                        </Typography>
+                        {loading && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <CircularProgress size={16} />
+                                <Typography variant="body2" color="text.secondary">
+                                    Loading posts...
+                                </Typography>
+                            </Box>
+                        )}
+                    </Box>
 
-                            {/* Info Window */}
-                            {selectedPost && (
-                                <InfoWindow
-                                    position={{
-                                        lat: selectedPost.location._latitude,
-                                        lng: selectedPost.location._longitude
+                    <Box sx={{
+                        flex: 1, 
+                        overflowY: 'auto', 
+                        p: 2,
+                        backgroundColor: '#fafafa'
+                    }}>
+                        {error && (
+                            <Alert severity="error" sx={{ mb: 2 }}>
+                                {error}
+                            </Alert>
+                        )}
+                        
+                        {!loading && posts.length === 0 ? (
+                            <Box sx={{ 
+                                textAlign: 'center', 
+                                py: 4,
+                                color: 'text.secondary'
+                            }}>
+                                <Typography variant="body1" gutterBottom>
+                                    No posts found in this area
+                                </Typography>
+                                <Typography variant="body2">
+                                    Try moving the map or zooming out
+                                </Typography>
+                            </Box>
+                        ) : (
+                            posts.map((post) => (
+                                <Box 
+                                    key={post.id}
+                                    ref={(el) => {
+                                        if (el) cardRefs.current[post.id] = el;
                                     }}
-                                    onCloseClick={() => setSelectedPost(null)}
                                 >
-                                    <Box sx={{ maxWidth: 200 }}>
-                                        <Typography variant="h6" gutterBottom>
-                                            {selectedPost.userDisplayName}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                                            {selectedPost.description.substring(0, 100)}
-                                            {selectedPost.description.length > 100 ? '...' : ''}
-                                        </Typography>
-                                        {selectedPost.files?.[0] && (
-                                            <img
-                                                src={selectedPost.files[0]}
-                                                alt="Post preview"
-                                                style={{
-                                                    width: '100%',
-                                                    height: 80,
-                                                    objectFit: 'cover',
-                                                    borderRadius: 4,
-                                                    marginBottom: 8
-                                                }}
-                                            />
-                                        )}
-                                        <Typography variant="caption" color="text.secondary">
-                                            {selectedPost.distanceKm?.toFixed(1)}km away • {selectedPost.likesCount || 0} likes
-                                        </Typography>
-                                    </Box>
-                                </InfoWindow>
-                            )}
-                        </GoogleMap>
+                                    <MapPostCard
+                                        post={post}
+                                        isSelected={selectedPost?.id === post.id}
+                                        onCardClick={handleCardClick}
+                                        onCardHover={handleCardHover}
+                                        onCardLeave={handleCardLeave}
+                                    />
+                                </Box>
+                            ))
+                        )}
+                    </Box>
+                </Box>
+
+                {/* Right Panel - Map */}
+                <Box sx={{ flex: 1, position: 'relative' }}>
+                    <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        center={mapCenter}
+                        zoom={12}
+                        options={mapOptions}
+                        onLoad={onLoad}
+                        onUnmount={onUnmount}
+                        onDragEnd={handleMapChange}
+                        onZoomChanged={handleMapChange}
+                    >
+                        {/* Markers */}
+                        {posts.map((post) => (
+                            post.location?._latitude && post.location?._longitude && (
+                                <Marker
+                                    key={post.id}
+                                    position={{
+                                        lat: post.location._latitude,
+                                        lng: post.location._longitude
+                                    }}
+                                    onClick={() => handleMarkerClick(post)}
+                                    icon={
+                                        selectedPost?.id === post.id || hoveredPost?.id === post.id
+                                            ? {
+                                                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                                    <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="15" cy="15" r="12" fill="#1976d2" stroke="white" stroke-width="3"/>
+                                                    </svg>
+                                                `),
+                                                scaledSize: new window.google.maps.Size(30, 30),
+                                                anchor: new window.google.maps.Point(15, 15)
+                                            }
+                                            : undefined
+                                    }
+                                />
+                            )
+                        ))}
+
+                        {/* Info Window */}
+                        {selectedPost && (
+                            <InfoWindow
+                                position={{
+                                    lat: selectedPost.location._latitude,
+                                    lng: selectedPost.location._longitude
+                                }}
+                                onCloseClick={() => setSelectedPost(null)}
+                            >
+                                <Box sx={{ maxWidth: 200 }}>
+                                    <Typography variant="h6" gutterBottom>
+                                        {selectedPost.userDisplayName}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                                        {selectedPost.description.substring(0, 100)}
+                                        {selectedPost.description.length > 100 ? '...' : ''}
+                                    </Typography>
+                                    {selectedPost.files?.[0] && (
+                                        <img
+                                            src={selectedPost.files[0]}
+                                            alt="Post preview"
+                                            style={{
+                                                width: '100%',
+                                                height: 80,
+                                                objectFit: 'cover',
+                                                borderRadius: 4,
+                                                marginBottom: 8
+                                            }}
+                                        />
+                                    )}
+                                    <Typography variant="caption" color="text.secondary">
+                                        {selectedPost.distanceKm?.toFixed(1)}km away • {selectedPost.likesCount || 0} likes
+                                    </Typography>
+                                </Box>
+                            </InfoWindow>
+                        )}
+                    </GoogleMap>
 
                     {/* Current Location Button */}
                     <Fab
@@ -209,44 +330,13 @@ const MapPostsView = () => {
                         onClick={getCurrentLocation}
                         sx={{
                             position: 'absolute',
-                            bottom: 186,
+                            bottom: 16,
                             right: 16,
                             zIndex: 1000
                         }}
                     >
                         <MyLocationIcon />
                     </Fab>
-
-                    {/* Loading Overlay */}
-                    {loading && (
-                        <Box sx={{
-                            position: 'absolute',
-                            top: 16,
-                            left: 16,
-                            bgcolor: 'background.paper',
-                            borderRadius: 1,
-                            p: 2,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            boxShadow: 2,
-                            zIndex: 1000
-                        }}>
-                            <CircularProgress size={20} />
-                            <Typography variant="body2">Loading posts...</Typography>
-                        </Box>
-                    )}
-
-                    {/* Error Alert */}
-                    {error && (
-                        <Alert
-                            severity="error"
-                            onClose={() => setError(null)}
-                            sx={{ position: 'absolute', top: 16, left: 16, right: 16, zIndex: 1000 }}
-                        >
-                            {error}
-                        </Alert>
-                    )}
                 </Box>
             </Box>
         </Box>
