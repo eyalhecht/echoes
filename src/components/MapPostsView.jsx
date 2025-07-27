@@ -252,22 +252,29 @@ const MapPostsView = () => {
                                 </Typography>
                             </Box>
                         ) : (
-                            locationPosts.map((post) => (
-                                <Box 
-                                    key={post.id}
-                                    ref={(el) => {
-                                        if (el) cardRefs.current[post.id] = el;
-                                    }}
-                                >
-                                    <MapPostCard
-                                        post={post}
-                                        isSelected={selectedPost?.id === post.id}
-                                        onCardClick={handleCardClick}
-                                        onCardHover={handleCardHover}
-                                        onCardLeave={handleCardLeave}
-                                    />
-                                </Box>
-                            ))
+                            <Box sx={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gap: 1.5,
+                                width: '100%'
+                            }}>
+                                {locationPosts.map((post) => (
+                                    <Box 
+                                        key={post.id}
+                                        ref={(el) => {
+                                            if (el) cardRefs.current[post.id] = el;
+                                        }}
+                                    >
+                                        <MapPostCard
+                                            post={post}
+                                            isSelected={selectedPost?.id === post.id}
+                                            onCardClick={handleCardClick}
+                                            onCardHover={handleCardHover}
+                                            onCardLeave={handleCardLeave}
+                                        />
+                                    </Box>
+                                ))}
+                            </Box>
                         )}
                     </Box>
                 </Box>

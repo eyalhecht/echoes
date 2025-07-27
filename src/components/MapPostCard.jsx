@@ -95,9 +95,9 @@ const MapPostCard = ({
             <Card
                 sx={{
                     width: '100%',
-                    height: 180,
+                    height: 280,
                     cursor: 'pointer',
-                    mb: 2,
+                    mb: 0,
                     borderRadius: '12px',
                     boxShadow: isSelected ? '0 4px 16px rgba(25, 118, 210, 0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
                     border: isSelected ? '2px solid #1976d2' : '1px solid #e0e0e0',
@@ -106,160 +106,200 @@ const MapPostCard = ({
                     '&:hover': {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                         transform: 'translateY(-1px)',
-                    }
+                    },
+                    overflow: 'hidden'
                 }}
                 onClick={handleCardClick}
                 onMouseEnter={() => onCardHover && onCardHover(post)}
                 onMouseLeave={() => onCardLeave && onCardLeave()}
             >
-                <CardContent sx={{ p: 2, height: '100%', '&:last-child': { pb: 2 } }}>
-                    <Box sx={{ display: 'flex', height: '100%', gap: 2 }}>
-                        {/* Image */}
-                        <Box
+                <Box
+                    sx={{
+                        height: 160,
+                        width: '100%',
+                        position: 'relative',
+                        backgroundColor: '#f5f5f5',
+                        overflow: 'hidden'
+                    }}
+                >
+                    {files && files[0] ? (
+                        <img
+                            src={files[0]}
+                            alt="Post preview"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                            }}
+                        />
+                    ) : (
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            height: '100%',
+                            color: 'text.secondary'
+                        }}>
+                            <Typography variant="body2">No image</Typography>
+                        </Box>
+                    )}
+                    
+                    <IconButton
+                        sx={{ 
+                            position: 'absolute', 
+                            top: 8, 
+                            right: 8,
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(4px)',
+                            width: 32,
+                            height: 32,
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 1)',
+                                transform: 'scale(1.1)'
+                            },
+                            transition: 'all 0.2s ease'
+                        }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookmarkToggle();
+                        }}
+                    >
+                        {bookmarked ? (
+                            <BookmarkIcon sx={{ fontSize: 18, color: '#1976d2' }} />
+                        ) : (
+                            <BookmarkBorderIcon sx={{ fontSize: 18, color: '#666' }} />
+                        )}
+                    </IconButton>
+                </Box>
+
+                <CardContent sx={{
+                    p: 1.5, 
+                    height: 120, 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'space-between',
+                    '&:last-child': { pb: 1.5 }
+                }}>
+                    {/* User info */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        <Avatar 
+                            src={userProfilePicUrl || ''} 
+                            alt={userDisplayName ? userDisplayName.charAt(0) : 'U'}
+                            sx={{ width: 28, height: 28 }}
+                        />
+                        <ButtonBase
+                            onClick={handleNameClick}
                             sx={{
-                                width: 120,
-                                height: 120,
-                                borderRadius: '8px',
-                                overflow: 'hidden',
-                                flexShrink: 0,
-                                backgroundColor: '#f5f5f5',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
+                                padding: 0,
+                                justifyContent: 'flex-start',
+                                flex: 1,
+                                textAlign: 'left',
+                                '&:hover': {
+                                    backgroundColor: 'transparent',
+                                }
                             }}
                         >
-                            {files && files[0] ? (
-                                <img
-                                    src={files[0]}
-                                    alt="Post preview"
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'cover',
-                                    }}
-                                />
-                            ) : (
-                                <Typography variant="body2" color="text.secondary">
-                                    No image
-                                </Typography>
-                            )}
-                        </Box>
-
-                        {/* Content */}
-                        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                            {/* Header with user info */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                                <Avatar
-                                    src={userProfilePicUrl || ''}
-                                    alt={userDisplayName ? userDisplayName.charAt(0) : 'U'}
-                                    sx={{ width: 32, height: 32 }}
-                                />
-                                <ButtonBase
-                                    onClick={handleNameClick}
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography 
+                                    variant="subtitle2" 
+                                    fontWeight="600"
                                     sx={{
-                                        padding: 0,
-                                        justifyContent: 'flex-start',
-                                        minWidth: 0,
-                                        flex: 1,
-                                        '&:hover': {
-                                            backgroundColor: 'transparent',
-                                        }
+                                        cursor: 'pointer',
+                                        color: 'inherit',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        fontSize: '14px',
+                                        lineHeight: 1.1
                                     }}
                                 >
-                                    <Typography
-                                        variant="subtitle1"
-                                        fontWeight="600"
-                                        sx={{
-                                            cursor: 'pointer',
-                                            color: 'inherit',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                            fontSize: '16px'
-                                        }}
-                                    >
-                                        {userDisplayName || 'Anonymous User'}
-                                    </Typography>
-                                </ButtonBase>
-                            </Box>
-
-                            {/* Description */}
-                            <Typography
-                                variant="body1"
-                                color="text.primary"
-                                sx={{
-                                    mb: 1.5,
-                                    flex: 1,
-                                    overflow: 'hidden',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    lineHeight: 1.4,
-                                    fontSize: '14px'
-                                }}
-                            >
-                                {truncateText(description, 100)}
-                            </Typography>
-
-                            {/* Interactions Row */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                                {/* Like */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <IconButton
-                                        size="medium"
-                                        sx={{ p: 0.5 }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleLikeToggle();
-                                        }}
-                                    >
-                                        {liked ? (
-                                            <FavoriteIcon sx={{ fontSize: 20, color: 'red' }} />
-                                        ) : (
-                                            <FavoriteBorderIcon sx={{ fontSize: 20 }} />
-                                        )}
-                                    </IconButton>
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                        {likesCount}
-                                    </Typography>
-                                </Box>
-
-                                {/* Comments */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <ChatBubbleOutlineIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                        {commentsCount || 0}
-                                    </Typography>
-                                </Box>
-
-                                {/* Bookmark */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <IconButton
-                                        size="medium"
-                                        sx={{ p: 0.5 }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleBookmarkToggle();
-                                        }}
-                                    >
-                                        {bookmarked ? (
-                                            <BookmarkIcon sx={{ fontSize: 20, color: '#1976d2' }} />
-                                        ) : (
-                                            <BookmarkBorderIcon sx={{ fontSize: 20 }} />
-                                        )}
-                                    </IconButton>
-                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                        {bookmarksCount}
-                                    </Typography>
-                                </Box>
-                            </Box>
-
-                            {/* Footer with timestamp */}
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '13px' }}>
+                                    {userDisplayName || 'Anonymous User'}
+                                </Typography>
+                                <Typography 
+                                    variant="caption" 
+                                    color="text.secondary"
+                                    sx={{ 
+                                        fontSize: '11px',
+                                        lineHeight: 1,
+                                        display: 'block',
+                                        mt: 0.25
+                                    }}
+                                >
                                     {formatFirebaseTimestamp(createdAt)}
                                 </Typography>
                             </Box>
+                        </ButtonBase>
+                    </Box>
+
+                    <Box sx={{ mb: 1, flex: 1 }}>
+                        <Typography 
+                            variant="body2" 
+                            color="text.primary"
+                            sx={{ 
+                                overflow: 'hidden',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                fontSize: '12px',
+                                lineHeight: 1.3,
+                                minHeight: '32px'
+                            }}
+                        >
+                            {description || 'No description available'}
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        {/* Like */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <IconButton 
+                                size="small"
+                                sx={{ 
+                                    p: 0.5,
+                                    '&:hover': {
+                                        transform: 'scale(1.1)',
+                                        backgroundColor: liked ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+                                    },
+                                    transition: 'all 0.2s ease',
+                                    backgroundColor: liked ? 'rgba(255, 0, 0, 0.05)' : 'transparent'
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log('Like button clicked for post:', post.id);
+                                    handleLikeToggle();
+                                }}
+                            >
+                                {liked ? (
+                                    <FavoriteIcon sx={{ fontSize: 18, color: '#ff4757' }} />
+                                ) : (
+                                    <FavoriteBorderIcon sx={{ fontSize: 18, color: '#666' }} />
+                                )}
+                            </IconButton>
+                            <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                    fontSize: '13px', 
+                                    fontWeight: 600, 
+                                    color: liked ? '#ff4757' : 'text.primary'
+                                }}
+                            >
+                                {likesCount || 0}
+                            </Typography>
+                        </Box>
+
+                        {/* Comments */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <ChatBubbleOutlineIcon sx={{ fontSize: 18, color: '#666' }} />
+                            <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                    fontSize: '13px', 
+                                    fontWeight: 600, 
+                                    color: 'text.primary'
+                                }}
+                            >
+                                {commentsCount || 0}
+                            </Typography>
                         </Box>
                     </Box>
                 </CardContent>
