@@ -95,7 +95,6 @@ const MapPostCard = ({
             <Card
                 sx={{
                     width: '100%',
-                    height: 280,
                     cursor: 'pointer',
                     mb: 0,
                     borderRadius: '12px',
@@ -173,11 +172,7 @@ const MapPostCard = ({
                 </Box>
 
                 <CardContent sx={{
-                    p: 1.5, 
-                    height: 120, 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    justifyContent: 'space-between',
+                    p: 1.5,
                     '&:last-child': { pb: 1.5 }
                 }}>
                     {/* User info */}
@@ -231,18 +226,14 @@ const MapPostCard = ({
                         </ButtonBase>
                     </Box>
 
-                    <Box sx={{ mb: 1, flex: 1 }}>
+                    <Box sx={{ mb: 1.5 }}>
                         <Typography 
                             variant="body2" 
                             color="text.primary"
                             sx={{ 
-                                overflow: 'hidden',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
                                 fontSize: '12px',
-                                lineHeight: 1.3,
-                                minHeight: '32px'
+                                lineHeight: 1.4,
+                                wordWrap: 'break-word'
                             }}
                         >
                             {description || 'No description available'}

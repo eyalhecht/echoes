@@ -8,6 +8,7 @@ import {
     Fab,
     Divider
 } from '@mui/material';
+import { Masonry } from '@mui/lab';
 import {
     MyLocation as MyLocationIcon,
 } from '@mui/icons-material';
@@ -252,12 +253,7 @@ const MapPostsView = () => {
                                 </Typography>
                             </Box>
                         ) : (
-                            <Box sx={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(2, 1fr)',
-                                gap: 1.5,
-                                width: '100%'
-                            }}>
+                            <Masonry columns={2} spacing={1.5}>
                                 {locationPosts.map((post) => (
                                     <Box 
                                         key={post.id}
@@ -274,7 +270,7 @@ const MapPostsView = () => {
                                         />
                                     </Box>
                                 ))}
-                            </Box>
+                            </Masonry>
                         )}
                     </Box>
                 </Box>
