@@ -13,9 +13,9 @@ import {
 } from '@mui/icons-material';
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
+import useUiStore from '../stores/useUiStore.js';
 
 const MapPostsView = () => {
-    const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [mapCenter, setMapCenter] = useState({ lat: 40.7589, lng: -73.9851 });
@@ -24,8 +24,12 @@ const MapPostsView = () => {
     const [selectedPost, setSelectedPost] = useState(null);
     const [hoveredPost, setHoveredPost] = useState(null);
     const [map, setMap] = useState(null);
+    const [locationPosts, setLocationPosts] = useState([]); // Local state for location-filtered posts
     const debounceTimer = useRef(null);
     const cardRefs = useRef({});
+
+    // Get global posts and post management functions
+    const { posts, updatePost, setPosts } = useUiStore();
 
     const mapContainerStyle = {
         width: '100%',
@@ -70,15 +74,37 @@ const MapPostsView = () => {
                 filteredPosts = filteredPosts.filter(post => post.type === type);
             }
 
-            setPosts(filteredPosts);
-            console.log('Got posts:', filteredPosts.length);
+            // Ensure all posts have proper interaction properties
+            const normalizedPosts = filteredPosts.map(post => ({
+                ...post,
+                likedByCurrentUser: post.likedByCurrentUser || false,
+                likesCount: post.likesCount || 0,
+                bookmarkedByCurrentUser: post.bookmarkedByCurrentUser || false,
+                bookmarksCount: post.bookmarksCount || 0,
+                isLikeUpdating: false,
+                isBookmarkUpdating: false
+            }));
+
+            // Add location posts to global store if they don't exist
+            const existingPostIds = new Set(posts.map(p => p.id));
+            const newPosts = normalizedPosts.filter(post => !existingPostIds.has(post.id));
+            
+            if (newPosts.length > 0) {
+                const updatedGlobalPosts = [...posts, ...newPosts];
+                setPosts(updatedGlobalPosts);
+                console.log('Added', newPosts.length, 'new posts to global store');
+            }
+
+            // Use normalized posts for location display
+            setLocationPosts(normalizedPosts);
+            console.log('Got posts:', normalizedPosts.length);
         } catch (err) {
             console.error('Error fetching posts:', err);
             setError('Failed to load posts for this area');
         } finally {
             setLoading(false);
         }
-    }, [postType]);
+    }, [postType, posts, setPosts]);
     const handleMapChange = useCallback(() => {
         if (!map) return;
 
@@ -174,7 +200,7 @@ const MapPostsView = () => {
                     Explore Posts by Location
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    {posts.length} posts found in this area
+                    {locationPosts.length} posts found in this area
                 </Typography>
             </Box>
 
@@ -212,7 +238,7 @@ const MapPostsView = () => {
                             </Alert>
                         )}
                         
-                        {!loading && posts.length === 0 ? (
+                        {!loading && locationPosts.length === 0 ? (
                             <Box sx={{ 
                                 textAlign: 'center', 
                                 py: 4,
@@ -226,7 +252,7 @@ const MapPostsView = () => {
                                 </Typography>
                             </Box>
                         ) : (
-                            posts.map((post) => (
+                            locationPosts.map((post) => (
                                 <Box 
                                     key={post.id}
                                     ref={(el) => {
@@ -259,7 +285,7 @@ const MapPostsView = () => {
                         onZoomChanged={handleMapChange}
                     >
                         {/* Markers */}
-                        {posts.map((post) => (
+                        {locationPosts.map((post) => (
                             post.location?._latitude && post.location?._longitude && (
                                 <Marker
                                     key={post.id}

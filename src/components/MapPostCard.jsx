@@ -6,14 +6,13 @@ import {
     Card,
     CardContent,
     Button,
-    Modal,
     ButtonBase,
     IconButton
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from 'date-fns';
-import PostCard from './PostCard.jsx';
+import PostDetailView from './PostDetailView.jsx';
 import useUiStore from "../stores/useUiStore.js";
 import { usePostInteractions } from '../hooks/usePostInteractions';
 
@@ -24,13 +23,14 @@ const MapPostCard = ({
     onCardHover, 
     onCardLeave 
 }) => {
-    const [fullPostOpen, setFullPostOpen] = useState(false);
+    const [detailViewOpen, setDetailViewOpen] = useState(false);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
     const {
         liked,
         likesCount,
+        handleLikeToggle
     } = usePostInteractions(post.id);
 
     const {
@@ -170,7 +170,14 @@ const MapPostCard = ({
                                     </Typography>
                                 </ButtonBase>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <IconButton size="small" sx={{ p: 0.5 }}>
+                                    <IconButton 
+                                        size="small" 
+                                        sx={{ p: 0.5 }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleLikeToggle();
+                                        }}
+                                    >
                                         {liked ? (
                                             <FavoriteIcon sx={{ fontSize: 16, color: 'red' }} />
                                         ) : (
@@ -210,7 +217,7 @@ const MapPostCard = ({
                                     variant="outlined"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setFullPostOpen(true);
+                                        setDetailViewOpen(true);
                                     }}
                                     sx={{
                                         fontSize: '10px',
@@ -227,27 +234,14 @@ const MapPostCard = ({
                 </CardContent>
             </Card>
 
-            {/* Full Post Modal */}
-            <Modal
-                open={fullPostOpen}
-                onClose={() => setFullPostOpen(false)}
-                aria-labelledby="full-post-modal"
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    p: 2
-                }}
-            >
-                <Box sx={{
-                    maxHeight: '90vh',
-                    overflowY: 'auto',
-                    backgroundColor: 'transparent',
-                    outline: 'none'
-                }}>
-                    <PostCard post={post} />
-                </Box>
-            </Modal>
+            {/* PostDetailView Modal */}
+            {detailViewOpen && (
+                <PostDetailView
+                    post={post}
+                    open={detailViewOpen}
+                    onClose={() => setDetailViewOpen(false)}
+                />
+            )}
         </>
     );
 };
