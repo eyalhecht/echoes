@@ -75,7 +75,6 @@ const MapPostsView = () => {
             setLoading(false);
         }
     }, [postType]);
-console.log("asd")
     const handleMapChange = useCallback(() => {
         if (!map) return;
 
@@ -102,13 +101,11 @@ console.log("asd")
         }, 500);
     }, [map, fetchPosts]);
 
-    // Handle marker click
     const handleMarkerClick = useCallback((post) => {
         setSelectedPost(post);
         console.log('Marker clicked:', post.userDisplayName);
     }, []);
 
-    // Get current location
     const getCurrentLocation = useCallback(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
