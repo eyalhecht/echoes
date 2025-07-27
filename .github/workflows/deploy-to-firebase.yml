@@ -24,6 +24,8 @@ jobs:
 
       - name: Build project
         run: npm run build
+        env:
+          VITE_MAPS_API_KEY: ${{ secrets.VITE_MAPS_API_KEY }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
