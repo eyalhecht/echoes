@@ -1,10 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Typography, Button, CircularProgress, Avatar, Paper } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Avatar, Paper, useMediaQuery, useTheme, IconButton } from '@mui/material';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
+import { LogoutOutlined } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = ({ targetUserId }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const navigate = useNavigate();
     const currentUser = useAuthStore(state => state.user);
 
     const toggleFollow = async (userId, isFollowing)=>{
@@ -136,6 +141,15 @@ const Profile = ({ targetUserId }) => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loadMorePosts, hasMorePosts, loadingMorePosts, userPostsLoading]);
 
+    const handleLogout = async () => {
+        try {
+            await useAuthStore.getState().logout();
+            navigate('/login');
+        } catch (err) {
+            console.error("Logout error:", err);
+        }
+    };
+
     const handleToggleFollow = async () => {
         if (!currentUser?.uid) {
             alert('You must be logged in to follow/unfollow.');
@@ -188,21 +202,39 @@ const Profile = ({ targetUserId }) => {
                             <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
                                 {profileData.displayName}
                             </Typography>
-                            {!isCurrentUserProfile && currentUser?.uid && (
-                                <Button
-                                    variant={isFollowing ? 'outlined' : 'contained'}
-                                    color="primary"
-                                    onClick={handleToggleFollow}
-                                    disabled={followActionLoading}
-                                    sx={{ minWidth: '100px' }}
-                                >
-                                    {followActionLoading ? (
-                                        <CircularProgress size={20} />
-                                    ) : (
-                                        isFollowing ? 'Unfollow' : 'Follow'
-                                    )}
-                                </Button>
-                            )}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                {/* Logout button for current user on mobile */}
+                                {isCurrentUserProfile && isMobile && (
+                                    <IconButton
+                                        onClick={handleLogout}
+                                        sx={{
+                                            color: '#8B4513',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(139, 69, 19, 0.1)'
+                                            }
+                                        }}
+                                        title="Logout"
+                                    >
+                                        <LogoutOutlined />
+                                    </IconButton>
+                                )}
+                                {/* Follow button for other users */}
+                                {!isCurrentUserProfile && currentUser?.uid && (
+                                    <Button
+                                        variant={isFollowing ? 'outlined' : 'contained'}
+                                        color="primary"
+                                        onClick={handleToggleFollow}
+                                        disabled={followActionLoading}
+                                        sx={{ minWidth: '100px' }}
+                                    >
+                                        {followActionLoading ? (
+                                            <CircularProgress size={20} />
+                                        ) : (
+                                            isFollowing ? 'Unfollow' : 'Follow'
+                                        )}
+                                    </Button>
+                                )}
+                            </Box>
                         </Box>
 
                         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>

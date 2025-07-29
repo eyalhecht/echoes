@@ -1,11 +1,14 @@
 import React, { useEffect, useCallback } from 'react';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import {callApiGateway} from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import SuggestedUsers from "./SuggestedUsers.jsx";
 
 function Home() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    
     const { 
         posts, 
         setPosts, 
@@ -91,7 +94,13 @@ function Home() {
 
     return (
         <>
-            <Box sx={{ maxWidth: '600px', margin: '0 auto', marginLeft: '280px', paddingBottom: '20px' }}>
+            {!isMobile && <SuggestedUsers />}
+            <Box sx={{ 
+                maxWidth: '600px', 
+                margin: '0 auto', 
+                marginLeft: isMobile ? 'auto' : '280px', // Responsive margin
+                paddingBottom: '20px' 
+            }}>
                 {posts && posts?.map((post) => (
                     <PostCard key={post.id} post={post} />
                 ))}
@@ -126,7 +135,6 @@ function Home() {
                     </Box>
                 )}
             </Box>
-            <SuggestedUsers />
         </>
     );
 }

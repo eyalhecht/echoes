@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Avatar, Button, CircularProgress, Paper } from '@mui/material';
+import { Box, Typography, Avatar, Button, CircularProgress, Paper, useMediaQuery, useTheme } from '@mui/material';
 import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import useUiStore from '../stores/useUiStore.js';
 
 const SuggestedUsers = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const currentUser = useAuthStore(state => state.user);
     const setActiveProfileView = useUiStore(state => state.setActiveProfileView);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
+
+    // Don't render on mobile
+    if (isMobile) {
+        return null;
+    }
 
     const [suggestedUsers, setSuggestedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
