@@ -286,7 +286,7 @@ const Profile = ({ targetUserId }) => {
                         </Typography>
                     </Paper>
                 ) : (
-                    <>
+                    <Box sx={{display: "flex", flexDirection: "column", gap: "10px"}}>
                         {userPosts.map((post) => (
                             <PostCard key={post.id} post={post} />
                         ))}
@@ -310,7 +310,7 @@ const Profile = ({ targetUserId }) => {
                                 No more posts to load
                             </Box>
                         )}
-                    </>
+                    </Box>
                 )}
             </Box>
         </Box>
