@@ -3,6 +3,14 @@ import { Box, Typography, Avatar, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import useUiStore from "../stores/useUiStore.js";
 import {useAuthStore} from "../stores/useAuthStore.js";
+import {
+    HomeOutlined,
+    PersonOutlined,
+    MapOutlined,
+    BookmarkBorderOutlined,
+    AddOutlined,
+    LogoutOutlined
+} from '@mui/icons-material';
 
 function Sidebar() {
     const navigate = useNavigate();
@@ -24,24 +32,24 @@ function Sidebar() {
     const items = [
         {
             name: 'Home',
-            icon: '📰',
+            icon: <HomeOutlined />,
             callback: () => {}
         },
         {
             name: 'Profile',
-            icon: '👤',
+            icon: <PersonOutlined />,
             callback: () => {
                 setActiveProfileView(currentUser.uid)
             }
         },
         {
             name: 'Map',
-            icon: '🗺️',
+            icon: <MapOutlined />,
             callback: () => {}
         },
         {
             name: 'Bookmarks',
-            icon: '🔖',
+            icon: <BookmarkBorderOutlined />,
             callback: () => {}
         },
     ];
@@ -49,12 +57,12 @@ function Sidebar() {
     const actionItems = [
         {
             name: 'Upload',
-            icon: '➕',
+            icon: <AddOutlined/>,
             callback: () => {}
         },
         {
             name: 'Logout',
-            icon: '🚪',
+            icon: <LogoutOutlined/>,
             callback: handleLogout,
             isLoading: loading
         },
@@ -122,15 +130,19 @@ function Sidebar() {
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
-                            <Typography sx={{ fontSize: '16px' }}>
+                            <Box sx={{
+                                color: activeSidebarItem === item.name ? '#2d2d2d' : '#555',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}>
                                 {item.icon}
-                            </Typography>
+                            </Box>
                             <Typography
                                 variant="body2"
                                 sx={{
                                     color: activeSidebarItem === item.name ? '#2d2d2d' : '#555',
                                     fontWeight: activeSidebarItem === item.name ? '600' : '400',
-                                    fontSize: '14px'
+                                    fontSize: '16px'
                                 }}
                             >
                                 {item.name}
@@ -172,15 +184,19 @@ function Sidebar() {
                             {item.isLoading ? (
                                 <CircularProgress size={14} sx={{ color: '#8B4513' }} />
                             ) : (
-                                <Typography sx={{ fontSize: '14px', color: '#8B4513' }}>
+                                <Box sx={{ 
+                                    color: '#8B4513',
+                                    display: 'flex',
+                                    alignItems: 'center' 
+                                }}>
                                     {item.icon}
-                                </Typography>
+                                </Box>
                             )}
                             <Typography
                                 variant="body2"
                                 sx={{
                                     color: '#8B4513',
-                                    fontSize: '13px',
+                                    fontSize: '15px',
                                     fontWeight: '500'
                                 }}
                             >
