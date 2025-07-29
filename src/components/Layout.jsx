@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import Header from './Header.jsx';
 import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
@@ -8,11 +8,14 @@ import Profile from "./Profile.jsx";
 import MapPostsView from "./MapPostsView.jsx"; // Import the new component
 import {useAuthStore} from "../stores/useAuthStore.js";
 import Sidebar from "./Sidebar.jsx";
+import MobileBottomNavigation from "./BottomNavigation.jsx";
 
 const HEADER_HEIGHT = 40;
 
 
 function MainContent() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
     const activeProfileView = useUiStore((state) => state.activeProfileView);
     const currentUser = useAuthStore(state => state.user);
@@ -38,12 +41,11 @@ function MainContent() {
 
     return (
         <Box sx={{
-            marginLeft: '200px',
-            // marginTop: `${HEADER_HEIGHT}px`,
-            // minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
+            marginLeft: isMobile ? '0px' : '200px', // Remove left margin on mobile
             minHeight: `100vh`,
             backgroundColor: 'grey',
-            padding: '20px'
+            padding: '20px',
+            paddingBottom: isMobile ? '80px' : '20px' // Add bottom padding for mobile nav
         }}>
             {renderContent()}
         </Box>
@@ -51,11 +53,15 @@ function MainContent() {
 }
 
 export default function Layout() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
     return (
         <Box>
             {/*<Header height={HEADER_HEIGHT} />*/}
-            <Sidebar />
+            {!isMobile && <Sidebar />}
             <MainContent />
+            {isMobile && <MobileBottomNavigation />}
         </Box>
     );
 }

@@ -1,10 +1,14 @@
 import React, { useEffect, useCallback } from 'react';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import {callApiGateway} from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
+import SuggestedUsers from "./SuggestedUsers.jsx";
 
 function Home() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    
     const { 
         posts, 
         setPosts, 
@@ -89,41 +93,49 @@ function Home() {
     }, [loadMorePosts, hasMore, postsLoading]);
 
     return (
-        <Box sx={{ maxWidth: '600px', margin: '0 auto', paddingBottom: '20px' }}>
-            {posts && posts?.map((post) => (
-                <PostCard key={post.id} post={post} />
-            ))}
+        <>
+            {!isMobile && <SuggestedUsers />}
+            <Box sx={{ 
+                maxWidth: '600px', 
+                margin: '0 auto', 
+                marginLeft: isMobile ? 'auto' : '280px', // Responsive margin
+                paddingBottom: '20px' 
+            }}>
+                {posts && posts?.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                ))}
 
-            {postsLoading && (
-                <Box sx={{
-                    textAlign: 'center',
-                    padding: '20px',
-                    color: '#666'
-                }}>
-                    Loading more posts...
-                </Box>
-            )}
-            
-            {!hasMore && posts.length > 0 && (
-                <Box sx={{
-                    textAlign: 'center',
-                    padding: '20px',
-                    color: '#666'
-                }}>
-                    No more posts to load
-                </Box>
-            )}
-            
-            {posts.length === 0 && !postsLoading && (
-                <Box sx={{
-                    textAlign: 'center',
-                    padding: '40px',
-                    color: '#999'
-                }}>
-                    No posts found
-                </Box>
-            )}
-        </Box>
+                {postsLoading && (
+                    <Box sx={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        color: '#666'
+                    }}>
+                        Loading more posts...
+                    </Box>
+                )}
+
+                {!hasMore && posts.length > 0 && (
+                    <Box sx={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        color: '#666'
+                    }}>
+                        No more posts to load
+                    </Box>
+                )}
+
+                {posts.length === 0 && !postsLoading && (
+                    <Box sx={{
+                        textAlign: 'center',
+                        padding: '40px',
+                        color: '#999'
+                    }}>
+                        No posts found
+                    </Box>
+                )}
+            </Box>
+        </>
     );
 }
 
