@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -13,7 +13,8 @@ import {
     ListItemAvatar,
     ListItemText,
     InputAdornment,
-    CardMedia
+    CardMedia,
+    ButtonBase
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -24,6 +25,10 @@ import ShareIcon from '@mui/icons-material/Share';
 import SendIcon from '@mui/icons-material/Send';
 import { format } from 'date-fns';
 import { usePostInteractions } from '../hooks/usePostInteractions';
+import { callApiGateway } from '../firebaseConfig.js';
+import { useAuthStore } from '../stores/useAuthStore.js';
+import useUiStore from '../stores/useUiStore.js';
+import {formatFirebaseTimestamp} from "./utils.js";
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -38,20 +43,14 @@ const PostDetailView = ({ post, open, onClose }) => {
     } = usePostInteractions(post.id);
 
     const [comment, setComment] = useState('');
-    const [comments, setComments] = useState([
-        {
-            id: 1,
-            user: 'Jane Doe',
-            text: 'This is amazing!',
-            timestamp: new Date(Date.now() - 3600000)
-        },
-        {
-            id: 2,
-            user: 'Jdane Doe',
-            text: 'This is amazing!',
-            timestamp: new Date(Date.now() - 3600000)
-        }
-    ]);
+    const [comments, setComments] = useState([]);
+    const [isCommentsLoading, setIsCommentsLoading] = useState(false);
+    const [commentError, setCommentError] = useState(null);
+    const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
+    
+    const currentUser = useAuthStore((state) => state.user);
+    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
+    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
     if (!post) return null;
 
@@ -64,18 +63,76 @@ const PostDetailView = ({ post, open, onClose }) => {
         createdAt,
     } = post;
 
-    const formattedTimestamp = "time here"
+
+
+    const fetchComments = useCallback(async () => {
+        setIsCommentsLoading(true);
+        setCommentError(null);
+        try {
+            const result = await callApiGateway({
+                action: 'getComments',
+                payload: {
+                    postId: post.id
+                }
+            });
+            const processedComments = result.data.comments.map(comment => ({
+                ...comment,
+                createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : comment.createdAt
+            }));
+            console.log(processedComments);
+
+            setComments(processedComments);
+            setHasCommentsFetched(true);
+        } catch (err) {
+            console.error("Error fetching comments via Cloud Function:", err);
+            if (err.code && err.message) {
+                setCommentError(`Failed to load comments: ${err.message}`);
+            } else {
+                setCommentError("Failed to load comments due to an unexpected error.");
+            }
+        } finally {
+            setIsCommentsLoading(false);
+        }
+    }, [post.id]);
+
+    const handleAddComment = async () => {
+        if (!comment.trim() || !currentUser) {
+            setCommentError("Comment cannot be empty and you must be logged in.");
+            return;
+        }
+
+        try {
+            await callApiGateway({
+                action: 'addComment',
+                payload: {
+                    postId: post.id,
+                    text: comment.trim()
+                }
+            });
+            setComment('');
+            setCommentError(null);
+
+            fetchComments();
+
+        } catch (err) {
+            console.error("Error adding comment:", err);
+            setCommentError("Failed to add comment.");
+        }
+    };
+
+    const handleNameClick = (userId) => {
+        setActiveSidebarItem('Profile');
+        setActiveProfileView(userId);
+    };
+
+    useEffect(() => {
+        if (open && post && !hasCommentsFetched) {
+            fetchComments();
+        }
+    }, [open, post, hasCommentsFetched, fetchComments]);
 
     const handleCommentSubmit = () => {
-        if (comment.trim()) {
-            setComments([...comments, {
-                id: Date.now(),
-                user: 'Current User',
-                text: comment,
-                timestamp: new Date()
-            }]);
-            setComment('');
-        }
+        handleAddComment();
     };
 
     return (
@@ -163,7 +220,7 @@ const PostDetailView = ({ post, open, onClose }) => {
                                         {userDisplayName}
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        {formattedTimestamp}
+                                        {formatFirebaseTimestamp(createdAt)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -193,21 +250,72 @@ const PostDetailView = ({ post, open, onClose }) => {
                         <Typography variant="subtitle2" sx={{ mb: 1 }}>
                             Comments
                         </Typography>
-                        <List sx={{ mb: 2 }}>
+                        
+                        {isCommentsLoading && (
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                Loading comments...
+                            </Typography>
+                        )}
+                        
+                        {commentError && (
+                            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+                                {commentError}
+                            </Typography>
+                        )}
+                        
+                        {!isCommentsLoading && !commentError && comments.length === 0 && (
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                No comments yet. Be the first to comment!
+                            </Typography>
+                        )}
+
+                        <List sx={{ mb: 2, maxHeight: 300, overflowY: 'auto' }}>
                             {comments.map((comment) => (
                                 <ListItem key={comment.id} alignItems="flex-start" sx={{ px: 0 }}>
                                     <ListItemAvatar>
-                                        <Avatar sx={{ width: 32, height: 32 }}>
-                                            {comment.user.charAt(0)}
+                                        <Avatar 
+                                            src={comment.userProfilePicUrl || ''}
+                                            sx={{ width: 32, height: 32 }}
+                                        >
+                                            {comment.userDisplayName?.charAt(0) || 'U'}
                                         </Avatar>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary={comment.user}
+                                        primary={
+                                            <ButtonBase
+                                                onClick={() => handleNameClick(comment.userId)}
+                                                sx={{
+                                                    padding: 0,
+                                                    justifyContent: 'flex-start',
+                                                    '&:hover': {
+                                                        backgroundColor: 'transparent',
+                                                    }
+                                                }}
+                                            >
+                                                <Typography 
+                                                    variant="subtitle2" 
+                                                    fontWeight="bold"
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                        color: 'inherit'
+                                                    }}
+                                                >
+                                                    {comment.userDisplayName || 'Anonymous'}
+                                                </Typography>
+                                            </ButtonBase>
+                                        }
                                         secondary={
                                             <>
-                                                {comment.text}
-                                                <Typography variant="caption" display="block">
-                                                    {format(comment.timestamp, 'MMM d, h:mm a')}
+                                                <Typography
+                                                    component="span"
+                                                    variant="body2"
+                                                    color="text.primary"
+                                                    sx={{ display: 'block' }}
+                                                >
+                                                    {comment.text}
+                                                </Typography>
+                                                <Typography variant="caption" display="block" color="text.secondary">
+                                                    {formatFirebaseTimestamp(comment.createdAt)}
                                                 </Typography>
                                             </>
                                         }
@@ -217,30 +325,38 @@ const PostDetailView = ({ post, open, onClose }) => {
                         </List>
 
                             {/* Comment input */}
-                            <TextField
-                                fullWidth
-                                placeholder="Add a comment..."
-                                value={comment}
-                                onChange={(e) => setComment(e.target.value)}
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault();
-                                        handleCommentSubmit();
-                                    }
-                                }}
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                onClick={handleCommentSubmit}
-                                                disabled={!comment.trim()}
-                                            >
-                                                <SendIcon />
-                                            </IconButton>
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
+                            {currentUser && (
+                                <TextField
+                                    fullWidth
+                                    placeholder="Add a comment..."
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            handleCommentSubmit();
+                                        }
+                                    }}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={handleCommentSubmit}
+                                                    disabled={!comment.trim()}
+                                                >
+                                                    <SendIcon />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            )}
+                            
+                            {!currentUser && (
+                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
+                                    Please log in to add comments
+                                </Typography>
+                            )}
                         </Box>
                     </Box>
                 </Box>
