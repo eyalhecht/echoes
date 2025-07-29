@@ -98,7 +98,8 @@ function Home() {
             <Box sx={{ 
                 maxWidth: '600px', 
                 margin: '0 auto', 
-                marginLeft: isMobile ? 'auto' : '280px', // Responsive margin
+                marginLeft: isMobile ? 'auto' : '200px', // Reduced margin to move cards left
+                marginRight: isMobile ? 'auto' : '300px', // Add right margin to avoid overlap
                 paddingBottom: '20px' ,
                 gap: "10px",
                 display: "flex",

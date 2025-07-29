@@ -80,11 +80,11 @@ const SuggestedUsers = () => {
             <Paper sx={{
                 position: 'fixed',
                 top: '20px',
-                right: '20px', // Changed to right side
-                width: '320px',
+                right: '20px',
+                width: '280px', // Reduced from 320px
                 height: '400px',
                 borderRadius: '12px',
-                padding: '20px',
+                padding: '16px', // Reduced padding
                 backgroundColor: '#fff',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
                 display: 'flex',
@@ -104,11 +104,11 @@ const SuggestedUsers = () => {
         <Paper sx={{
             position: 'fixed',
             top: '20px',
-            right: '20px', // Changed to right side
-            width: '320px',
+            right: '20px',
+            width: '280px', // Reduced from 320px
             maxHeight: '500px',
             borderRadius: '12px',
-            padding: '20px',
+            padding: '16px', // Reduced padding
             backgroundColor: '#fff',
             boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
             overflowY: 'auto'
