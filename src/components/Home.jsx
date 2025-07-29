@@ -99,7 +99,10 @@ function Home() {
                 maxWidth: '600px', 
                 margin: '0 auto', 
                 marginLeft: isMobile ? 'auto' : '280px', // Responsive margin
-                paddingBottom: '20px' 
+                paddingBottom: '20px' ,
+                gap: "10px",
+                display: "flex",
+                flexDirection: 'column',
             }}>
                 {posts && posts?.map((post) => (
                     <PostCard key={post.id} post={post} />

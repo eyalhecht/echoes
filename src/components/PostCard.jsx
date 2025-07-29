@@ -255,7 +255,6 @@ function PostCard({ post }) {
         <Card
             sx={{
             maxWidth: 600, // Max width for a typical post card
-            margin: '16px auto', // Center the card and add some vertical spacing
             borderRadius: '12px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             backgroundColor: 'white',

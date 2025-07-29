@@ -43,7 +43,7 @@ function MainContent() {
         <Box sx={{
             marginLeft: isMobile ? '0px' : '200px', // Remove left margin on mobile
             minHeight: `100vh`,
-            backgroundColor: 'grey',
+            backgroundColor: 'black',
             padding: '20px',
             paddingBottom: isMobile ? '80px' : '20px' // Add bottom padding for mobile nav
         }}>
