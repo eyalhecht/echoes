@@ -9,10 +9,14 @@ const useUiStore = create((set, get) => ({
     posts: [],
     postsLoading: false,
     postsError: null,
+    lastDocId: null,
+    hasMore: true,
     setPosts: (posts) => set({ posts }),
     addPosts: (newPosts) => set((state) => ({
         posts: [...state.posts, ...newPosts]
     })),
+    setLastDocId: (lastDocId) => set({ lastDocId }),
+    setHasMore: (hasMore) => set({ hasMore }),
     addPost: (post) => set((state) => ({
         posts: [post, ...state.posts]
     })),
