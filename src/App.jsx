@@ -30,14 +30,14 @@ function App() {
                 {/* Public Routes */}
                 <Route
                     path="/"
-                    element={isAuthenticated ? <Navigate to="/app" replace /> : <Login />}
+                    element={isAuthenticated ? <Navigate to="/home" replace /> : <Login />}
                 />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
 
                 {/* Protected Layout - Single route that protects everything */}
                 <Route
-                    path="/app/*"
+                    path="/home"
                     element={
                         <ProtectedRoute>
                             <Layout />
