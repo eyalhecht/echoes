@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Box, Typography, Button, CircularProgress, Avatar, Paper } from '@mui/material';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
@@ -20,6 +20,10 @@ const Profile = ({ targetUserId }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [followActionLoading, setFollowActionLoading] = useState(false);
     const [userPostsLoading, setUserPostsLoading] = useState(true);
+    
+    const [lastPostId, setLastPostId] = useState(null);
+    const [hasMorePosts, setHasMorePosts] = useState(true);
+    const [loadingMorePosts, setLoadingMorePosts] = useState(false);
 
     const isCurrentUserProfile = currentUser?.uid === targetUserId;
 
@@ -52,43 +56,85 @@ const Profile = ({ targetUserId }) => {
         loadProfile();
     }, [targetUserId]);
 
-    useEffect(() => {
-        const loadUserPosts = async () => {
-            if (!targetUserId) {
-                console.warn("loadUserPosts called without targetUserId.");
-                setUserPostsLoading(false);
-                return;
-            }
+    const loadMorePosts = useCallback(async (isInitial = false) => {
+        if (!targetUserId) {
+            console.warn("loadMorePosts called without targetUserId.");
+            return;
+        }
 
-            setUserPostsLoading(true);
-            try {
-                const response = await callApiGateway({
-                    action: 'getUserPosts',
-                    payload: {
-                        profileUserId: targetUserId, // Fix: Use profileUserId to match backend
-                        limit: 20
-                    }
-                });
+        if (!isInitial && (!hasMorePosts || loadingMorePosts)) return;
+        const loading = isInitial ? setUserPostsLoading : setLoadingMorePosts;
+        loading(true);
 
-                console.log("Fetched user posts response:", response); // Debug log
+        try {
+            const response = await callApiGateway({
+                action: 'getUserPosts',
+                payload: {
+                    profileUserId: targetUserId,
+                    limit: 10,
+                    lastPostId: isInitial ? null : lastPostId
+                }
+            });
 
-                if (response && response.data.posts) {
+            console.log("Fetched user posts response:", response);
+
+            if (response && response.data.posts) {
+                if (isInitial) {
                     setUserPosts(response.data.posts);
                 } else {
+                    setUserPosts(prevPosts => [...prevPosts, ...response.data.posts]);
+                }
+                setLastPostId(response.data.lastDocId);
+                setHasMorePosts(response.data.hasMore);
+            } else {
+                if (isInitial) {
                     setUserPosts([]);
                 }
-            } catch (error) {
-                console.error("Error fetching user posts:", error);
+                setHasMorePosts(false);
+            }
+        } catch (error) {
+            console.error("Error fetching user posts:", error);
+            if (isInitial) {
                 setUserPosts([]);
-            } finally {
-                setUserPostsLoading(false);
+            }
+            setHasMorePosts(false);
+        } finally {
+            loading(false);
+        }
+    }, [targetUserId, hasMorePosts, loadingMorePosts, lastPostId]);
+
+    // Load initial posts
+    useEffect(() => {
+        if (targetUserId) {
+            // Reset states when targetUserId changes
+            setUserPosts([]);
+            setLastPostId(null);
+            setHasMorePosts(true);
+            setLoadingMorePosts(false);
+            
+            loadMorePosts(true);
+        }
+    }, [targetUserId]);
+
+    // Infinite scroll handler
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Trigger when user is within 200px of the bottom
+            const nearBottom = scrollTop + windowHeight >= documentHeight - 200;
+            
+            if (nearBottom && hasMorePosts && !loadingMorePosts && !userPostsLoading) {
+                console.log('Profile scroll triggered load more posts');
+                loadMorePosts(false);
             }
         };
 
-        loadUserPosts();
-    }, [targetUserId]);
-
-// Updated Frontend handleToggleFollow function for Profile.jsx
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [loadMorePosts, hasMorePosts, loadingMorePosts, userPostsLoading]);
 
     const handleToggleFollow = async () => {
         if (!currentUser?.uid) {
@@ -118,7 +164,7 @@ const Profile = ({ targetUserId }) => {
     }
 
     return (
-        <Box sx={{ maxWidth: '900px', margin: '0 auto', p: 0 }}>
+        <Box sx={{ maxWidth: '900px', margin: '0 auto', p: 0, paddingBottom: '20px' }}>
             <Paper sx={{
                 p: 3,
                 mx: 2,
@@ -208,9 +254,31 @@ const Profile = ({ targetUserId }) => {
                         </Typography>
                     </Paper>
                 ) : (
-                    userPosts.map((post) => (
-                        <PostCard key={post.id} post={post} />
-                    ))
+                    <>
+                        {userPosts.map((post) => (
+                            <PostCard key={post.id} post={post} />
+                        ))}
+                        
+                        {loadingMorePosts && (
+                            <Box sx={{
+                                textAlign: 'center',
+                                padding: '20px',
+                                color: '#666'
+                            }}>
+                                Loading more posts...
+                            </Box>
+                        )}
+                        
+                        {!hasMorePosts && userPosts.length > 0 && (
+                            <Box sx={{
+                                textAlign: 'center',
+                                padding: '20px',
+                                color: '#666'
+                            }}>
+                                No more posts to load
+                            </Box>
+                        )}
+                    </>
                 )}
             </Box>
         </Box>
