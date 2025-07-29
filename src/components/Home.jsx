@@ -74,11 +74,11 @@ function Home() {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
-            
-            // Trigger when user is within 200px of the bottom
-            const nearBottom = scrollTop + windowHeight >= documentHeight - 200;
-            
-            if (nearBottom && hasMore && !postsLoading) {
+            const lastThirdStart = documentHeight * (2 / 3);
+            // Trigger when the bottom of the viewport has scrolled past the start of the last third
+            const reachesLastThird = (scrollTop + windowHeight) >= lastThirdStart;
+
+            if (reachesLastThird && hasMore && !postsLoading) {
                 console.log('Scroll triggered load more');
                 loadMorePosts();
             }
