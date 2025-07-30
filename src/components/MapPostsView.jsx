@@ -195,17 +195,8 @@ const MapPostsView = () => {
     }, []);
 
     return (
-        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 2, bgcolor: '#f5f1e8', borderBottom: 1, borderColor: 'divider' }}>
-                <Typography variant="h5" gutterBottom>
-                    Explore Posts by Location
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {locationPosts.length} posts found in this area
-                </Typography>
-            </Box>
-
-            <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <Box sx={{ height: '90vh',  marginInline: "10px", display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ flex: 1, borderRadius: "8px", display: 'flex', overflow: 'hidden' }}>
                 <Box sx={{
                     width: '55%', 
                     borderRight: 1, 
@@ -215,7 +206,7 @@ const MapPostsView = () => {
                 }}>
                     <Box sx={{ p: 2, bgcolor: '#fafafa', borderBottom: 1, borderColor: 'divider' }}>
                         <Typography variant="h6" gutterBottom>
-                            Posts in Area
+                            {locationPosts.length} Posts in Area
                         </Typography>
                         {loading && (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
