@@ -126,69 +126,83 @@ function PostCard({ post }) {
 
         const firstFile = files[0];
 
-        switch (type) {
-            case 'photo':
-            case 'document':
-            case 'item':
-                return (
-                    <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
-                        <CardMedia
-                            component="img"
-                            image={firstFile}
-                            alt="Post media"
-                            sx={{ maxHeight: 400, objectFit: 'contain', margin: 'auto', width: '100%' }}
-                        />
-                        {year && year.length > 0 && (
-                            <Box sx={{
-                                position: 'absolute',
-                                bottom: 8,
-                                right: 8,
-                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                color: 'white',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                                backdropFilter: 'blur(4px)',
-                                border: '1px solid rgba(255, 255, 255, 0.2)'
-                            }}>
-                                {year.join(', ')}
-                            </Box>
-                        )}
+        if (type === 'photo' || type === 'document' || type === 'item') {
+            return (
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center',
+                    paddingInline: "10px"
+                }}>
+                    <Box sx={{
+                        backgroundColor: 'white',
+                        padding: '20px 20px 80px 20px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
+                        width: '100%'
+                    }}>
+                        <Box sx={{ position: 'relative' }}>
+                            <CardMedia
+                                component="img"
+                                image={firstFile}
+                                alt="Post media"
+                                sx={{ 
+                                    width: '100%',
+                                    maxHeight:500,
+                                    objectFit: 'cover'
+                                }}
+                            />
+                            {year && year.length > 0 && (
+                                <Box sx={{
+                                    position: 'absolute',
+                                    bottom: -50, // Position in the white Polaroid footer
+                                    right: 10,
+                                    color: '#666',
+                                    fontSize: '12px',
+                                    fontFamily: 'serif',
+                                    fontStyle: 'italic'
+                                }}>
+                                    {year.join(', ')}
+                                </Box>
+                            )}
+                        </Box>
                     </Box>
-                );
-            case 'video':
-                return (
-                    <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
-                        <CardMedia
-                            component="video"
-                            controls
-                            src={firstFile}
-                            sx={{ maxHeight: 400, width: '100%' }}
-                        />
-                        {year && year.length > 0 && (
-                            <Box sx={{
-                                position: 'absolute',
-                                bottom: 48, // Higher up to avoid video controls
-                                right: 8,
-                                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                                color: 'white',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                                backdropFilter: 'blur(4px)',
-                                border: '1px solid rgba(255, 255, 255, 0.2)'
-                            }}>
-                                {year.join(', ')}
-                            </Box>
-                        )}
-                    </Box>
-                );
-            default:
-                return null;
+                </Box>
+            );
         }
+
+        // Keep video as original
+        if (type === 'video') {
+            return (
+                <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                    <CardMedia
+                        component="video"
+                        controls
+                        src={firstFile}
+                        sx={{ maxHeight: 400, width: '100%' }}
+                    />
+                    {year && year.length > 0 && (
+                        <Box sx={{
+                            position: 'absolute',
+                            bottom: 48, // Higher up to avoid video controls
+                            right: 8,
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            backdropFilter: 'blur(4px)',
+                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                        }}>
+                            {year.join(', ')}
+                        </Box>
+                    )}
+                </Box>
+            );
+        }
+
+        return null;
     };
+
     const fetchComments = useCallback(async () => {
         setIsCommentsLoading(true);
         setCommentError(null);
@@ -254,10 +268,10 @@ function PostCard({ post }) {
         <>
         <Card
             sx={{
-            maxWidth: 500, // Max width for a typical post card
-            borderRadius: '12px',
+            maxWidth: 500,
+            borderRadius: '5px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            backgroundColor: 'white',
+            backgroundColor: '#be8f3c',
         }}>
             <CardHeader
                 avatar={
@@ -322,6 +336,7 @@ function PostCard({ post }) {
                     }
                 }}
                 onClick={() => setDetailViewOpen(true)}
+                sx={{ cursor: 'pointer' }}
             >
             {renderMedia()}
             </Box>
