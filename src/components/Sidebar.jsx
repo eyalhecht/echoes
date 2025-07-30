@@ -70,7 +70,7 @@ function Sidebar() {
 
     return (
         <Box sx={{
-            width: '220px',
+            width: '210px',
             height: '100vh',
             backgroundColor: '#f5f1e8',
             color: '#2d2d2d',

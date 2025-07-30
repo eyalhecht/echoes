@@ -9,6 +9,7 @@ import MapPostsView from "./MapPostsView.jsx"; // Import the new component
 import {useAuthStore} from "../stores/useAuthStore.js";
 import Sidebar from "./Sidebar.jsx";
 import MobileBottomNavigation from "./BottomNavigation.jsx";
+import Bookmarks from "./Bookmarks.jsx";
 
 const HEADER_HEIGHT = 40;
 
@@ -33,7 +34,7 @@ function MainContent() {
             case 'Upload':
                 return <UploadPost>Upload Page Coming Soon...</UploadPost>;
             case 'Bookmarks':
-                return <Box>Bookmarks Page Coming Soon...</Box>;
+                return <Bookmarks/>;
             default:
                 return <Home />;
         }
