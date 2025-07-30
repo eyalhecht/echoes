@@ -292,14 +292,48 @@ const MapPostsView = () => {
                                         selectedPost?.id === post.id || hoveredPost?.id === post.id
                                             ? {
                                                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                                    <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                                                        <circle cx="15" cy="15" r="12" fill="#1976d2" stroke="white" stroke-width="3"/>
+                                                    <svg width="40" height="50" viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg">
+                                                        <defs>
+                                                            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                                                <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+                                                            </filter>
+                                                        </defs>
+                                                        <!-- Main pin shape -->
+                                                        <path d="M20 45 C20 45, 35 28, 35 20 C35 11.7, 28.3 5, 20 5 C11.7 5, 5 11.7, 5 20 C5 28, 20 45, 20 45 Z" 
+                                                              fill="#FF6B6B" stroke="white" stroke-width="2" filter="url(#shadow)"/>
+                                                        <!-- Inner circle -->
+                                                        <circle cx="20" cy="20" r="8" fill="white"/>
+                                                        <!-- Photo icon -->
+                                                        <rect x="16" y="16" width="8" height="6" rx="1" fill="#FF6B6B"/>
+                                                        <circle cx="17.5" cy="18" r="0.8" fill="white"/>
+                                                        <polygon points="22,20 23,19 24,20 24,22 16,22 16,20" fill="white"/>
                                                     </svg>
                                                 `),
-                                                scaledSize: new window.google.maps.Size(30, 30),
-                                                anchor: new window.google.maps.Point(15, 15)
+                                                scaledSize: new window.google.maps.Size(40, 50),
+                                                anchor: new window.google.maps.Point(20, 45)
                                             }
-                                            : undefined
+                                            : {
+                                                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                                    <svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                                                        <defs>
+                                                            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                                                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.2)"/>
+                                                            </filter>
+                                                        </defs>
+                                                        <!-- Main pin shape -->
+                                                        <path d="M16 36 C16 36, 28 22.4, 28 16 C28 9.4, 22.6 4, 16 4 C9.4 4, 4 9.4, 4 16 C4 22.4, 16 36, 16 36 Z" 
+                                                              fill="#4285F4" stroke="white" stroke-width="1.5" filter="url(#shadow)"/>
+                                                        <!-- Inner circle -->
+                                                        <circle cx="16" cy="16" r="6" fill="white"/>
+                                                        <!-- Photo icon -->
+                                                        <rect x="13" y="13.5" width="6" height="4.5" rx="0.5" fill="#4285F4"/>
+                                                        <circle cx="14" cy="15" r="0.6" fill="white"/>
+                                                        <polygon points="17.5,17 18.5,16 19,17 19,18 13,18 13,17" fill="white"/>
+                                                    </svg>
+                                                `),
+                                                scaledSize: new window.google.maps.Size(32, 40),
+                                                anchor: new window.google.maps.Point(16, 36)
+                                            }
                                     }
                                 />
                             )
