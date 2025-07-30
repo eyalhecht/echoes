@@ -20,7 +20,7 @@ const MapPostsView = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [mapCenter, setMapCenter] = useState({ lat: 40.7589, lng: -73.9851 });
-    const [radiusKm, setRadiusKm] = useState(5);
+    const [radiusKm, setRadiusKm] = useState(45);
     const [postType, setPostType] = useState('all');
     const [selectedPost, setSelectedPost] = useState(null);
     const [hoveredPost, setHoveredPost] = useState(null);
