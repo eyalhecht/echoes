@@ -489,6 +489,37 @@ function PostCard({ post }) {
                                 </Box>
                             )}
 
+                            {/* AI-Detected Location */}
+                            {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
+                                <Box sx={{ mb: 1.5 }}>
+                                    <Typography variant="caption" sx={{
+                                        color: 'text.secondary',
+                                        fontWeight: 'medium',
+                                        display: 'block',
+                                        mb: 0.5
+                                    }}>
+                                        AI-Detected Location
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <LocationOnIcon sx={{ fontSize: 14, color: '#1976d2' }} />
+                                        <Typography variant="body2" sx={{
+                                            color: 'text.primary',
+                                            fontSize: '13px'
+                                        }}>
+                                            {post.AiMetadata.location_confidence && post.AiMetadata.location_confidence !== 'unknown' && (
+                                                <Typography component="span" sx={{
+                                                    color: 'text.secondary',
+                                                    fontSize: '12px',
+                                                    ml: 1
+                                                }}>
+                                                    {post.AiMetadata.location}
+                                                </Typography>
+                                            )}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            )}
+
                             {/* Time Period */}
                             {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
                                 <Box>
