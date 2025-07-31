@@ -15,7 +15,8 @@ import {
     MenuItem,
     TextField,
     List, ListItem, ListItemText, ListItemAvatar, Divider,
-    Collapse
+    Collapse,
+    Chip
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -26,6 +27,7 @@ import BookmarkIcon from '@mui/icons-material/BookmarkBorder'; // Corrected book
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import {format, formatDistanceToNowStrict, isToday, isYesterday} from 'date-fns';
 import { usePostInteractions } from '../hooks/usePostInteractions';
 import PostMap from "./PostMap.jsx";
@@ -61,6 +63,7 @@ function PostCard({ post }) {
     const [commentError, setCommentError] = useState(null);
     const [showComments, setShowComments] = useState(false); // Controls visibility of comments section
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false); // Tracks if comments have been fetched for this post
+    const [showAiInsights, setShowAiInsights] = useState(false); // Controls AI insights panel
 
     const {
         id: postId,
@@ -271,7 +274,7 @@ function PostCard({ post }) {
             maxWidth: 500,
             borderRadius: '5px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            backgroundColor: '#be8f3c',
+            backgroundColor: 'white',
         }}>
             <CardHeader
                 avatar={
@@ -341,16 +344,37 @@ function PostCard({ post }) {
             {renderMedia()}
             </Box>
             <CardContent>
-                <Typography
-                    variant="body1"
-                    color="text.primary"
-                    sx={{
-                        marginBottom: shouldTruncate ? '8px' : '16px',
-                        whiteSpace: 'pre-wrap' // Preserve line breaks
-                    }}
-                >
-                    {getDisplayedText()}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: shouldTruncate ? 1 : 2 }}>
+                    <Typography
+                        variant="body1"
+                        color="text.primary"
+                        sx={{
+                            flex: 1,
+                            whiteSpace: 'pre-wrap' // Preserve line breaks
+                        }}
+                    >
+                        {getDisplayedText()}
+                    </Typography>
+                    
+                    {post.AiMetadata && (
+                        <IconButton 
+                            size="large"
+                            onClick={() => setShowAiInsights(!showAiInsights)}
+                            sx={{
+                                color: showAiInsights ? 'black' : '#1976d2',
+                                padding: '4px',
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                    color: '#1976d2',
+                                    transform: 'scale(1.3)'
+                                }
+                            }}
+                            aria-label="AI insights"
+                        >
+                            <AutoAwesomeIcon sx={{ fontSize: 20 }} />
+                        </IconButton>
+                    )}
+                </Box>
 
                 {shouldTruncate && (
                     <Button
@@ -369,6 +393,163 @@ function PostCard({ post }) {
                     >
                         {isDescriptionExpanded ? 'Read less' : 'Read more'}
                     </Button>
+                )}
+
+                {/* AI Insights Panel */}
+                {post.AiMetadata && (
+                    <Collapse in={showAiInsights}>
+                        <Box sx={{
+                            mt: 2,
+                            mb: 2,
+                            p: 2,
+                            bgcolor: 'rgba(25, 118, 210, 0.04)',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(25, 118, 210, 0.12)',
+                            position: 'relative'
+                        }}>
+                            {/* AI Badge */}
+                            <Box sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 1, 
+                                mb: 1.5,
+                                opacity: 0.8
+                            }}>
+                                <AutoAwesomeIcon sx={{ fontSize: 14, color: '#1976d2' }} />
+                                <Typography variant="caption" sx={{ 
+                                    color: '#1976d2', 
+                                    fontWeight: 'medium',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                }}>
+                                    AI Analysis
+                                </Typography>
+                            </Box>
+
+                            {/* AI Description */}
+                            {post.AiMetadata.description && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="body2" sx={{ 
+                                        fontStyle: 'italic',
+                                        color: 'text.secondary',
+                                        lineHeight: 1.5
+                                    }}>
+                                        "{post.AiMetadata.description}"
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {/* Cultural Context */}
+                            {post.AiMetadata.cultural_context && (
+                                <Box sx={{ mb: 1.5 }}>
+                                    <Typography variant="caption" sx={{ 
+                                        color: 'text.secondary',
+                                        fontWeight: 'medium',
+                                        display: 'block',
+                                        mb: 0.5
+                                    }}>
+                                        Cultural Context
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ 
+                                        color: 'text.primary',
+                                        fontSize: '13px'
+                                    }}>
+                                        {post.AiMetadata.cultural_context}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {/* People Identified */}
+                            {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
+                                <Box sx={{ mb: 1.5 }}>
+                                    <Typography variant="caption" sx={{ 
+                                        color: 'text.secondary',
+                                        fontWeight: 'medium',
+                                        display: 'block',
+                                        mb: 0.5
+                                    }}>
+                                        People Identified
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                        {post.AiMetadata.people_identified.map((person, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={person}
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{
+                                                    fontSize: '11px',
+                                                    height: '20px',
+                                                    borderColor: 'rgba(25, 118, 210, 0.3)',
+                                                    color: '#1976d2'
+                                                }}
+                                            />
+                                        ))}
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {/* AI-Detected Location */}
+                            {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
+                                <Box sx={{ mb: 1.5 }}>
+                                    <Typography variant="caption" sx={{
+                                        color: 'text.secondary',
+                                        fontWeight: 'medium',
+                                        display: 'block',
+                                        mb: 0.5
+                                    }}>
+                                        AI-Detected Location
+                                    </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <LocationOnIcon sx={{ fontSize: 14, color: '#1976d2' }} />
+                                        <Typography variant="body2" sx={{
+                                            color: 'text.primary',
+                                            fontSize: '13px'
+                                        }}>
+                                            {post.AiMetadata.location_confidence && post.AiMetadata.location_confidence !== 'unknown' && (
+                                                <Typography component="span" sx={{
+                                                    color: 'text.secondary',
+                                                    fontSize: '12px',
+                                                    ml: 1
+                                                }}>
+                                                    {post.AiMetadata.location}
+                                                </Typography>
+                                            )}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {/* Time Period */}
+                            {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
+                                <Box>
+                                    <Typography variant="caption" sx={{ 
+                                        color: 'text.secondary',
+                                        fontWeight: 'medium',
+                                        display: 'block',
+                                        mb: 0.5
+                                    }}>
+                                        Estimated Period
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ 
+                                        color: 'text.primary',
+                                        fontSize: '13px'
+                                    }}>
+                                        {post.AiMetadata.date_estimate}
+                                        {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
+                                            <Typography component="span" sx={{ 
+                                                color: 'text.secondary',
+                                                fontSize: '12px',
+                                                ml: 1
+                                            }}>
+                                                ({post.AiMetadata.date_confidence})
+                                            </Typography>
+                                        )}
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
+                    </Collapse>
                 )}
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
