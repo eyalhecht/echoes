@@ -427,23 +427,23 @@ function PostCard({ post }) {
                         )}
                     </div>
 
-                    {/* Comments Section */}
-                    {showComments && (
-                        <div className="mt-6 border-t pt-4">
-                            <h4 className="font-semibold mb-4">Comments</h4>
-
+                    <div
+                        className={`
+                            border-t 
+                            transition-all duration-300 ease-in-out overflow-hidden
+                            ${showComments ? 'max-h-[500px] opacity-100 pt-4' : 'max-h-0 opacity-0'}
+                        `}
+                    >
+                        <h4 className="font-semibold mb-4">Comments</h4>
                             {isCommentsLoading && (
                                 <p className="text-sm text-muted-foreground">Loading comments...</p>
                             )}
-
                             {commentError && (
                                 <p className="text-sm text-destructive">{commentError}</p>
                             )}
-
                             {!isCommentsLoading && !commentError && comments.length === 0 && (
                                 <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment!</p>
                             )}
-
                             <div className="max-h-48 overflow-y-auto mb-4 space-y-3">
                                 {comments.map((comment) => (
                                     <div key={comment.id} className="flex gap-3">
@@ -466,7 +466,6 @@ function PostCard({ post }) {
                                     </div>
                                 ))}
                             </div>
-
                             {currentUser && (
                                 <div className="flex gap-2">
                                     <Input
@@ -491,7 +490,6 @@ function PostCard({ post }) {
                                 </div>
                             )}
                         </div>
-                    )}
                 </CardContent>
             </Card>
 
