@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box } from '@mui/material';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar.jsx";
 import Home from './Home.jsx';
@@ -9,7 +8,7 @@ import Profile from "./Profile.jsx";
 import MapPostsView from "./MapPostsView.jsx";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import Bookmarks from "./Bookmarks.jsx";
-import {ModeToggle} from "@/components/ModeToggle.jsx";
+import { ModeToggle } from "@/components/ModeToggle.jsx";
 
 function MainContent() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
@@ -25,7 +24,11 @@ function MainContent() {
             case 'Map':
                 return <MapPostsView />;
             case 'Friends':
-                return <Box>Friends Page Coming Soon...</Box>;
+                return (
+                    <div className="flex items-center justify-center h-64">
+                        <p className="text-muted-foreground">Friends Page Coming Soon...</p>
+                    </div>
+                );
             case 'Upload':
                 return <UploadPost>Upload Page Coming Soon...</UploadPost>;
             case 'Bookmarks':
@@ -48,14 +51,10 @@ function MainContent() {
                 </div>
             </header>
 
-            <div className="flex flex-1 flex-col gap-4">
-                <Box sx={{
-                    minHeight: `calc(100vh - 120px)`,
-                    backgroundColor: 'black',
-                    padding: '20px',
-                }}>
+            <div className="flex flex-1 flex-col">
+                <div className="min-h-[calc(100vh-3rem)] p-5">
                     {renderContent()}
-                </Box>
+                </div>
             </div>
         </main>
     );

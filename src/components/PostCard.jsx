@@ -126,20 +126,20 @@ function PostCard({ post }) {
 
         if (type === 'photo' || type === 'document' || type === 'item') {
             return (
-                <div className="flex justify-center px-2">
-                    <div className="bg-white p-5 pb-20 shadow-xl w-full">
-                        <div className="relative">
-                            <img
-                                src={firstFile}
-                                alt="Post media"
-                                className="w-full max-h-[500px] object-cover"
-                            />
-                            {year && year.length > 0 && (
-                                <div className="absolute -bottom-12 right-2 text-gray-600 text-xs font-serif italic">
-                                    {year.join(', ')}
-                                </div>
-                            )}
-                        </div>
+                <div className="flex justify-center px-4 sm:px-6">
+                    {/* This is the "polaroid" wrapper for the image */}
+                    <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full z-10 ">
+                        <img
+                            src={firstFile}
+                            alt="Post media"
+                            className="w-full max-h-[400px] object-contain pb-10"
+                        />
+                        {year && year.length > 0 && (
+                            // Position the year text relative to the image wrapper
+                            <div className="absolute -bottom-6 right-2 text-gray-600 text-xs font-serif italic bg-white px-1 rounded">
+                                {year.join(', ')}
+                            </div>
+                        )}
                     </div>
                 </div>
             );
