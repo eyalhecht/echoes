@@ -1,18 +1,21 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, Typography, Button, CircularProgress, Avatar, Paper, useMediaQuery, useTheme, IconButton } from '@mui/material';
+import { useMediaQuery } from '@mui/material'; // Keep this for breakpoint detection
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LogOut, Loader2 } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
-import { LogoutOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = ({ targetUserId }) => {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isMobile = useMediaQuery('(max-width: 768px)');
     const navigate = useNavigate();
     const currentUser = useAuthStore(state => state.user);
 
-    const toggleFollow = async (userId, isFollowing)=>{
+    const toggleFollow = async (userId, isFollowing) => {
         return await callApiGateway({
             action: isFollowing ? 'unfollowUser' : 'followUser',
             payload: { targetUserId: targetUserId }
@@ -25,7 +28,7 @@ const Profile = ({ targetUserId }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [followActionLoading, setFollowActionLoading] = useState(false);
     const [userPostsLoading, setUserPostsLoading] = useState(true);
-    
+
     const [lastPostId, setLastPostId] = useState(null);
     const [hasMorePosts, setHasMorePosts] = useState(true);
     const [loadingMorePosts, setLoadingMorePosts] = useState(false);
@@ -116,7 +119,7 @@ const Profile = ({ targetUserId }) => {
             setLastPostId(null);
             setHasMorePosts(true);
             setLoadingMorePosts(false);
-            
+
             loadMorePosts(true);
         }
     }, [targetUserId]);
@@ -127,10 +130,10 @@ const Profile = ({ targetUserId }) => {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
-            
+
             // Trigger when user is within 200px of the bottom
             const nearBottom = scrollTop + windowHeight >= documentHeight - 200;
-            
+
             if (nearBottom && hasMorePosts && !loadingMorePosts && !userPostsLoading) {
                 console.log('Profile scroll triggered load more posts');
                 loadMorePosts(false);
@@ -171,149 +174,140 @@ const Profile = ({ targetUserId }) => {
 
     if (profileLoading) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <CircularProgress />
-            </Box>
+            <div className="flex justify-center items-center h-screen">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
         );
     }
 
     return (
-        <Box sx={{ maxWidth: '900px', margin: '0 auto', p: 0, paddingBottom: '20px' }}>
-            <Paper sx={{
-                p: 3,
-                mx: 2,
-                borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                position: 'relative',
-            }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3 }}>
-                    <Avatar
-                        src={profileData?.profilePictureUrl || '/default-avatar.png'}
-                        alt={profileData.displayName}
-                        sx={{
-                            width: 100,
-                            height: 100,
-                            border: '4px solid white',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                        }}
-                    />
-                    <Box sx={{ flex: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-                            <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
-                                {profileData.displayName}
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                {/* Logout button for current user on mobile */}
-                                {isCurrentUserProfile && isMobile && (
-                                    <IconButton
-                                        onClick={handleLogout}
-                                        sx={{
-                                            color: '#8B4513',
-                                            '&:hover': {
-                                                backgroundColor: 'rgba(139, 69, 19, 0.1)'
-                                            }
-                                        }}
-                                        title="Logout"
-                                    >
-                                        <LogoutOutlined />
-                                    </IconButton>
-                                )}
-                                {/* Follow button for other users */}
-                                {!isCurrentUserProfile && currentUser?.uid && (
-                                    <Button
-                                        variant={isFollowing ? 'outlined' : 'contained'}
-                                        color="primary"
-                                        onClick={handleToggleFollow}
-                                        disabled={followActionLoading}
-                                        sx={{ minWidth: '100px' }}
-                                    >
-                                        {followActionLoading ? (
-                                            <CircularProgress size={20} />
-                                        ) : (
-                                            isFollowing ? 'Unfollow' : 'Follow'
-                                        )}
-                                    </Button>
-                                )}
-                            </Box>
-                        </Box>
+        <div className="max-w-4xl mx-auto p-0 pb-5">
+            <Card className="mx-2 shadow-lg">
+                <CardContent className="p-6">
+                    <div className="flex items-start gap-6">
+                        <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
+                            <AvatarImage
+                                src={profileData?.profilePictureUrl || '/default-avatar.png'}
+                                alt={profileData?.displayName}
+                            />
+                            <AvatarFallback className="text-2xl">
+                                {profileData?.displayName?.charAt(0) || 'U'}
+                            </AvatarFallback>
+                        </Avatar>
 
-                        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                            @{profileData.username || 'user'}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mb: 3, color: '#666' }}>
-                            {profileData.bio || 'No bio available.'}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 4 }}>
-                            <Box sx={{ textAlign: 'center' }}>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c2c2c' }}>
-                                    {profileData.postsCount || 0}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Posts
-                                </Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'center' }}>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c2c2c' }}>
-                                    {profileData.followersCount || 0}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Followers
-                                </Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'center' }}>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2c2c2c' }}>
-                                    {profileData.followingCount || 0}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Following
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Box>
-                </Box>
-            </Paper>
+                        <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                                <h1 className="text-3xl font-bold">
+                                    {profileData?.displayName}
+                                </h1>
 
-            <Box sx={{ p: 2, mt: 2 }}>
+                                <div className="flex items-center gap-2">
+                                    {/* Logout button for current user on mobile */}
+                                    {isCurrentUserProfile && isMobile && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={handleLogout}
+                                            className="text-amber-700 hover:bg-amber-100"
+                                            title="Logout"
+                                        >
+                                            <LogOut className="h-5 w-5" />
+                                        </Button>
+                                    )}
+
+                                    {/* Follow button for other users */}
+                                    {!isCurrentUserProfile && currentUser?.uid && (
+                                        <Button
+                                            variant={isFollowing ? 'outline' : 'default'}
+                                            onClick={handleToggleFollow}
+                                            disabled={followActionLoading}
+                                            className="min-w-[100px]"
+                                        >
+                                            {followActionLoading ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                isFollowing ? 'Unfollow' : 'Follow'
+                                            )}
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+
+                            <p className="text-muted-foreground mb-3">
+                                @{profileData?.username || 'user'}
+                            </p>
+
+                            <p className="text-sm text-gray-600 mb-6">
+                                {profileData?.bio || 'No bio available.'}
+                            </p>
+
+                            <div className="flex gap-8">
+                                <div className="text-center">
+                                    <div className="text-xl font-bold text-gray-800">
+                                        {profileData?.postsCount || 0}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        Posts
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-xl font-bold text-gray-800">
+                                        {profileData?.followersCount || 0}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        Followers
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-xl font-bold text-gray-800">
+                                        {profileData?.followingCount || 0}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        Following
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <div className="p-2 mt-4">
                 {userPostsLoading ? (
-                    <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <CircularProgress size={30} />
-                        <Typography color="text.secondary" sx={{ mt: 1 }}>Loading posts...</Typography>
-                    </Box>
+                    <div className="text-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                        <p className="text-muted-foreground">Loading posts...</p>
+                    </div>
                 ) : userPosts.length === 0 ? (
-                    <Paper sx={{ p: 4, textAlign: 'center', backgroundColor: '#f9f9f9' }}>
-                        <Typography sx={{ color: '#666' }}>
-                            {isCurrentUserProfile ? "You haven't posted anything yet." : `${profileData.displayName} hasn't posted anything yet.`}
-                        </Typography>
-                    </Paper>
+                    <Card className="p-8 text-center bg-gray-50">
+                        <p className="text-gray-600">
+                            {isCurrentUserProfile
+                                ? "You haven't posted anything yet."
+                                : `${profileData?.displayName} hasn't posted anything yet.`
+                            }
+                        </p>
+                    </Card>
                 ) : (
-                    <Box sx={{display: "flex", flexDirection: "column", gap: "10px"}}>
+                    <div className="flex flex-col gap-2.5">
                         {userPosts.map((post) => (
                             <PostCard key={post.id} post={post} />
                         ))}
-                        
+
                         {loadingMorePosts && (
-                            <Box sx={{
-                                textAlign: 'center',
-                                padding: '20px',
-                                color: '#666'
-                            }}>
+                            <div className="text-center py-5 text-gray-600">
                                 Loading more posts...
-                            </Box>
+                            </div>
                         )}
-                        
+
                         {!hasMorePosts && userPosts.length > 0 && (
-                            <Box sx={{
-                                textAlign: 'center',
-                                padding: '20px',
-                                color: '#666'
-                            }}>
+                            <div className="text-center py-5 text-gray-600">
                                 No more posts to load
-                            </Box>
+                            </div>
                         )}
-                    </Box>
+                    </div>
                 )}
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };
 
