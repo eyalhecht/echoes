@@ -117,6 +117,13 @@ function PostCard({ post }) {
         await deletePost(postId);
     };
 
+    // Helper function to safely render year data
+    const formatYear = (yearData) => {
+        if (!yearData) return null;
+        return yearData[0]
+
+    };
+
     const renderMedia = () => {
         if (!files || files.length === 0) {
             return null;
@@ -128,18 +135,21 @@ function PostCard({ post }) {
             return (
                 <div className="flex justify-center px-4 sm:px-6">
                     {/* This is the "polaroid" wrapper for the image */}
-                    <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full z-10 ">
+                    <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full z-10">
+                        {/* Year badge in top right corner */}
+                        {formatYear(year) && (
+                            <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20  backdrop-blur-sm">
+                                {formatYear(year)}
+                            </div>
+
+                        )}
                         <img
                             src={firstFile}
                             alt="Post media"
-                            className="w-full max-h-[400px] object-contain pb-10"
+                            className="w-full max-h-[400px] object-contain"
                         />
-                        {year && year.length > 0 && (
-                            // Position the year text relative to the image wrapper
-                            <div className="absolute -bottom-6 right-2 text-gray-600 text-xs font-serif italic bg-white px-1 rounded">
-                                {year.join(', ')}
-                            </div>
-                        )}
+                        {/* Empty space at bottom for polaroid effect */}
+                        <div className="h-10"></div>
                     </div>
                 </div>
             );
@@ -153,9 +163,9 @@ function PostCard({ post }) {
                         src={firstFile}
                         className="max-h-96 w-full"
                     />
-                    {year && year.length > 0 && (
+                    {year && (
                         <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20">
-                            {year.join(', ')}
+                            {formatYear(year)}
                         </div>
                     )}
                 </div>
@@ -355,9 +365,19 @@ function PostCard({ post }) {
                                     </p>
                                     <div className="flex items-center gap-2">
                                         <MapPin className="h-3.5 w-3.5 text-blue-600" />
-                                        <p className="text-xs text-foreground">
-                                            {post.AiMetadata.location}
-                                        </p>
+                                        {post.AiMetadata?.location ? (
+                                            <div className="flex flex-wrap gap-1">
+                                                {post.AiMetadata.location
+                                                    .split(',')
+                                                    .map(loc => loc.trim())
+                                                    .filter(Boolean)
+                                                    .map((loc, i) => (
+                                                        <Badge key={i} variant="outline" className="text-xs">
+                                                            {loc}
+                                                        </Badge>
+                                                    ))}
+                                            </div>
+                                        ) : null}
                                     </div>
                                 </div>
                             )}

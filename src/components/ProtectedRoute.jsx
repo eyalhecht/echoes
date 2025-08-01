@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, loading } = useAuthStore();
 
     if (loading) {
-        return <LoadingScreen/>;
+        return <div/>;
     }
 
     if (!isAuthenticated) {
