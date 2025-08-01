@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Avatar, Button, Paper, useMediaQuery, useTheme } from '@mui/material';
+import { useMediaQuery } from '@mui/material'; // Keep this for breakpoint detection
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import useUiStore from '../stores/useUiStore.js';
 import { SuggestedUsersSkeleton } from "@/components/SuggestedUsersSkeleton.jsx";
 
 const SuggestedUsers = () => {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isMobile = useMediaQuery('(max-width: 768px)'); // Using direct media query
     const currentUser = useAuthStore(state => state.user);
     const setActiveProfileView = useUiStore(state => state.setActiveProfileView);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
@@ -25,7 +27,7 @@ const SuggestedUsers = () => {
     useEffect(() => {
         const fetchSuggestedUsers = async () => {
             if (!currentUser?.uid) return;
-            
+
             setLoading(true);
             try {
                 const response = await callApiGateway({
@@ -85,111 +87,61 @@ const SuggestedUsers = () => {
     }
 
     return (
-        <Paper sx={{
-            position: 'absolute',
-            top: '68px',
-            right: '20px',
-            width: '280px',
-            maxHeight: '500px',
-            borderRadius: '12px',
-            padding: '16px',
-            backgroundColor: '#fff',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
-            overflowY: 'auto'
-        }}>
-            {/* Header */}
-            <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                marginBottom: '16px' 
-            }}>
-                <Typography variant="h6" sx={{ 
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    color: '#2d2d2d'
-                }}>
+        <Card className="fixed top-[68px] right-5 w-[280px] max-h-[500px] shadow-lg overflow-y-auto">
+            <CardHeader className="pb-4">
+                <h3 className="text-base font-bold">
                     Suggested for you
-                </Typography>
-            </Box>
+                </h3>
+            </CardHeader>
 
-            {/* Suggested Users List */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <CardContent className="space-y-3 pt-0">
                 {suggestedUsers.map((user) => {
                     const isFollowing = followingStates[user.userId] || false;
-                    
+
                     return (
-                        <Box 
-                            key={user.userId} 
-                            sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                justifyContent: 'space-between',
-                                padding: '8px 0'
-                            }}
+                        <div
+                            key={user.userId}
+                            className="flex items-center justify-between py-2"
                         >
                             {/* User Info */}
-                            <Box sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '12px',
-                                flex: 1,
-                                cursor: 'pointer'
-                            }}
-                                 onClick={() => handleProfileClick(user.userId)}
-
+                            <div
+                                className="flex items-center gap-3 flex-1 cursor-pointer min-w-0"
+                                onClick={() => handleProfileClick(user.userId)}
                             >
-                                <Avatar
-                                    src={user.profilePictureUrl}
-                                    alt={user.displayName}
-                                    sx={{ width: 44, height: 44 }}
-                                />
-                                <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ 
-                                            fontWeight: '600',
-                                            fontSize: '14px',
-                                            color: '#2d2d2d',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }}
-                                    >
+                                <Avatar className="h-11 w-11">
+                                    <AvatarImage
+                                        src={user.profilePictureUrl}
+                                        alt={user.displayName}
+                                    />
+                                    <AvatarFallback>
+                                        {user.displayName?.charAt(0) || 'U'}
+                                    </AvatarFallback>
+                                </Avatar>
+
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate">
                                         {user.displayName}
-                                    </Typography>
-                                    <Typography 
-                                        variant="caption" 
-                                        sx={{ 
-                                            color: '#666',
-                                            fontSize: '12px'
-                                        }}
-                                    >
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
                                         {user.reason}
-                                    </Typography>
-                                </Box>
-                            </Box>
+                                    </p>
+                                </div>
+                            </div>
 
                             {/* Follow Button */}
                             <Button
-                                variant={isFollowing ? "outlined" : "contained"}
-                                size="small"
+                                variant={isFollowing ? "outline" : "default"}
+                                size="sm"
                                 onClick={() => handleFollowToggle(user.userId, isFollowing)}
-                                sx={{
-                                    minWidth: '70px',
-                                    height: '32px',
-                                    textTransform: 'none',
-                                    fontSize: '12px',
-                                    fontWeight: '600'
-                                }}
+                                className="min-w-[70px] h-8 text-xs font-semibold"
                             >
                                 {isFollowing ? 'Following' : 'Follow'}
                             </Button>
-                        </Box>
+                        </div>
                     );
                 })}
-            </Box>
-        </Paper>
+            </CardContent>
+        </Card>
     );
 };
 

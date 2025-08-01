@@ -1,40 +1,42 @@
 import React, { useState, useCallback } from 'react';
 import {
-    Box,
-    Typography,
-    Avatar,
     Card,
     CardHeader,
     CardContent,
-    CardMedia,
-    IconButton,
-    Button,
-    Modal,
-    ButtonBase,
-    Menu,
-    MenuItem,
-    TextField,
-    List, ListItem, ListItemText, ListItemAvatar, Divider,
-    Collapse,
-    Chip
-} from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import BookmarkIcon from '@mui/icons-material/BookmarkBorder'; // Corrected bookmark icon
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SendIcon from '@mui/icons-material/Send';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import {format, formatDistanceToNowStrict, isToday, isYesterday} from 'date-fns';
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+    MoreVertical,
+    Heart,
+    MessageCircle,
+    Bookmark,
+    MapPin,
+    Trash2,
+    Send,
+    Sparkles,
+} from 'lucide-react';
+import { format, formatDistanceToNowStrict, isToday, isYesterday } from 'date-fns';
 import { usePostInteractions } from '../hooks/usePostInteractions';
 import PostMap from "./PostMap.jsx";
 import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
-import {useAuthStore} from "../stores/useAuthStore.js";
-import {callApiGateway} from "../firebaseConfig.js";
+import { useAuthStore } from "../stores/useAuthStore.js";
+import { callApiGateway } from "../firebaseConfig.js";
 
 function PostCard({ post }) {
     const {
@@ -51,7 +53,6 @@ function PostCard({ post }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
     const [detailViewOpen, setDetailViewOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null); // State for menu anchor
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const deletePost = useUiStore(state => state.deletePost);
@@ -61,9 +62,9 @@ function PostCard({ post }) {
     const [newCommentText, setNewCommentText] = useState('');
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
     const [commentError, setCommentError] = useState(null);
-    const [showComments, setShowComments] = useState(false); // Controls visibility of comments section
-    const [hasCommentsFetched, setHasCommentsFetched] = useState(false); // Tracks if comments have been fetched for this post
-    const [showAiInsights, setShowAiInsights] = useState(false); // Controls AI insights panel
+    const [showComments, setShowComments] = useState(false);
+    const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
+    const [showAiInsights, setShowAiInsights] = useState(false);
 
     const {
         id: postId,
@@ -71,13 +72,12 @@ function PostCard({ post }) {
         userProfilePicUrl,
         description,
         type,
-        files, // This will be an array of URLs, or a single YouTube URL
+        files,
         location,
         year,
         commentsCount: actualCommentsCount,
         userId,
         createdAt,
-        // postId, userId, updatedAt are also there but not directly displayed here
     } = post;
 
     const MAX_DESCRIPTION_LENGTH = 150;
@@ -102,9 +102,9 @@ function PostCard({ post }) {
         } else if (isYesterday(date)) {
             return `Yesterday at ${format(date, 'h:mm a')}`;
         } else if (Math.abs(date.getTime() - now.getTime()) < 7 * 24 * 60 * 60 * 1000) {
-            return format(date, 'EEEE \'at\' h:mm a'); // E.g., "Monday at 10:00 AM"
+            return format(date, 'EEEE \'at\' h:mm a');
         } else {
-            return format(date, 'MMM dd, yyyy'); // E.g., "Jul 15, 2025"
+            return format(date, 'MMM dd, yyyy');
         }
     };
 
@@ -113,13 +113,8 @@ function PostCard({ post }) {
         setActiveProfileView(userId)
     }
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
     const handleDeleteClick = async () => {
         await deletePost(postId);
-        handleMenuClose();
     };
 
     const renderMedia = () => {
@@ -131,75 +126,39 @@ function PostCard({ post }) {
 
         if (type === 'photo' || type === 'document' || type === 'item') {
             return (
-                <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center',
-                    paddingInline: "10px"
-                }}>
-                    <Box sx={{
-                        backgroundColor: 'white',
-                        padding: '20px 20px 80px 20px',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.45)',
-                        width: '100%'
-                    }}>
-                        <Box sx={{ position: 'relative' }}>
-                            <CardMedia
-                                component="img"
-                                image={firstFile}
+                <div className="flex justify-center px-2">
+                    <div className="bg-white p-5 pb-20 shadow-xl w-full">
+                        <div className="relative">
+                            <img
+                                src={firstFile}
                                 alt="Post media"
-                                sx={{ 
-                                    width: '100%',
-                                    maxHeight:500,
-                                    objectFit: 'cover'
-                                }}
+                                className="w-full max-h-[500px] object-cover"
                             />
                             {year && year.length > 0 && (
-                                <Box sx={{
-                                    position: 'absolute',
-                                    bottom: -50, // Position in the white Polaroid footer
-                                    right: 10,
-                                    color: '#666',
-                                    fontSize: '12px',
-                                    fontFamily: 'serif',
-                                    fontStyle: 'italic'
-                                }}>
+                                <div className="absolute -bottom-12 right-2 text-gray-600 text-xs font-serif italic">
                                     {year.join(', ')}
-                                </Box>
+                                </div>
                             )}
-                        </Box>
-                    </Box>
-                </Box>
+                        </div>
+                    </div>
+                </div>
             );
         }
 
-        // Keep video as original
         if (type === 'video') {
             return (
-                <Box sx={{ position: 'relative', display: 'inline-block', width: '100%' }}>
-                    <CardMedia
-                        component="video"
+                <div className="relative w-full">
+                    <video
                         controls
                         src={firstFile}
-                        sx={{ maxHeight: 400, width: '100%' }}
+                        className="max-h-96 w-full"
                     />
                     {year && year.length > 0 && (
-                        <Box sx={{
-                            position: 'absolute',
-                            bottom: 48, // Higher up to avoid video controls
-                            right: 8,
-                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            color: 'white',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            backdropFilter: 'blur(4px)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)'
-                        }}>
+                        <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20">
                             {year.join(', ')}
-                        </Box>
+                        </div>
                     )}
-                </Box>
+                </div>
             );
         }
 
@@ -212,29 +171,22 @@ function PostCard({ post }) {
         try {
             const result = await callApiGateway({
                 action: 'getComments',
-                payload: {
-                    postId
-                }
+                payload: { postId }
             });
             const processedComments = result.data.comments.map(comment => ({
                 ...comment,
                 createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : comment.createdAt
             }));
-            console.log(processedComments)
-
             setComments(processedComments);
             setHasCommentsFetched(true);
         } catch (err) {
-            console.error("Error fetching comments via Cloud Function:", err);
-            if (err.code && err.message) {
-                setCommentError(`Failed to load comments: ${err.message}`);
-            } else {
-                setCommentError("Failed to load comments due to an unexpected error.");
-            }
+            console.error("Error fetching comments:", err);
+            setCommentError("Failed to load comments due to an unexpected error.");
         } finally {
             setIsCommentsLoading(false);
         }
     }, [postId]);
+
     const handleAddComment = async () => {
         if (!newCommentText.trim() || !currentUser) {
             setCommentError("Comment cannot be empty and you must be logged in.");
@@ -251,9 +203,7 @@ function PostCard({ post }) {
             });
             setNewCommentText('');
             setCommentError(null);
-
             fetchComments();
-
         } catch (err) {
             console.error("Error adding comment:", err);
             setCommentError("Failed to add comment.");
@@ -269,409 +219,257 @@ function PostCard({ post }) {
 
     return (
         <>
-        <Card
-            sx={{
-            maxWidth: 500,
-            borderRadius: '5px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            backgroundColor: 'white',
-        }}>
-            <CardHeader
-                avatar={
-                    <Avatar src={userProfilePicUrl || ''} alt={userDisplayName ? userDisplayName.charAt(0) : 'U'} />
-                }
-                action={
-                    <>
-                        <IconButton aria-label="settings" onClick={(event) => {
-                            setAnchorEl(event.currentTarget);
-                        }}>
-                            <MoreVertIcon />
-                        </IconButton>
-
-                            {currentUser?.uid && userId === currentUser.uid && (
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleMenuClose}
-                                    disableScrollLock
-                                >
-                                <MenuItem onClick={handleDeleteClick}>
-                                    <DeleteIcon sx={{ mr: 1 }} /> Delete Post
-                                </MenuItem>
-                                </Menu>
-                            )}
-                    </>
-                }
-                title={
-                    <ButtonBase
-                        onClick={() => handleNameClick(userId)}
-                        sx={{
-                            padding: 0,
-                            justifyContent: 'flex-start',
-                            '&:hover': {
-                                backgroundColor: 'transparent',
-                            }
-                        }}
-                    >
-                        <Typography tabIndex={0} variant="subtitle1" fontWeight="bold"
-                                    sx={{
-                                        cursor: 'pointer',
-                                        color: 'inherit' // Ensures the text color comes from the parent
-                                    }}
+            <Card className="max-w-[500px] rounded-lg shadow-lg">
+                <CardHeader className="flex flex-row items-center space-y-0 pb-2">
+                    <Avatar className="h-10 w-10">
+                        <AvatarImage src={userProfilePicUrl || ''} />
+                        <AvatarFallback>{userDisplayName ? userDisplayName.charAt(0) : 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 ml-3">
+                        <button
+                            onClick={() => handleNameClick(userId)}
+                            className="text-sm font-semibold hover:underline text-left"
                         >
                             {userDisplayName || 'Anonymous User'}
-                        </Typography>
-                    </ButtonBase>
-                }
-                subheader={
-                    <>
-                        <Typography variant="body2" color="text.secondary">
+                        </button>
+                        <p className="text-xs text-muted-foreground">
                             {formatFirebaseTimestamp(createdAt)}
-                        </Typography>
-                    </>
-                }
-            />
-            <Box
-                tabIndex={0}
-                onKeyDown={(e)=>{
-                    if (e.key === ' ') {
-                        setDetailViewOpen(true)
-                    }
-                }}
-                onClick={() => setDetailViewOpen(true)}
-                sx={{ cursor: 'pointer' }}
-            >
-            {renderMedia()}
-            </Box>
-            <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: shouldTruncate ? 1 : 2 }}>
-                    <Typography
-                        variant="body1"
-                        color="text.primary"
-                        sx={{
-                            flex: 1,
-                            whiteSpace: 'pre-wrap' // Preserve line breaks
-                        }}
-                    >
-                        {getDisplayedText()}
-                    </Typography>
-                    
-                    {post.AiMetadata && (
-                        <IconButton 
-                            size="large"
-                            onClick={() => setShowAiInsights(!showAiInsights)}
-                            sx={{
-                                color: showAiInsights ? 'black' : '#1976d2',
-                                padding: '4px',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                    color: '#1976d2',
-                                    transform: 'scale(1.3)'
-                                }
-                            }}
-                            aria-label="AI insights"
+                        </p>
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        {currentUser?.uid && userId === currentUser.uid && (
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={handleDeleteClick}>
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete Post
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        )}
+                    </DropdownMenu>
+                </CardHeader>
+
+                <div
+                    className="cursor-pointer"
+                    onClick={() => setDetailViewOpen(true)}
+                    onKeyDown={(e) => {
+                        if (e.key === ' ') {
+                            setDetailViewOpen(true)
+                        }
+                    }}
+                    tabIndex={0}
+                >
+                    {renderMedia()}
+                </div>
+
+                <CardContent className="pt-4">
+                    <div className="flex items-start gap-2 mb-2">
+                        <p className="text-sm flex-1 whitespace-pre-wrap">
+                            {getDisplayedText()}
+                        </p>
+
+                        {post.AiMetadata && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setShowAiInsights(!showAiInsights)}
+                                className={`p-1 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600 hover:scale-110'}`}
+                            >
+                                <Sparkles className="h-5 w-5" />
+                            </Button>
+                        )}
+                    </div>
+
+                    {shouldTruncate && (
+                        <Button
+                            variant="link"
+                            size="sm"
+                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                            className="p-0 h-auto text-xs mb-4"
                         >
-                            <AutoAwesomeIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
+                            {isDescriptionExpanded ? 'Read less' : 'Read more'}
+                        </Button>
                     )}
-                </Box>
 
-                {shouldTruncate && (
-                    <Button
-                        variant="text"
-                        size="small"
-                        onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                        sx={{
-                            padding: 0,
-                            marginBottom: '16px',
-                            textTransform: 'none',
-                            '&:hover': {
-                                backgroundColor: 'transparent',
-                                textDecoration: 'underline'
-                            }
-                        }}
-                    >
-                        {isDescriptionExpanded ? 'Read less' : 'Read more'}
-                    </Button>
-                )}
-
-                {/* AI Insights Panel */}
-                {post.AiMetadata && (
-                    <Collapse in={showAiInsights}>
-                        <Box sx={{
-                            mt: 2,
-                            mb: 2,
-                            p: 2,
-                            bgcolor: 'rgba(25, 118, 210, 0.04)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(25, 118, 210, 0.12)',
-                            position: 'relative'
-                        }}>
-                            {/* AI Badge */}
-                            <Box sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 1, 
-                                mb: 1.5,
-                                opacity: 0.8
-                            }}>
-                                <AutoAwesomeIcon sx={{ fontSize: 14, color: '#1976d2' }} />
-                                <Typography variant="caption" sx={{ 
-                                    color: '#1976d2', 
-                                    fontWeight: 'medium',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.5px'
-                                }}>
+                    {/* AI Insights Panel */}
+                    {post.AiMetadata && showAiInsights && (
+                        <div className="mt-4 mb-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                            <div className="flex items-center gap-2 mb-3 opacity-80">
+                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
                                     AI Analysis
-                                </Typography>
-                            </Box>
+                                </span>
+                            </div>
 
-                            {/* AI Description */}
                             {post.AiMetadata.description && (
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="body2" sx={{ 
-                                        fontStyle: 'italic',
-                                        color: 'text.secondary',
-                                        lineHeight: 1.5
-                                    }}>
+                                <div className="mb-4">
+                                    <p className="text-sm italic text-muted-foreground leading-relaxed">
                                         "{post.AiMetadata.description}"
-                                    </Typography>
-                                </Box>
+                                    </p>
+                                </div>
                             )}
 
-                            {/* Cultural Context */}
                             {post.AiMetadata.cultural_context && (
-                                <Box sx={{ mb: 1.5 }}>
-                                    <Typography variant="caption" sx={{ 
-                                        color: 'text.secondary',
-                                        fontWeight: 'medium',
-                                        display: 'block',
-                                        mb: 0.5
-                                    }}>
+                                <div className="mb-3">
+                                    <p className="text-xs text-muted-foreground font-medium mb-1">
                                         Cultural Context
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ 
-                                        color: 'text.primary',
-                                        fontSize: '13px'
-                                    }}>
+                                    </p>
+                                    <p className="text-xs text-foreground">
                                         {post.AiMetadata.cultural_context}
-                                    </Typography>
-                                </Box>
+                                    </p>
+                                </div>
                             )}
 
-                            {/* People Identified */}
                             {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
-                                <Box sx={{ mb: 1.5 }}>
-                                    <Typography variant="caption" sx={{ 
-                                        color: 'text.secondary',
-                                        fontWeight: 'medium',
-                                        display: 'block',
-                                        mb: 0.5
-                                    }}>
+                                <div className="mb-3">
+                                    <p className="text-xs text-muted-foreground font-medium mb-1">
                                         People Identified
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    </p>
+                                    <div className="flex flex-wrap gap-1">
                                         {post.AiMetadata.people_identified.map((person, index) => (
-                                            <Chip
+                                            <Badge
                                                 key={index}
-                                                label={person}
-                                                size="small"
-                                                variant="outlined"
-                                                sx={{
-                                                    fontSize: '11px',
-                                                    height: '20px',
-                                                    borderColor: 'rgba(25, 118, 210, 0.3)',
-                                                    color: '#1976d2'
-                                                }}
-                                            />
+                                                variant="outline"
+                                                className="text-xs h-5 border-blue-300 text-blue-600"
+                                            >
+                                                {person}
+                                            </Badge>
                                         ))}
-                                    </Box>
-                                </Box>
+                                    </div>
+                                </div>
                             )}
 
-                            {/* AI-Detected Location */}
                             {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
-                                <Box sx={{ mb: 1.5 }}>
-                                    <Typography variant="caption" sx={{
-                                        color: 'text.secondary',
-                                        fontWeight: 'medium',
-                                        display: 'block',
-                                        mb: 0.5
-                                    }}>
+                                <div className="mb-3">
+                                    <p className="text-xs text-muted-foreground font-medium mb-1">
                                         AI-Detected Location
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <LocationOnIcon sx={{ fontSize: 14, color: '#1976d2' }} />
-                                        <Typography variant="body2" sx={{
-                                            color: 'text.primary',
-                                            fontSize: '13px'
-                                        }}>
-                                            {post.AiMetadata.location_confidence && post.AiMetadata.location_confidence !== 'unknown' && (
-                                                <Typography component="span" sx={{
-                                                    color: 'text.secondary',
-                                                    fontSize: '12px',
-                                                    ml: 1
-                                                }}>
-                                                    {post.AiMetadata.location}
-                                                </Typography>
-                                            )}
-                                        </Typography>
-                                    </Box>
-                                </Box>
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="h-3.5 w-3.5 text-blue-600" />
+                                        <p className="text-xs text-foreground">
+                                            {post.AiMetadata.location}
+                                        </p>
+                                    </div>
+                                </div>
                             )}
 
-                            {/* Time Period */}
                             {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
-                                <Box>
-                                    <Typography variant="caption" sx={{ 
-                                        color: 'text.secondary',
-                                        fontWeight: 'medium',
-                                        display: 'block',
-                                        mb: 0.5
-                                    }}>
+                                <div>
+                                    <p className="text-xs text-muted-foreground font-medium mb-1">
                                         Estimated Period
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ 
-                                        color: 'text.primary',
-                                        fontSize: '13px'
-                                    }}>
+                                    </p>
+                                    <p className="text-xs text-foreground">
                                         {post.AiMetadata.date_estimate}
                                         {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
-                                            <Typography component="span" sx={{ 
-                                                color: 'text.secondary',
-                                                fontSize: '12px',
-                                                ml: 1
-                                            }}>
+                                            <span className="text-muted-foreground ml-1">
                                                 ({post.AiMetadata.date_confidence})
-                                            </Typography>
+                                            </span>
                                         )}
-                                    </Typography>
-                                </Box>
+                                    </p>
+                                </div>
                             )}
-                        </Box>
-                    </Collapse>
-                )}
+                        </div>
+                    )}
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <IconButton
-                        aria-label="like"
-                        onClick={handleLikeToggle}
-                        sx={{
-                            color: liked ? 'red' : 'inherit',
-                            '&:disabled': {
-                                opacity: 0.6
-                            }
-                        }}
-                    >
-                        {liked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                    </IconButton>
-                    <Typography variant="body2">{likesCount}</Typography>
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleLikeToggle}
+                                className={`h-8 w-8 ${liked ? 'text-red-500' : ''}`}
+                                disabled={isLikeUpdating}
+                            >
+                                <Heart className={`h-5 w-5 ${liked ? 'fill-current' : ''}`} />
+                            </Button>
+                            <span className="text-sm">{likesCount}</span>
+                        </div>
 
-                        <IconButton aria-label="comment" onClick={handleToggleComments}>
-                            <ChatBubbleOutlineIcon />
-                        </IconButton>
-                        <Typography variant="body2">{actualCommentsCount}</Typography> {/* Using actualCommentsCount from post prop */}
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleToggleComments}
+                                className="h-8 w-8"
+                            >
+                                <MessageCircle className="h-5 w-5" />
+                            </Button>
+                            <span className="text-sm">{actualCommentsCount}</span>
+                        </div>
 
-                    <IconButton
-                        aria-label="bookmark"
-                        onClick={handleBookmarkToggle}
-                        sx={{
-                            color: bookmarked ? '#1976d2' : 'inherit',
-                            '&:disabled': {
-                                opacity: 0.6
-                            }
-                        }}
-                    >
-                        {bookmarked ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                    </IconButton>
-                    <Typography variant="body2">{bookmarksCount}</Typography>
-                    {location && <Box>
-                        <IconButton onClick={() => setLocationModal(true)} aria-label="comment">
-                            <LocationOnIcon/>
-                        </IconButton>
-                        <Modal
-                            open={locationModal}
-                            onClose={() => setLocationModal(false)}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
-                        >
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: 400,
-                                bgcolor: 'white',
-                            }}>
-                                <PostMap center={{lat: location?._latitude, lng: location?._longitude}}/>
+                        <div className="flex items-center gap-1">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleBookmarkToggle}
+                                className={`h-8 w-8 ${bookmarked ? 'text-blue-600' : ''}`}
+                                disabled={isBookmarkUpdating}
+                            >
+                                <Bookmark className={`h-5 w-5 ${bookmarked ? 'fill-current' : ''}`} />
+                            </Button>
+                            <span className="text-sm">{bookmarksCount}</span>
+                        </div>
 
-                            </Box>
-                        </Modal>
-                    </Box>}
-                </Box>
+                        {location && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setLocationModal(true)}
+                                className="h-8 w-8"
+                            >
+                                <MapPin className="h-5 w-5" />
+                            </Button>
+                        )}
+                    </div>
 
-                    <Collapse in={showComments}>
-                        <Box sx={{ mt: 3, borderTop: '1px solid #eee', pt: 2 }}>
-                            <Typography variant="h6" gutterBottom>Comments</Typography>
-                            {isCommentsLoading && <Typography variant="body2" color="text.secondary">Loading comments...</Typography>}
-                            {commentError && <Typography variant="body2" color="error">{commentError}</Typography>}
+                    {/* Comments Section */}
+                    {showComments && (
+                        <div className="mt-6 border-t pt-4">
+                            <h4 className="font-semibold mb-4">Comments</h4>
+
+                            {isCommentsLoading && (
+                                <p className="text-sm text-muted-foreground">Loading comments...</p>
+                            )}
+
+                            {commentError && (
+                                <p className="text-sm text-destructive">{commentError}</p>
+                            )}
 
                             {!isCommentsLoading && !commentError && comments.length === 0 && (
-                                <Typography variant="body2" color="text.secondary">No comments yet. Be the first to comment!</Typography>
+                                <p className="text-sm text-muted-foreground">No comments yet. Be the first to comment!</p>
                             )}
 
-                            <List sx={{ maxHeight: 200, overflowY: 'auto', mb: 2 }}>
+                            <div className="max-h-48 overflow-y-auto mb-4 space-y-3">
                                 {comments.map((comment) => (
-                                    <React.Fragment key={comment.id}>
-                                        <ListItem alignItems="flex-start">
-                                            <ListItemAvatar>
-                                                <Avatar alt={comment.userDisplayName?.charAt(0) || 'U'} src={comment.userProfilePicUrl || ''} />
-                                            </ListItemAvatar>
-                                            <ListItemText
+                                    <div key={comment.id} className="flex gap-3">
+                                        <Avatar className="h-8 w-8">
+                                            <AvatarImage src={comment.userProfilePicUrl || ''} />
+                                            <AvatarFallback>{comment.userDisplayName?.charAt(0) || 'U'}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <button
                                                 onClick={() => handleNameClick(comment.userId)}
-                                                primary={
-                                                    <ButtonBase
-                                                        component="span"
-                                                        variant="subtitle2"
-                                                        color="text.primary"
-                                                        fontWeight="bold"
-                                                        sx={{ display: 'inline' }}
-                                                    >
-                                                        {comment.userDisplayName || 'Anonymous'}
-                                                    </ButtonBase>
-                                                }
-                                                secondary={
-                                                    <React.Fragment>
-                                                        <Typography
-                                                            sx={{ display: 'block' }}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            {comment.text}
-                                                        </Typography>
-                                                        <Typography
-                                                            component="span"
-                                                            variant="caption"
-                                                            color="text.secondary"
-                                                        >
-                                                            {formatFirebaseTimestamp(comment.createdAt)}
-                                                        </Typography>
-                                                    </React.Fragment>
-                                                }
-                                            />
-                                        </ListItem>
-                                        <Divider variant="inset" component="li" />
-                                    </React.Fragment>
+                                                className="text-sm font-semibold hover:underline"
+                                            >
+                                                {comment.userDisplayName || 'Anonymous'}
+                                            </button>
+                                            <p className="text-sm text-foreground mt-1">{comment.text}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {formatFirebaseTimestamp(comment.createdAt)}
+                                            </p>
+                                        </div>
+                                    </div>
                                 ))}
-                            </List>
+                            </div>
 
                             {currentUser && (
-                                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        size="small"
+                                <div className="flex gap-2">
+                                    <Input
                                         placeholder="Add a comment..."
                                         value={newCommentText}
                                         onChange={(e) => setNewCommentText(e.target.value)}
@@ -681,24 +479,41 @@ function PostCard({ post }) {
                                                 handleAddComment();
                                             }
                                         }}
+                                        className="flex-1"
                                     />
-                                    <IconButton color="primary" onClick={handleAddComment} disabled={!newCommentText.trim()}>
-                                        <SendIcon />
-                                    </IconButton>
-                                </Box>
+                                    <Button
+                                        size="icon"
+                                        onClick={handleAddComment}
+                                        disabled={!newCommentText.trim()}
+                                    >
+                                        <Send className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             )}
-                        </Box>
-                    </Collapse>
-            </CardContent>
-        </Card>
-    {detailViewOpen && (
-        <PostDetailView
-            post={post}
-            open={detailViewOpen}
-            onClose={() => setDetailViewOpen(false)}
-        />
-    )}
-    </>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Location Modal */}
+            <Dialog open={locationModal} onOpenChange={setLocationModal}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Post Location</DialogTitle>
+                    </DialogHeader>
+                    <PostMap center={{lat: location?._latitude, lng: location?._longitude}}/>
+                </DialogContent>
+            </Dialog>
+
+            {/* Detail View */}
+            {detailViewOpen && (
+                <PostDetailView
+                    post={post}
+                    open={detailViewOpen}
+                    onClose={() => setDetailViewOpen(false)}
+                />
+            )}
+        </>
     );
 }
 
