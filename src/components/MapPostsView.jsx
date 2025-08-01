@@ -335,7 +335,7 @@ const MapPostsView = () => {
                     <Button
                         size="icon"
                         onClick={getCurrentLocation}
-                        className="absolute bottom-4 right-4 z-10 shadow-lg"
+                        className="absolute bottom-[35px] left-4 z-10 shadow-lg"
                     >
                         <Navigation className="h-4 w-4" />
                     </Button>
