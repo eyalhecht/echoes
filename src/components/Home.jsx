@@ -4,6 +4,7 @@ import {callApiGateway} from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import SuggestedUsers from "./SuggestedUsers.jsx";
+import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
 
 function Home() {
     const theme = useTheme();
@@ -92,12 +93,18 @@ function Home() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loadMorePosts, hasMore, postsLoading]);
 
+    const renderSkeletonCards = () => (
+        Array.from({ length: 5 }).map((_, index) => (
+            <PostCardSkeleton key={`skeleton-${index}`} />
+        ))
+    );
+
     return (
         <>
             {!isMobile && <SuggestedUsers />}
-            <Box sx={{ 
-                maxWidth: '600px', 
-                margin: '0 auto', 
+            <Box sx={{
+                maxWidth: '600px',
+                margin: '0 auto',
                 marginLeft: isMobile ? 'auto' : '200px', // Reduced margin to move cards left
                 marginRight: isMobile ? 'auto' : '300px', // Add right margin to avoid overlap
                 paddingBottom: '20px' ,
@@ -105,11 +112,14 @@ function Home() {
                 display: "flex",
                 flexDirection: 'column',
             }}>
+                {postsLoading && posts.length === 0 && renderSkeletonCards()}
+
                 {posts && posts?.map((post) => (
                     <PostCard key={post.id} post={post} />
                 ))}
 
-                {postsLoading && (
+                {/* Show loading for pagination (when loading more posts) */}
+                {postsLoading && posts.length > 0 && (
                     <Box sx={{
                         textAlign: 'center',
                         padding: '20px',
