@@ -1,17 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
-import {
-    Box,
-    Typography,
-    CircularProgress,
-    Alert,
-    Fab,
-    Divider
-} from '@mui/material';
-import { Masonry } from '@mui/lab';
-import {
-    MyLocation as MyLocationIcon,
-} from '@mui/icons-material';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, MapPin, Navigation } from 'lucide-react';
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
 import useUiStore from '../stores/useUiStore.js';
@@ -25,7 +17,7 @@ const MapPostsView = () => {
     const [selectedPost, setSelectedPost] = useState(null);
     const [hoveredPost, setHoveredPost] = useState(null);
     const [map, setMap] = useState(null);
-    const [locationPosts, setLocationPosts] = useState([]); // Local state for location-filtered posts
+    const [locationPosts, setLocationPosts] = useState([]);
     const debounceTimer = useRef(null);
     const cardRefs = useRef({});
 
@@ -89,7 +81,7 @@ const MapPostsView = () => {
             // Add location posts to global store if they don't exist
             const existingPostIds = new Set(posts.map(p => p.id));
             const newPosts = normalizedPosts.filter(post => !existingPostIds.has(post.id));
-            
+
             if (newPosts.length > 0) {
                 const updatedGlobalPosts = [...posts, ...newPosts];
                 setPosts(updatedGlobalPosts);
@@ -106,6 +98,7 @@ const MapPostsView = () => {
             setLoading(false);
         }
     }, [postType, posts, setPosts]);
+
     const handleMapChange = useCallback(() => {
         if (!map) return;
 
@@ -135,7 +128,7 @@ const MapPostsView = () => {
     const handleMarkerClick = useCallback((post) => {
         setSelectedPost(post);
         console.log('Marker clicked:', post.userDisplayName);
-        
+
         // Scroll to corresponding card
         if (cardRefs.current[post.id]) {
             cardRefs.current[post.id].scrollIntoView({
@@ -147,7 +140,7 @@ const MapPostsView = () => {
 
     const handleCardClick = useCallback((post) => {
         setSelectedPost(post);
-        
+
         if (map && post.location?._latitude && post.location?._longitude) {
             const position = {
                 lat: post.location._latitude,
@@ -155,7 +148,7 @@ const MapPostsView = () => {
             };
             map.panTo(position);
         }
-        
+
         console.log('Card clicked:', post.userDisplayName);
     }, [map]);
 
@@ -195,62 +188,52 @@ const MapPostsView = () => {
     }, []);
 
     return (
-        <Box sx={{ height: '90vh',  marginInline: "10px", display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ flex: 1, borderRadius: "8px", display: 'flex', overflow: 'hidden' }}>
-                <Box sx={{
-                    width: '55%', 
-                    borderRight: 1, 
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
-                    <Box sx={{ p: 2, bgcolor: '#fafafa', borderBottom: 1, borderColor: 'divider' }}>
-                        <Typography variant="h6" gutterBottom>
+        <div className="h-[90vh] mx-2 flex flex-col">
+            <div className="flex-1 rounded-lg flex overflow-hidden border">
+                {/* Left Panel - Posts */}
+                <div className="w-[55%] border-r flex flex-col">
+                    {/* Header */}
+                    <div className="p-4 bg-muted/50 border-b">
+                        <h2 className="text-lg font-semibold mb-2">
                             {locationPosts.length} Posts in Area
-                        </Typography>
+                        </h2>
                         {loading && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <CircularProgress size={16} />
-                                <Typography variant="body2" color="text.secondary">
+                            <div className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span className="text-sm text-muted-foreground">
                                     Loading posts...
-                                </Typography>
-                            </Box>
+                                </span>
+                            </div>
                         )}
-                    </Box>
+                    </div>
 
-                    <Box sx={{
-                        flex: 1, 
-                        overflowY: 'auto', 
-                        p: 2,
-                        backgroundColor: '#fafafa'
-                    }}>
+                    {/* Posts Grid */}
+                    <div className="flex-1 overflow-y-auto p-4 bg-muted/30">
                         {error && (
-                            <Alert severity="error" sx={{ mb: 2 }}>
-                                {error}
+                            <Alert className="mb-4">
+                                <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
-                        
+
                         {!loading && locationPosts.length === 0 ? (
-                            <Box sx={{ 
-                                textAlign: 'center', 
-                                py: 4,
-                                color: 'text.secondary'
-                            }}>
-                                <Typography variant="body1" gutterBottom>
+                            <div className="text-center py-8 text-muted-foreground">
+                                <MapPin className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                <h3 className="text-base font-medium mb-1">
                                     No posts found in this area
-                                </Typography>
-                                <Typography variant="body2">
+                                </h3>
+                                <p className="text-sm">
                                     Try moving the map or zooming out
-                                </Typography>
-                            </Box>
+                                </p>
+                            </div>
                         ) : (
-                            <Masonry columns={2} spacing={1.5}>
+                            <div className="columns-2 gap-3 space-y-3">
                                 {locationPosts.map((post) => (
-                                    <Box 
+                                    <div
                                         key={post.id}
                                         ref={(el) => {
                                             if (el) cardRefs.current[post.id] = el;
                                         }}
+                                        className="break-inside-avoid mb-3"
                                     >
                                         <MapPostCard
                                             post={post}
@@ -259,15 +242,15 @@ const MapPostsView = () => {
                                             onCardHover={handleCardHover}
                                             onCardLeave={handleCardLeave}
                                         />
-                                    </Box>
+                                    </div>
                                 ))}
-                            </Masonry>
+                            </div>
                         )}
-                    </Box>
-                </Box>
+                    </div>
+                </div>
 
                 {/* Right Panel - Map */}
-                <Box sx={{ flex: 1, position: 'relative' }}>
+                <div className="flex-1 relative">
                     <GoogleMap
                         mapContainerStyle={mapContainerStyle}
                         center={mapCenter}
@@ -292,47 +275,56 @@ const MapPostsView = () => {
                                         selectedPost?.id === post.id || hoveredPost?.id === post.id
                                             ? {
                                                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                                    <svg width="40" height="50" viewBox="0 0 40 50" xmlns="http://www.w3.org/2000/svg">
+                                                    <svg width="48" height="60" viewBox="0 0 48 60" xmlns="http://www.w3.org/2000/svg">
                                                         <defs>
+                                                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                                                <feMerge> 
+                                                                    <feMergeNode in="coloredBlur"/>
+                                                                    <feMergeNode in="SourceGraphic"/>
+                                                                </feMerge>
+                                                            </filter>
                                                             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                                                                <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+                                                                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.25)"/>
                                                             </filter>
                                                         </defs>
+                                                        <!-- Outer glow ring -->
+                                                        <circle cx="24" cy="24" r="22" fill="none" stroke="hsl(0, 84%, 60%)" stroke-width="2" opacity="0.6" filter="url(#glow)"/>
                                                         <!-- Main pin shape -->
-                                                        <path d="M20 45 C20 45, 35 28, 35 20 C35 11.7, 28.3 5, 20 5 C11.7 5, 5 11.7, 5 20 C5 28, 20 45, 20 45 Z" 
-                                                              fill="#FF6B6B" stroke="white" stroke-width="2" filter="url(#shadow)"/>
+                                                        <path d="M24 54 C24 54, 42 34, 42 24 C42 14, 34 6, 24 6 C14 6, 6 14, 6 24 C6 34, 24 54, 24 54 Z" 
+                                                              fill="hsl(0, 84%, 60%)" stroke="white" stroke-width="3" filter="url(#shadow)"/>
                                                         <!-- Inner circle -->
-                                                        <circle cx="20" cy="20" r="8" fill="white"/>
+                                                        <circle cx="24" cy="24" r="10" fill="white"/>
                                                         <!-- Photo icon -->
-                                                        <rect x="16" y="16" width="8" height="6" rx="1" fill="#FF6B6B"/>
-                                                        <circle cx="17.5" cy="18" r="0.8" fill="white"/>
-                                                        <polygon points="22,20 23,19 24,20 24,22 16,22 16,20" fill="white"/>
+                                                        <rect x="19" y="19" width="10" height="8" rx="1" fill="hsl(0, 84%, 60%)"/>
+                                                        <circle cx="21" cy="22" r="1.2" fill="white"/>
+                                                        <polygon points="27,25 28.5,23.5 30,25 30,27 19,27 19,25" fill="white"/>
                                                     </svg>
                                                 `),
-                                                scaledSize: new window.google.maps.Size(40, 50),
-                                                anchor: new window.google.maps.Point(20, 45)
+                                                scaledSize: new window.google.maps.Size(48, 60),
+                                                anchor: new window.google.maps.Point(24, 54)
                                             }
                                             : {
                                                 url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                                    <svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                                                    <svg width="36" height="45" viewBox="0 0 36 45" xmlns="http://www.w3.org/2000/svg">
                                                         <defs>
                                                             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                                                                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.2)"/>
+                                                                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.2)"/>
                                                             </filter>
                                                         </defs>
                                                         <!-- Main pin shape -->
-                                                        <path d="M16 36 C16 36, 28 22.4, 28 16 C28 9.4, 22.6 4, 16 4 C9.4 4, 4 9.4, 4 16 C4 22.4, 16 36, 16 36 Z" 
-                                                              fill="#4285F4" stroke="white" stroke-width="1.5" filter="url(#shadow)"/>
+                                                        <path d="M18 40.5 C18 40.5, 32 25.5, 32 18 C32 10.3, 25.7 4, 18 4 C10.3 4, 4 10.3, 4 18 C4 25.5, 18 40.5, 18 40.5 Z" 
+                                                              fill="hsl(221, 83%, 53%)" stroke="white" stroke-width="2" filter="url(#shadow)"/>
                                                         <!-- Inner circle -->
-                                                        <circle cx="16" cy="16" r="6" fill="white"/>
+                                                        <circle cx="18" cy="18" r="8" fill="white"/>
                                                         <!-- Photo icon -->
-                                                        <rect x="13" y="13.5" width="6" height="4.5" rx="0.5" fill="#4285F4"/>
-                                                        <circle cx="14" cy="15" r="0.6" fill="white"/>
-                                                        <polygon points="17.5,17 18.5,16 19,17 19,18 13,18 13,17" fill="white"/>
+                                                        <rect x="14" y="14.5" width="8" height="6" rx="0.8" fill="hsl(221, 83%, 53%)"/>
+                                                        <circle cx="15.5" cy="16.5" r="0.8" fill="white"/>
+                                                        <polygon points="19.5,19 20.5,18 21.5,19 21.5,20.5 14,20.5 14,19" fill="white"/>
                                                     </svg>
                                                 `),
-                                                scaledSize: new window.google.maps.Size(32, 40),
-                                                anchor: new window.google.maps.Point(16, 36)
+                                                scaledSize: new window.google.maps.Size(36, 45),
+                                                anchor: new window.google.maps.Point(18, 40.5)
                                             }
                                     }
                                 />
@@ -348,52 +340,39 @@ const MapPostsView = () => {
                                 }}
                                 onCloseClick={() => setSelectedPost(null)}
                             >
-                                <Box sx={{ maxWidth: 200 }}>
-                                    <Typography variant="h6" gutterBottom>
-                                        {selectedPost.userDisplayName}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                                        {selectedPost.description.substring(0, 100)}
-                                        {selectedPost.description.length > 100 ? '...' : ''}
-                                    </Typography>
-                                    {selectedPost.files?.[0] && (
-                                        <img
-                                            src={selectedPost.files[0]}
-                                            alt="Post preview"
-                                            style={{
-                                                width: '100%',
-                                                height: 80,
-                                                objectFit: 'cover',
-                                                borderRadius: 4,
-                                                marginBottom: 8
-                                            }}
-                                        />
-                                    )}
-                                    <Typography variant="caption" color="text.secondary">
-                                        {selectedPost.distanceKm?.toFixed(1)}km away • {selectedPost.likesCount || 0} likes
-                                    </Typography>
-                                </Box>
+                                <Card className="max-w-52 border-0 shadow-none">
+                                    <CardContent className="p-3">
+                                        <h4 className="font-semibold mb-2">
+                                            {selectedPost.userDisplayName}
+                                        </h4>
+                                        <p className="text-sm text-muted-foreground mb-3">
+                                            {selectedPost.description.substring(0, 100)}
+                                            {selectedPost.description.length > 100 ? '...' : ''}
+                                        </p>
+                                        {selectedPost.files?.[0] && (
+                                            <img
+                                                src={selectedPost.files[0]}
+                                                alt="Post preview"
+                                                className="w-full h-20 object-cover rounded mb-2"
+                                            />
+                                        )}
+                                    </CardContent>
+                                </Card>
                             </InfoWindow>
                         )}
                     </GoogleMap>
 
                     {/* Current Location Button */}
-                    <Fab
-                        color="primary"
-                        size="small"
+                    <Button
+                        size="icon"
                         onClick={getCurrentLocation}
-                        sx={{
-                            position: 'absolute',
-                            bottom: 16,
-                            right: 16,
-                            zIndex: 1000
-                        }}
+                        className="absolute bottom-4 right-4 z-10 shadow-lg"
                     >
-                        <MyLocationIcon />
-                    </Fab>
-                </Box>
-            </Box>
-        </Box>
+                        <Navigation className="h-4 w-4" />
+                    </Button>
+                </div>
+            </div>
+        </div>
     );
 };
 
