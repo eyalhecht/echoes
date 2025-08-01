@@ -6,6 +6,7 @@ import {BrowserRouter} from "react-router-dom";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import {LoadScript} from "@react-google-maps/api";
+import { ThemeProvider as ShadcnThemeProvider } from "@/components/theme-provider"
 
 const theme = createTheme();
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')).render(
             <ThemeProvider theme={theme}>
                 <LoadScript googleMapsApiKey={import.meta.env.VITE_MAPS_API_KEY}>
                     {/*<CssBaseline />*/}
-                     <App />
+                    <ShadcnThemeProvider defaultTheme="light" storageKey="echoes-ui-theme">
+                    <App />
+                    </ShadcnThemeProvider>
                 </LoadScript>
             </ThemeProvider>
         </BrowserRouter>

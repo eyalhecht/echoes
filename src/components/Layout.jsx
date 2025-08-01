@@ -9,6 +9,7 @@ import Profile from "./Profile.jsx";
 import MapPostsView from "./MapPostsView.jsx";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import Bookmarks from "./Bookmarks.jsx";
+import {ModeToggle} from "@/components/ModeToggle.jsx";
 
 function MainContent() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
@@ -42,6 +43,9 @@ function MainContent() {
                 <h1 className="text-lg font-semibold">
                     {activeSidebarItem || 'Home'}
                 </h1>
+                <div className="ml-auto">
+                    <ModeToggle />
+                </div>
             </header>
 
             <div className="flex flex-1 flex-col gap-4">
