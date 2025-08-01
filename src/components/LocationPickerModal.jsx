@@ -1,59 +1,48 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
-    DialogActions,
-    Button,
-    IconButton,
-    Box,
-    Typography,
-    Alert,
-    Chip
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import InfoIcon from '@mui/icons-material/Info';
-import PanToolIcon from '@mui/icons-material/PanTool';
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Check } from 'lucide-react';
 
 const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation }) => {
     const mapRef = useRef(null);
     const [selectedPosition, setSelectedPosition] = useState(
         initialLocation || { lat: 40.7128, lng: -74.0060 }
     );
-    const [mapCenter, setMapCenter] = useState(
-        initialLocation || { lat: 40.7128, lng: -74.0060 }
-    );
     const [hasInteracted, setHasInteracted] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            setSelectedPosition(initialLocation || { lat: 40.7128, lng: -74.0060 });
+            setHasInteracted(false);
+        }
+    }, [open, initialLocation]);
 
     const mapContainerStyle = {
         width: '100%',
-        height: '500px'
+        height: '400px'
     };
 
     const options = {
-        disableDefaultUI: false,
+        disableDefaultUI: true,
         zoomControl: true,
-        streetViewControl: false,
-        mapTypeControl: true,
-        fullscreenControl: false,
-
-
-        // STRICT RESTRICTION: Cannot pan beyond one world
+        gestureHandling: 'greedy',
+        scrollwheel: true,
         restriction: {
             latLngBounds: {
-                north: 85,      // Almost to the poles
-                south: -85,     // Almost to the poles
-                west: -180,     // International Date Line
-                east: 180,      // International Date Line
+                north: 85,
+                south: -85,
+                west: -180,
+                east: 180,
             },
-            strictBounds: true, // TRUE = Cannot pan outside these bounds at all
+            strictBounds: true,
         },
-
-        // Additional options to improve UX
-        gestureHandling: 'greedy', // One-finger pan on mobile
-        scrollwheel: true,         // Enable scroll zoom
     };
 
     const onLoad = useCallback((map) => {
@@ -64,7 +53,6 @@ const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation 
         mapRef.current = null;
     }, []);
 
-    // Handle map drag end to update the selected position
     const onDragEnd = useCallback(() => {
         if (mapRef.current) {
             const newCenter = mapRef.current.getCenter();
@@ -82,180 +70,86 @@ const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation 
     };
 
     const formatCoordinates = (lat, lng) => {
-        return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <LocationOnIcon color="primary" />
-                    Select Post Location
-                </Box>
-                <IconButton
-                    aria-label="close"
-                    onClick={onClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500],
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </DialogTitle>
-            <DialogContent dividers>
-                {/* Instructions Section */}
-                <Alert
-                    severity="info"
-                    icon={<InfoIcon />}
-                    sx={{ mb: 2 }}
-                >
-                    <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
-                        Choose the location that your post is about
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        This could be where a photo was taken, where an event happened,
-                        or any location relevant to your post content.
-                    </Typography>
-                </Alert>
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <MapPin className="h-5 w-5 text-blue-600" />
+                        Select Location
+                    </DialogTitle>
+                </DialogHeader>
 
-                {/* How to use instructions */}
-                <Box sx={{ mb: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <PanToolIcon fontSize="small" color="primary" />
-                        <Typography variant="subtitle2" color="primary">
-                            How to select location:
-                        </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 3 }}>
-                        • The red pin indicates your chosen location
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 3 }}>
-                        • Drag the map to move the red pin to your desired location
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 3 }}>
-                        • Scroll or use zoom controls (+/-) to get a better view
-                    </Typography>
-                </Box>
+                <div className="space-y-4">
+                    {/* Current coordinates */}
+                    <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                            Selected coordinates:
+                        </span>
+                        <Badge variant="outline" className="font-mono">
+                            {formatCoordinates(selectedPosition.lat, selectedPosition.lng)}
+                        </Badge>
+                    </div>
 
-                {/* Current coordinates display */}
-                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography variant="body2" color="text.secondary">
-                        Selected coordinates:
-                    </Typography>
-                    <Chip
-                        label={formatCoordinates(selectedPosition.lat, selectedPosition.lng)}
-                        size="small"
-                        color={hasInteracted ? "primary" : "default"}
-                        variant="outlined"
-                    />
-                    {!hasInteracted && (
-                        <Typography variant="caption" color="text.secondary">
-                            (Default location - drag map to change)
-                        </Typography>
-                    )}
-                </Box>
-                {/* Success message when location is selected */}
-                {hasInteracted && (
-                    <Alert severity="success" sx={{ mt: 2 }}>
-                        <Typography variant="body2">
-                            Great! You've positioned the pin. Click "Confirm Location" to save this selection.
-                        </Typography>
-                    </Alert>
-                )}
-
-                {/* Map Container */}
-                <Box sx={{ width: '100%', height: '500px', position: 'relative', border: '2px dashed', borderColor: 'grey.300', borderRadius: 1 }}>
-                    <GoogleMap
-                        mapContainerStyle={mapContainerStyle}
-                        center={mapCenter}
-                        zoom={15}
-                        options={options}
-                        onLoad={onLoad}
-                        onUnmount={onUnmount}
-                        onDragEnd={onDragEnd}
-                    />
-
-                    {/* Static pin in the center of the map */}
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -100%)',
-                            zIndex: 10,
-                            pointerEvents: 'none',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <LocationOnIcon
-                            sx={{
-                                fontSize: '3rem',
-                                color: 'error.main',
-                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-                                animation: hasInteracted ? 'none' : 'pulse 2s infinite'
-                            }}
+                    {/* Map Container */}
+                    <div className="relative rounded-lg overflow-hidden border-2 border-dashed border-gray-300">
+                        <GoogleMap
+                            mapContainerStyle={mapContainerStyle}
+                            center={selectedPosition}
+                            zoom={15}
+                            options={options}
+                            onLoad={onLoad}
+                            onUnmount={onUnmount}
+                            onDragEnd={onDragEnd}
                         />
-                        <Box
-                            sx={{
-                                width: 15,
-                                height: 15,
-                                borderRadius: '50%',
-                                backgroundColor: 'rgba(0,0,0,0.3)',
-                                marginTop: '-8px',
-                                filter: 'blur(2px)'
-                            }}
-                        />
-                    </Box>
 
-                    {/* Floating instruction overlay (shows until user interacts) */}
-                    {!hasInteracted && (
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                top: 20,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                zIndex: 15,
-                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                color: 'white',
-                                px: 2,
-                                py: 1,
-                                borderRadius: 1,
-                                fontSize: '0.875rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                                animation: 'fadeInOut 3s infinite'
-                            }}
+                        {/* Center Pin */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full z-10 pointer-events-none">
+                            <MapPin
+                                className={`h-8 w-8 text-red-500 drop-shadow-lg ${
+                                    !hasInteracted ? 'animate-bounce' : ''
+                                }`}
+                            />
+                        </div>
+
+                        {/* Instruction overlay */}
+                        {!hasInteracted && (
+                            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-black/80 text-white text-sm px-3 py-2 rounded-lg animate-pulse">
+                                Drag map to position pin
+                            </div>
+                        )}
+
+                        {/* Success indicator */}
+                        {hasInteracted && (
+                            <div className="absolute top-4 right-4 z-20 bg-green-500 text-white p-2 rounded-full animate-in fade-in-0 slide-in-from-top-2 duration-300">
+                                <Check className="h-4 w-4" />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-4">
+                        <Button
+                            variant="outline"
+                            onClick={onClose}
+                            className="flex-1"
                         >
-                            <PanToolIcon fontSize="small" />
-                            Drag the map to position the pin
-                        </Box>
-                    )}
-                </Box>
-
-
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleConfirmSelection}
+                            disabled={!hasInteracted}
+                            className="flex-1"
+                        >
+                            <MapPin className="h-4 w-4 mr-2" />
+                            Confirm Location
+                        </Button>
+                    </div>
+                </div>
             </DialogContent>
-
-            <DialogActions sx={{ p: 2 }}>
-                <Button onClick={onClose} color="secondary" variant="outlined">
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handleConfirmSelection}
-                    color="primary"
-                    variant="contained"
-                    disabled={!hasInteracted}
-                    startIcon={<LocationOnIcon />}
-                >
-                    Confirm Location
-                </Button>
-            </DialogActions>
         </Dialog>
     );
 };

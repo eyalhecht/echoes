@@ -1,44 +1,47 @@
 import React, { useState, useRef, useMemo } from 'react';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-    Box,
-    Button,
-    TextField,
-    Typography,
-    Paper,
-    IconButton,
-    CircularProgress,
-    FormControl,
-    InputLabel,
     Select,
-    MenuItem,
-    Autocomplete,
-    Chip,
-} from '@mui/material';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import CloseIcon from '@mui/icons-material/Close';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
-import {storage, auth, functions} from "../firebaseConfig.js";
-import {httpsCallable} from "firebase/functions";
-import {GeoPoint} from "firebase/firestore";
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Camera,
+    X,
+    MapPin,
+    Loader2,
+    Upload,
+} from 'lucide-react';
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage, auth, functions } from "../firebaseConfig.js";
+import { httpsCallable } from "firebase/functions";
+import { GeoPoint } from "firebase/firestore";
 import LocationPickerModal from './LocationPickerModal';
 
 const UploadPost = () => {
     const [description, setDescription] = useState('');
-    const [type, setType] = useState('photo'); // Default to 'photo'
-    const [files, setFiles] = useState([]); // Array to store multiple files
-    const [filePreviews, setFilePreviews] = useState([]); // Array for file previews
-    const [location, setLocation] = useState(null); // This will now display coordinates
-    const [selectedYear, setSelectedYear] = useState(null);
+    const [type, setType] = useState('photo');
+    const [files, setFiles] = useState([]);
+    const [filePreviews, setFilePreviews] = useState([]);
+    const [location, setLocation] = useState(null);
+    const [selectedYear, setSelectedYear] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState(null);
-    const [isMapModalOpen, setIsMapModalOpen] = useState(false); // State for map modal
+    const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
     const fileInputRef = useRef(null);
 
     const yearOptions = useMemo(() => {
         const currentYear = new Date().getFullYear();
-        const maxYear = currentYear - 5; // 5 years before current year
+        const maxYear = currentYear - 5;
         const minYear = 1900;
 
         const years = [];
@@ -51,25 +54,25 @@ const UploadPost = () => {
     const handleDescriptionChange = (event) => {
         setDescription(event.target.value);
     };
-    const handleTypeChange = (event) => {
-        setType(event.target.value);
+
+    const handleTypeChange = (value) => {
+        setType(value);
         setFiles([]);
         setFilePreviews([]);
     };
 
-    const handleYearSelect = (event, newValue) => {
-        setSelectedYear(newValue);
+    const handleYearSelect = (value) => {
+        setSelectedYear(value);
         setError(null);
     };
 
     const handleFileChange = (event) => {
         const newFiles = Array.from(event.target.files);
         if (newFiles.length > 0) {
-            // Create new preview URLs and add to existing files
             const newFilePreviews = newFiles.map(file => URL.createObjectURL(file));
             setFiles((prevFiles) => [...prevFiles, ...newFiles]);
             setFilePreviews((prevPreviews) => [...prevPreviews, ...newFilePreviews]);
-            setError(null); // Clear any previous errors
+            setError(null);
         }
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -107,11 +110,8 @@ const UploadPost = () => {
         try {
             let fileUrls = [];
 
-            // --- Step 1: Handle File Uploads to Firebase Storage ---
-            // This applies to 'photo', 'video', 'document', 'item' types
             if (type !== 'youtube' && files.length > 0) {
                 const uploadPromises = files.map(async (file) => {
-                    // Generate a unique path for each file in Storage
                     const storageRef = ref(storage, `post_media/${auth.currentUser?.uid || 'anonymous'}/${Date.now()}_${file.name}`);
                     const uploadTaskSnapshot = await uploadBytes(storageRef, file);
                     return await getDownloadURL(uploadTaskSnapshot.ref);
@@ -119,41 +119,35 @@ const UploadPost = () => {
                 fileUrls = await Promise.all(uploadPromises);
                 console.log('Files uploaded to Storage:', fileUrls);
             } else if (type === 'youtube' && files.length > 0) {
-                // For 'youtube' type, the 'files' state contains the URL string directly
-                fileUrls = files; // Pass the YouTube URL(s) as is
+                fileUrls = files;
             }
 
-            // --- Step 2: Call the Backendd Cloud Function to create the post ---
-            // The payload for the backend function
             const payload = {
-                action: 'createPost', // Specify the action for your apiGateway
+                action: 'createPost',
                 payload: {
                     description: description.trim(),
                     type: type,
-                    fileUrls: fileUrls, // Array of download URLs from Storage or YouTube URL(s)
+                    fileUrls: fileUrls,
                     location: location ? new GeoPoint(location.lat, location.lng) : null,
-                    year: selectedYear ? [selectedYear] : [], // Convert single year to array for backend compatibility
-                    // Backend will handle userId, likesCount, commentsCount, bookmarksCount, createdAt, updatedAt
+                    year: selectedYear ? [parseInt(selectedYear)] : [],
                 }
             };
 
-            const response = await  httpsCallable(functions, 'apiGateway')(payload); // Call the backend function
+            const response = await httpsCallable(functions, 'apiGateway')(payload);
 
             console.log('Post creation response from backend:', response.data);
 
-            // --- Step 3: Reset Form on Success ---
+            // Reset form
             setDescription('');
-            setType('photo'); // Reset to default type
+            setType('photo');
             setFiles([]);
             setFilePreviews([]);
             setLocation(null);
-            setSelectedYear(null);
-            // You might want to display a success message to the user, e.g., using a Snackbar
+            setSelectedYear('');
             alert(response.data.message || 'Post uploaded successfully!');
 
         } catch (err) {
             console.error('Error uploading post:', err);
-            // Firebase Cloud Functions HttpsError objects have a 'code' and 'message' property
             let errorMessage = 'Failed to upload post. Please try again.';
             if (err.code && err.message) {
                 errorMessage = `Error (${err.code}): ${err.message}`;
@@ -165,362 +159,232 @@ const UploadPost = () => {
             setIsUploading(false);
         }
     };
+
     return (
-        <Paper
-            elevation={3}
-            sx={{
-                p: 3,
-                mb: 3,
-                borderRadius: 2,
-                maxWidth: 700,
-                mx: 'auto', // Center the component
-            }}
-        >
-            <Typography variant="h4" gutterBottom align="center" sx={{
-                mb: 4,
-                fontWeight: 600,
-            }}>
-                Create New Post
-            </Typography>
+        <div className="max-w-2xl mx-auto">
+            <Card className="shadow-lg bg-sidebar">
+                <CardHeader className="text-center pb-6">
+                    <h1 className="text-2xl font-bold">Create New Post</h1>
+                </CardHeader>
 
-            {/* Description Input */}
-            <TextField
-                label="Description"
-                multiline
-                rows={4}
-                fullWidth
-                variant="outlined"
-                value={description}
-                onChange={handleDescriptionChange}
-                sx={{
-                    mb: 3,
-                    '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        transition: 'all 0.2s ease-in-out',
-                        '&:hover': {
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        },
-                        '&.Mui-focused': {
-                            boxShadow: '0 4px 20px rgba(25,118,210,0.2)',
-                        }
-                    }
-                }}
-                disabled={isUploading}
-                placeholder="Describe your post"
-            />
-
-            <FormControl fullWidth variant="outlined" sx={{
-                mb: 3,
-            }} disabled={isUploading}>
-                <InputLabel id="post-type-label">Post Type</InputLabel>
-                <Select
-                    labelId="post-type-label"
-                    id="post-type-select"
-                    value={type}
-                    onChange={handleTypeChange}
-                    label="Post Type"
-                >
-                    <MenuItem value="photo">Photo</MenuItem>
-                    {/*<MenuItem value="video">Video</MenuItem>*/}
-                    {/*<MenuItem value="document">Document</MenuItem>*/}
-                    {/*<MenuItem value="item">Item</MenuItem>*/}
-                    {/*<MenuItem value="youtube">YouTube Link</MenuItem>*/}
-                </Select>
-            </FormControl>
-
-            {/* File Upload Section */}
-            {type !== 'youtube' && ( // Only show file upload for relevant types
-                <Box sx={{ mb: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
-                        <input
-                            // Use appropriate accept attribute based on selected type
-                            accept={type === 'photo' ? 'image/*' : type === 'video' ? 'video/*' : '*/*'}
-                            style={{ display: 'none' }}
-                            id="file-upload-button"
-                            type="file"
-                            multiple // Allow multiple file selection
-                            onChange={handleFileChange}
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                            id="description"
+                            placeholder="Describe your post..."
+                            value={description}
+                            onChange={handleDescriptionChange}
                             disabled={isUploading}
-                            ref={fileInputRef} // Assign the ref
+                            className="min-h-[100px] resize-none"
                         />
-                        <label htmlFor="file-upload-button">
-                            <Button
-                                variant="outlined"
-                                component="span"
-                                startIcon={<PhotoCameraIcon />}
+                    </div>
+
+                    {/* Post Type Select */}
+                    <div className="space-y-2">
+                        <Label htmlFor="post-type">Post Type</Label>
+                        <Select value={type} onValueChange={handleTypeChange} disabled={isUploading}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select post type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="photo">Photo</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* File Upload Section */}
+                    {type !== 'youtube' && (
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                                <input
+                                    accept={type === 'photo' ? 'image/*' : type === 'video' ? 'video/*' : '*/*'}
+                                    className="hidden"
+                                    id="file-upload"
+                                    type="file"
+                                    multiple
+                                    onChange={handleFileChange}
+                                    disabled={isUploading}
+                                    ref={fileInputRef}
+                                />
+                                <Label htmlFor="file-upload">
+                                    <Button
+                                        variant="outline"
+                                        className="cursor-pointer border-2 border-dashed border-primary bg-primary/5 hover:bg-primary/10"
+                                        asChild
+                                    >
+                                        <span>
+                                            <Camera className="h-4 w-4 mr-2" />
+                                            Upload {type === 'photo' ? 'Image(s)' : 'File(s)'}
+                                        </span>
+                                    </Button>
+                                </Label>
+                                {files.length > 0 && (
+                                    <span className="text-sm text-muted-foreground">
+                                        {files.length} file(s) selected
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* File Previews */}
+                            {filePreviews.length > 0 && (
+                                <div className="flex flex-wrap gap-3 p-4 bg-muted/30 rounded-lg">
+                                    {filePreviews.map((previewUrl, index) => (
+                                        <div key={index} className="relative group">
+                                            <div className="w-20 h-20 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-shadow">
+                                                {type === 'photo' && (
+                                                    <img
+                                                        src={previewUrl}
+                                                        alt={`Preview ${index}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                )}
+                                                {type === 'video' && (
+                                                    <video
+                                                        src={previewUrl}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                )}
+                                                {(type === 'document' || type === 'item') && (
+                                                    <div className="w-full h-full flex items-center justify-center bg-muted text-2xl">
+                                                        {type === 'document' ? '📄' : '📦'}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <Button
+                                                variant="destructive"
+                                                size="icon"
+                                                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                                                onClick={() => handleRemoveFile(index)}
+                                                disabled={isUploading}
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* YouTube Link Input */}
+                    {type === 'youtube' && (
+                        <div className="space-y-2">
+                            <Label htmlFor="youtube-url">YouTube Video URL</Label>
+                            <Input
+                                id="youtube-url"
+                                placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                value={files[0] || ''}
+                                onChange={(e) => setFiles([e.target.value])}
                                 disabled={isUploading}
-                                sx={{
-                                    borderRadius: 2,
-                                    textTransform: 'none',
-                                    fontWeight: 500,
-                                    px: 3,
-                                    py: 1.5,
-                                    border: '2px dashed',
-                                    borderColor: 'primary.main',
-                                    backgroundColor: 'rgba(25,118,210,0.04)',
-                                    transition: 'all 0.2s ease-in-out',
-                                    '&:hover': {
-                                        borderColor: 'primary.dark',
-                                        backgroundColor: 'rgba(25,118,210,0.08)',
-                                        transform: 'translateY(-1px)',
-                                        boxShadow: '0 4px 12px rgba(25,118,210,0.2)',
-                                    }
-                                }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Location Section */}
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsMapModalOpen(true)}
+                                disabled={isUploading}
+                                className="flex-shrink-0"
                             >
-                                Upload {type === 'photo' ? 'Image(s)' : type === 'video' ? 'Video(s)' : 'File(s)'}
+                                <MapPin className="h-4 w-4 mr-2" />
+                                {location ? 'Change' : 'Select'} Location
                             </Button>
-                        </label>
-                        {files.length > 0 && (
-                            <Typography variant="body2" color="text.secondary">
-                                {files.length} file(s) selected
-                            </Typography>
-                        )}
-                    </Box>
-                    {/* File Previews */}
-                    {filePreviews.length > 0 && (
-                        <Box sx={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            gap: 2,
-                            mt: 2,
-                            p: 2,
-                            borderRadius: 2,
-                            backgroundColor: 'rgba(0,0,0,0.02)',
-                            border: '1px solid rgba(0,0,0,0.08)'
-                        }}>
-                            {filePreviews.map((previewUrl, index) => (
-                                <Box key={index} sx={{
-                                    position: 'relative',
-                                    width: 90,
-                                    height: 90,
-                                    overflow: 'hidden',
-                                    borderRadius: 2,
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                                    transition: 'all 0.2s ease-in-out',
-                                    '&:hover': {
-                                        transform: 'scale(1.05)',
-                                        boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
-                                    }
-                                }}>
-                                    {type === 'photo' && (
-                                        <img
-                                            src={previewUrl}
-                                            alt={`Preview ${index}`}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    )}
-                                    {type === 'video' && (
-                                        <video
-                                            src={previewUrl}
-                                            controls={false} // Don't show controls on small preview
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    )}
-                                    {/* For document/item, just show an icon or placeholder */}
-                                    {(type === 'document' || type === 'item') && (
-                                        <Box sx={{
-                                            width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            backgroundColor: '#f0f0f0', color: 'text.secondary', fontSize: '1.5rem'
-                                        }}>
-                                            {type === 'document' ? '📄' : '📦'}
-                                        </Box>
-                                    )}
-                                    <IconButton
-                                        onClick={() => handleRemoveFile(index)}
-                                        size="small"
-                                        sx={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            right: 0,
-                                            backgroundColor: 'rgba(255,255,255,0.7)',
-                                            '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' },
-                                        }}
+                        </div>
+
+                        {location && (
+                            <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-4 w-4 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                                        onClick={() => setLocation(null)}
                                         disabled={isUploading}
                                     >
-                                        <CloseIcon fontSize="small" />
-                                    </IconButton>
-                                </Box>
-                            ))}
-                        </Box>
+                                        <X className="h-2 w-2" />
+                                    </Button>
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">Location selected</span>
+                            </div>
+                        )}
+
+                        {!location && (
+                            <p className="text-sm text-muted-foreground">
+                                Optional: Select where this post is about
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Year Selection */}
+                    <div className="space-y-2">
+                        <Label htmlFor="year-select">Year (Optional)</Label>
+                        <Select value={selectedYear} onValueChange={handleYearSelect} disabled={isUploading}>
+                            <SelectTrigger>
+                                <SelectValue placeholder={`Select year (1900 - ${new Date().getFullYear() - 5})`} />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-60">
+                                {yearOptions.map((year) => (
+                                    <SelectItem key={year} value={year.toString()}>
+                                        {year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {!selectedYear && (
+                            <p className="text-sm text-muted-foreground">
+                                Select the year when this photo was taken (optional)
+                            </p>
+                        )}
+
+                        {selectedYear && (
+                            <p className="text-sm text-primary font-medium">
+                                Selected year: {selectedYear}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Error Message */}
+                    {error && (
+                        <Alert variant="destructive">
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
                     )}
-                </Box>
-            )}
 
-            {/* YouTube Link Input */}
-            {type === 'youtube' && (
-                <TextField
-                    label="YouTube Video URL"
-                    fullWidth
-                    variant="outlined"
-                    value={files[0] || ''} // Assuming one YouTube link
-                    onChange={(e) => setFiles([e.target.value])} // Store link in files array
-                    sx={{ mb: 3 }}
-                    disabled={isUploading}
-                    placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                />
-            )}
-
-            {/* Location Section */}
-            <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                    {/* Upload Button */}
                     <Button
-                        variant="outlined"
-                        size="large"
-                        startIcon={<LocationOnIcon />}
-                        onClick={() => setIsMapModalOpen(true)}
-                        disabled={isUploading}
-                        sx={{
-                            minWidth: 'auto',
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            fontWeight: 500,
-                            '&:hover': {
-                                transform: 'translateY(-1px)',
-                                boxShadow: '0 4px 12px rgba(25,118,210,0.2)',
-                            }
-                        }}
+                        onClick={handleUploadPost}
+                        disabled={isUploading || (!description.trim() && files.length === 0)}
+                        className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200"
                     >
-                        {location ? 'Change' : 'Select'} Location
+                        {isUploading ? (
+                            <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Uploading...
+                            </>
+                        ) : (
+                            <>
+                                <Upload className="h-4 w-4 mr-2" />
+                                Create Post
+                            </>
+                        )}
                     </Button>
-                </Box>
-
-                {location && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                        <Chip
-                            icon={<LocationOnIcon />}
-                            label={`${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
-                            color="primary"
-                            variant="filled"
-                            size="small"
-                            onDelete={() => setLocation(null)}
-                            disabled={isUploading}
-                            sx={{
-                                borderRadius: 2,
-                                fontWeight: 500,
-                                '& .MuiChip-deleteIcon': {
-                                    transition: 'all 0.2s ease-in-out',
-                                    '&:hover': {
-                                        transform: 'scale(1.2)',
-                                    }
-                                }
-                            }}
-                        />
-                        <Typography variant="caption" color="text.secondary">
-                            Location selected
-                        </Typography>
-                    </Box>
-                )}
-
-                {!location && (
-                    <Typography variant="body2" color="text.secondary">
-                        Optional: Select where this post is about
-                    </Typography>
-                )}
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-                <Autocomplete
-                    value={selectedYear}
-                    onChange={handleYearSelect}
-                    options={yearOptions}
-                    getOptionLabel={(option) => option.toString()}
-                    isOptionEqualToValue={(option, value) => option === value}
-                    filterOptions={(options, { inputValue }) => {
-                        return options.filter(option =>
-                            option.toString().includes(inputValue)
-                        );
-                    }}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            label={`Year (1900 - ${new Date().getFullYear() - 5})`}
-                            placeholder="Type to search or select a year..."
-                            disabled={isUploading}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 2,
-                                    transition: 'all 0.2s ease-in-out',
-                                    '&:hover': {
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    },
-                                    '&.Mui-focused': {
-                                        boxShadow: '0 4px 20px rgba(25,118,210,0.2)',
-                                    }
-                                }
-                            }}
-                        />
-                    )}
-                    disabled={isUploading}
-                    noOptionsText="No matching years"
-                    clearOnEscape
-                    selectOnFocus
-                    handleHomeEndKeys
-                    isClearable
-                />
-
-                {!selectedYear && (
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        Select the year when this photo was taken (optional)
-                    </Typography>
-                )}
-
-                {selectedYear && (
-                    <Typography variant="body2" color="primary" sx={{ mt: 1 }}>
-                        Selected year: {selectedYear}
-                    </Typography>
-                )}
-            </Box>
-
-            {/* Error Message */}
-            {error && (
-                <Typography color="error" variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-                    {error}
-                </Typography>
-            )}
-
-            {/* Upload Button */}
-            <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                onClick={handleUploadPost}
-                disabled={isUploading || (!description.trim() && files.length === 0)}
-                sx={{
-                    height: 56,
-                    mt: 3,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                    fontWeight: 600,
-                    background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
-                    boxShadow: '0 4px 16px rgba(25,118,210,0.3)',
-                    transition: 'all 0.2s ease-in-out',
-                    '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 24px rgba(25,118,210,0.4)',
-                        background: 'linear-gradient(45deg, #1565c0 30%, #1e88e5 90%)',
-                    },
-                    '&:disabled': {
-                        background: 'rgba(0,0,0,0.12)',
-                        transform: 'none',
-                        boxShadow: 'none',
-                    }
-                }}
-            >
-                {isUploading ? <CircularProgress size={24} color="inherit" /> : 'Create Post'}
-            </Button>
+                </CardContent>
+            </Card>
 
             <LocationPickerModal
                 open={isMapModalOpen}
-                onClose={() => {
-                    setIsMapModalOpen(false);
-                }}
-                onSelectLocation={(coords) => {
-                    setLocation(coords);
-                }}
-                initialLocation={{ lat: 40.7128, lng: -74.0060 }} // Pass current selected coordinates to center the map
+                onClose={() => setIsMapModalOpen(false)}
+                onSelectLocation={(coords) => setLocation(coords)}
+                initialLocation={{ lat: 40.7128, lng: -74.0060 }}
             />
-        </Paper>
+        </div>
     );
 };
 
