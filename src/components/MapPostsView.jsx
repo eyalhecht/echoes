@@ -330,38 +330,7 @@ const MapPostsView = () => {
                                 />
                             )
                         ))}
-
-                        {/* Info Window */}
-                        {selectedPost && (
-                            <InfoWindow
-                                position={{
-                                    lat: selectedPost.location._latitude,
-                                    lng: selectedPost.location._longitude
-                                }}
-                                onCloseClick={() => setSelectedPost(null)}
-                            >
-                                <Card className="max-w-52 border-0 shadow-none">
-                                    <CardContent className="p-3">
-                                        <h4 className="font-semibold mb-2">
-                                            {selectedPost.userDisplayName}
-                                        </h4>
-                                        <p className="text-sm text-muted-foreground mb-3">
-                                            {selectedPost.description.substring(0, 100)}
-                                            {selectedPost.description.length > 100 ? '...' : ''}
-                                        </p>
-                                        {selectedPost.files?.[0] && (
-                                            <img
-                                                src={selectedPost.files[0]}
-                                                alt="Post preview"
-                                                className="w-full h-20 object-cover rounded mb-2"
-                                            />
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </InfoWindow>
-                        )}
                     </GoogleMap>
-
                     {/* Current Location Button */}
                     <Button
                         size="icon"
