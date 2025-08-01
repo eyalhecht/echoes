@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import {
     Dialog,
@@ -16,6 +16,13 @@ const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation 
         initialLocation || { lat: 40.7128, lng: -74.0060 }
     );
     const [hasInteracted, setHasInteracted] = useState(false);
+
+    useEffect(() => {
+        if (open) {
+            setSelectedPosition(initialLocation || { lat: 40.7128, lng: -74.0060 });
+            setHasInteracted(false);
+        }
+    }, [open, initialLocation]);
 
     const mapContainerStyle = {
         width: '100%',
