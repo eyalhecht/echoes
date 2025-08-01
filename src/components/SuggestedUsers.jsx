@@ -102,8 +102,8 @@ const SuggestedUsers = () => {
 
     return (
         <Paper sx={{
-            position: 'fixed',
-            top: '20px',
+            position: 'absolute',
+            top: '84px',
             right: '20px',
             width: '280px', // Reduced from 320px
             maxHeight: '500px',
