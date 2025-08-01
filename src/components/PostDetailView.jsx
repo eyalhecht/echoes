@@ -1,29 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
-    Dialog,
-    DialogContent,
-    Box,
-    Typography,
-    Avatar,
-    IconButton,
-    TextField,
-    Divider,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemText,
-    InputAdornment,
-    CardMedia,
-    ButtonBase
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import ShareIcon from '@mui/icons-material/Share';
-import SendIcon from '@mui/icons-material/Send';
-import { format } from 'date-fns';
+    Heart,
+    Bookmark,
+    Send,
+} from 'lucide-react';
+import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
 import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
@@ -63,8 +49,6 @@ const PostDetailView = ({ post, open, onClose }) => {
         createdAt,
     } = post;
 
-
-
     const fetchComments = useCallback(async () => {
         setIsCommentsLoading(true);
         setCommentError(null);
@@ -79,8 +63,6 @@ const PostDetailView = ({ post, open, onClose }) => {
                 ...comment,
                 createdAt: comment.createdAt?.toDate ? comment.createdAt.toDate() : comment.createdAt
             }));
-            console.log(processedComments);
-
             setComments(processedComments);
             setHasCommentsFetched(true);
         } catch (err) {
@@ -111,9 +93,7 @@ const PostDetailView = ({ post, open, onClose }) => {
             });
             setComment('');
             setCommentError(null);
-
             fetchComments();
-
         } catch (err) {
             console.error("Error adding comment:", err);
             setCommentError("Failed to add comment.");
@@ -136,198 +116,131 @@ const PostDetailView = ({ post, open, onClose }) => {
     };
 
     return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            maxWidth="xl"
-            fullWidth
-            PaperProps={{
-                sx: { height: '90vh' }
-            }}
-        >
-            <DialogContent sx={{ p: 0, height: '100%', overflow: 'hidden' }}>
-                <Box sx={{ display: 'flex', height: '100%', position: 'relative' }}>
-                    <IconButton
-                        onClick={onClose}
-                        sx={{
-                            position: 'absolute',
-                            top: 16,
-                            right: 16,
-                            zIndex: 10,
-                            backgroundColor: 'rgba(0,0,0,0.5)',
-                            color: 'white',
-                            '&:hover': {
-                                backgroundColor: 'rgba(0,0,0,0.7)',
-                            }
-                        }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent
+                className="p-1 max-w-none w-[90vw] h-[90vh] flex"
+                onPointerDownOutside={(e) => e.preventDefault()}
+            >
+                <div className="flex h-full w-full relative ">
                     {files && files[0] && (
-                        <Box sx={{
-                            flex: 1,
-                            backgroundColor: 'black',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRight: 1,
-                            borderColor: 'divider'
-                        }}>
+                        <div className="flex-1 bg-black flex justify-center items-center rounded">
                             {type === 'photo' && (
-                                <CardMedia
-                                    component="img"
-                                    image={files[0]}
+                                <img
+                                    src={files[0]}
                                     alt="Post media"
-                                    sx={{
-                                        maxHeight: '100%',
-                                        maxWidth: '100%',
-                                        width: 'auto',
-                                        height: 'auto',
-                                        objectFit: 'contain'
-                                    }}
+                                    className="max-h-full max-w-full w-auto h-auto object-contain"
                                 />
                             )}
                             {type === 'video' && (
                                 <video
                                     controls
                                     src={files[0]}
-                                    style={{
-                                        maxHeight: '100%',
-                                        maxWidth: '100%',
-                                        width: 'auto',
-                                        height: 'auto'
-                                    }}
+                                    className="max-h-full max-w-full w-auto h-auto"
                                 />
                             )}
-                        </Box>
+                        </div>
                     )}
 
-                    <Box sx={{
-                        flex: files && files[0] ? 1 : 2,
-                        display: 'flex',
-                        maxWidth: "400px",
-                        flexDirection: 'column',
-                        overflow: 'auto'
-                    }}>
-                        <Box sx={{ p: 2 }}>
-                            {/* User info at the top of right panel */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Avatar src={userProfilePicUrl} sx={{ mr: 2 }}>
-                                    {userDisplayName?.charAt(0)}
+                    <div className={`flex flex-col overflow-auto ${files && files[0] ? 'flex-1 max-w-[400px]' : 'w-full'}`}>
+                        <div className="p-4 flex-grow flex flex-col"> {/* Added flex-grow to ensure content pushes input to bottom */}
+                            {/* User info */}
+                            <div className="flex items-center mb-4">
+                                <Avatar className="mr-3 w-10 h-10">
+                                    <AvatarImage src={userProfilePicUrl || ''} />
+                                    <AvatarFallback>{userDisplayName?.charAt(0) || 'U'}</AvatarFallback>
                                 </Avatar>
-                                <Box>
-                                    <Typography variant="subtitle1" fontWeight="bold">
+                                <div>
+                                    <p className="text-base font-semibold">
                                         {userDisplayName}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
                                         {formatFirebaseTimestamp(createdAt)}
-                                    </Typography>
-                                </Box>
-                            </Box>
+                                    </p>
+                                </div>
+                            </div>
 
-                            <Typography variant="body1" sx={{ mb: 2 }}>
+                            <p className="text-sm mb-4 whitespace-pre-wrap">
                                 {description}
-                            </Typography>
+                            </p>
 
-                        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                            <IconButton onClick={handleLikeToggle} disabled={isLikeUpdating}>
-                                {liked ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
-                            </IconButton>
-                            <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                                {likesCount}
-                            </Typography>
-                            <IconButton onClick={handleBookmarkToggle} disabled={isBookmarkUpdating}>
-                                {bookmarked ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
-                            </IconButton>
-                            <Typography sx={{ display: 'flex', alignItems: 'center' }}>
-                                {bookmarksCount}
-                            </Typography>
-                        </Box>
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-1 mb-4">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={handleLikeToggle}
+                                    disabled={isLikeUpdating}
+                                >
+                                    {liked ? <Heart className="h-5 w-5 text-red-500 fill-red-500" /> : <Heart className="h-5 w-5" />}
+                                </Button>
+                                <span className="text-sm">{likesCount}</span>
 
-                        <Divider sx={{ mb: 2 }} />
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={handleBookmarkToggle}
+                                    disabled={isBookmarkUpdating}
+                                >
+                                    {bookmarked ? <Bookmark className="h-5 w-5 text-blue-600 fill-blue-600" /> : <Bookmark className="h-5 w-5" />}
+                                </Button>
+                                <span className="text-sm">{bookmarksCount}</span>
+                            </div>
 
-                        {/* Comments */}
-                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                            Comments
-                        </Typography>
-                        
-                        {isCommentsLoading && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                Loading comments...
-                            </Typography>
-                        )}
-                        
-                        {commentError && (
-                            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-                                {commentError}
-                            </Typography>
-                        )}
-                        
-                        {!isCommentsLoading && !commentError && comments.length === 0 && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                No comments yet. Be the first to comment!
-                            </Typography>
-                        )}
+                            <Separator className="my-4" />
 
-                        <List sx={{ mb: 2, maxHeight: 300, overflowY: 'auto' }}>
-                            {comments.map((comment) => (
-                                <ListItem key={comment.id} alignItems="flex-start" sx={{ px: 0 }}>
-                                    <ListItemAvatar>
-                                        <Avatar 
-                                            src={comment.userProfilePicUrl || ''}
-                                            sx={{ width: 32, height: 32 }}
-                                        >
-                                            {comment.userDisplayName?.charAt(0) || 'U'}
+                            {/* Comments Section */}
+                            <p className="text-base font-semibold mb-2">
+                                Comments
+                            </p>
+
+                            {isCommentsLoading && (
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Loading comments...
+                                </p>
+                            )}
+
+                            {commentError && (
+                                <p className="text-sm text-destructive mb-4">
+                                    {commentError}
+                                </p>
+                            )}
+
+                            {!isCommentsLoading && !commentError && comments.length === 0 && (
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    No comments yet. Be the first to comment!
+                                </p>
+                            )}
+
+                            <div className="mb-4 max-h-[300px] overflow-y-auto space-y-3">
+                                {comments.map((comment) => (
+                                    <div key={comment.id} className="flex items-start gap-3">
+                                        <Avatar className="w-8 h-8">
+                                            <AvatarImage src={comment.userProfilePicUrl || ''} />
+                                            <AvatarFallback>{comment.userDisplayName?.charAt(0) || 'U'}</AvatarFallback>
                                         </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={
-                                            <ButtonBase
+                                        <div className="flex-1">
+                                            <button
                                                 onClick={() => handleNameClick(comment.userId)}
-                                                sx={{
-                                                    padding: 0,
-                                                    justifyContent: 'flex-start',
-                                                    '&:hover': {
-                                                        backgroundColor: 'transparent',
-                                                    }
-                                                }}
+                                                className="text-sm font-semibold hover:underline text-left"
                                             >
-                                                <Typography 
-                                                    variant="subtitle2" 
-                                                    fontWeight="bold"
-                                                    sx={{
-                                                        cursor: 'pointer',
-                                                        color: 'inherit'
-                                                    }}
-                                                >
-                                                    {comment.userDisplayName || 'Anonymous'}
-                                                </Typography>
-                                            </ButtonBase>
-                                        }
-                                        secondary={
-                                            <>
-                                                <Typography
-                                                    component="span"
-                                                    variant="body2"
-                                                    color="text.primary"
-                                                    sx={{ display: 'block' }}
-                                                >
-                                                    {comment.text}
-                                                </Typography>
-                                                <Typography variant="caption" display="block" color="text.secondary">
-                                                    {formatFirebaseTimestamp(comment.createdAt)}
-                                                </Typography>
-                                            </>
-                                        }
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
+                                                {comment.userDisplayName || 'Anonymous'}
+                                            </button>
+                                            <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">
+                                                {comment.text}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {formatFirebaseTimestamp(comment.createdAt)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div> {/* End of p-4 flex-grow div */}
 
-                            {/* Comment input */}
-                            {currentUser && (
-                                <TextField
-                                    fullWidth
+                        {/* Comment Input Section (sticky to bottom) */}
+                        {currentUser ? (
+                            <div className="p-4 border-t border-border flex items-center gap-2">
+                                <Input
                                     placeholder="Add a comment..."
                                     value={comment}
                                     onChange={(e) => setComment(e.target.value)}
@@ -337,29 +250,25 @@ const PostDetailView = ({ post, open, onClose }) => {
                                             handleCommentSubmit();
                                         }
                                     }}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    onClick={handleCommentSubmit}
-                                                    disabled={!comment.trim()}
-                                                >
-                                                    <SendIcon />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        ),
-                                    }}
+                                    className="flex-1"
                                 />
-                            )}
-                            
-                            {!currentUser && (
-                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 2 }}>
+                                <Button
+                                    size="icon"
+                                    onClick={handleCommentSubmit}
+                                    disabled={!comment.trim()}
+                                >
+                                    <Send className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="p-4 border-t border-border">
+                                <p className="text-sm text-muted-foreground text-center">
                                     Please log in to add comments
-                                </Typography>
-                            )}
-                        </Box>
-                    </Box>
-                </Box>
+                                </p>
+                            </div>
+                        )}
+                    </div> {/* End of right panel */}
+                </div>
             </DialogContent>
         </Dialog>
     );
