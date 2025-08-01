@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Avatar, Button, CircularProgress, Paper, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, Avatar, Button, Paper, useMediaQuery, useTheme } from '@mui/material';
 import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import useUiStore from '../stores/useUiStore.js';
+import { SuggestedUsersSkeleton } from "@/components/SuggestedUsersSkeleton.jsx";
 
 const SuggestedUsers = () => {
     const theme = useTheme();
@@ -76,28 +77,11 @@ const SuggestedUsers = () => {
     };
 
     if (loading) {
-        return (
-            <Paper sx={{
-                position: 'fixed',
-                top: '20px',
-                right: '20px',
-                width: '280px', // Reduced from 320px
-                height: '400px',
-                borderRadius: '12px',
-                padding: '16px', // Reduced padding
-                backgroundColor: '#fff',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <CircularProgress size={30} />
-            </Paper>
-        );
+        return <SuggestedUsersSkeleton />;
     }
 
     if (suggestedUsers.length === 0) {
-        return null; // Don't show if no suggestions
+        return null;
     }
 
     return (
@@ -105,10 +89,10 @@ const SuggestedUsers = () => {
             position: 'absolute',
             top: '68px',
             right: '20px',
-            width: '280px', // Reduced from 320px
+            width: '280px',
             maxHeight: '500px',
             borderRadius: '12px',
-            padding: '16px', // Reduced padding
+            padding: '16px',
             backgroundColor: '#fff',
             boxShadow: '0 2px 12px rgba(0,0,0,0.1)',
             overflowY: 'auto'
