@@ -274,10 +274,10 @@ function PostCard({ post }) {
 
                         {post.AiMetadata && (
                             <Button
-                                variant="ghost"
+                                variant="outlined"
                                 size="icon"
                                 onClick={() => setShowAiInsights(!showAiInsights)}
-                                className={`p-1 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600 hover:scale-110'}`}
+                                className={`${showAiInsights ? 'text-foreground' : 'text-blue-600'}`}
                             >
                                 <Sparkles className="h-5 w-5" />
                             </Button>
@@ -295,15 +295,20 @@ function PostCard({ post }) {
                         </Button>
                     )}
 
-                    {/* AI Insights Panel */}
-                    {post.AiMetadata && showAiInsights && (
-                        <div className="mt-4 mb-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                            <div className="flex items-center gap-2 mb-3 opacity-80">
-                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
-                                    AI Analysis
-                                </span>
-                            </div>
+                    {post.AiMetadata && (
+                        <div
+                            className={`
+                                transition-all duration-300 ease-in-out overflow-hidden
+                                ${showAiInsights ? 'max-h-[400px] opacity-100 mb-4' : 'max-h-0 opacity-0'}
+                            `}
+                        >
+                            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                                <div className="flex items-center gap-2 mb-3 opacity-80">
+                                    <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                                    <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
+                                        AI Analysis
+                                    </span>
+                                </div>
 
                             {post.AiMetadata.description && (
                                 <div className="mb-4">
@@ -357,26 +362,27 @@ function PostCard({ post }) {
                                 </div>
                             )}
 
-                            {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
-                                <div>
-                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                        Estimated Period
-                                    </p>
-                                    <p className="text-xs text-foreground">
-                                        {post.AiMetadata.date_estimate}
-                                        {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
-                                            <span className="text-muted-foreground ml-1">
-                                                ({post.AiMetadata.date_confidence})
-                                            </span>
-                                        )}
-                                    </p>
-                                </div>
-                            )}
+                                {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
+                                    <div>
+                                        <p className="text-xs text-muted-foreground font-medium mb-1">
+                                            Estimated Period
+                                        </p>
+                                        <p className="text-xs text-foreground">
+                                            {post.AiMetadata.date_estimate}
+                                            {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
+                                                <span className="text-muted-foreground ml-1">
+                                                    ({post.AiMetadata.date_confidence})
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 pb-4">
                         <div className="flex items-center gap-1">
                             <Button
                                 variant="ghost"
