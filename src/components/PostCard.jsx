@@ -21,14 +21,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    MoreVertical,
     Heart,
     MessageCircle,
     Bookmark,
     MapPin,
     Trash2,
     Send,
-    Sparkles,
+    Sparkles, MoreHorizontal,
 } from 'lucide-react';
 import { format, formatDistanceToNowStrict, isToday, isYesterday } from 'date-fns';
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -249,7 +248,7 @@ function PostCard({ post }) {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
+                                <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         {currentUser?.uid && userId === currentUser.uid && (
@@ -396,7 +395,7 @@ function PostCard({ post }) {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-4">
+                    <div className="pb-2 flex items-center gap-4">
                         <div className="flex items-center gap-1">
                             <Button
                                 variant="ghost"
