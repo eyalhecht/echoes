@@ -12,15 +12,37 @@ import { MapPin, Check } from 'lucide-react';
 
 const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation }) => {
     const mapRef = useRef(null);
-    const [selectedPosition, setSelectedPosition] = useState(
-        initialLocation || { lat: 40.7128, lng: -74.0060 }
-    );
+    const [selectedPosition, setSelectedPosition] = useState({ lat: 40.7128, lng: -74.0060 });
     const [hasInteracted, setHasInteracted] = useState(false);
 
     useEffect(() => {
         if (open) {
-            setSelectedPosition(initialLocation || { lat: 40.7128, lng: -74.0060 });
             setHasInteracted(false);
+            if (initialLocation) {
+                setSelectedPosition(initialLocation);
+                return;
+            }
+            if (!navigator.geolocation) {
+                setSelectedPosition({ lat: 40.7128, lng: -74.0060 });
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const newPos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    setSelectedPosition(newPos);
+                },
+                (error) => {
+                    setSelectedPosition({ lat: 40.7128, lng: -74.0060 });
+                },
+                { 
+                    enableHighAccuracy: false,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
         }
     }, [open, initialLocation]);
 
