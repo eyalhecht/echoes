@@ -65,34 +65,34 @@ const UploadPost = () => {
             description: 'Share a photo or image',
             accept: 'image/*'
         },
-        {
-            id: 'video',
-            label: 'Video',
-            icon: Video,
-            description: 'Upload a video file',
-            accept: 'video/*'
-        },
-        {
-            id: 'document',
-            label: 'Document',
-            icon: FileText,
-            description: 'Share a document',
-            accept: '.pdf,.doc,.docx,.txt'
-        },
-        {
-            id: 'item',
-            label: 'Item',
-            icon: Package,
-            description: 'Share an item or object',
-            accept: 'image/*'
-        },
-        {
-            id: 'youtube',
-            label: 'YouTube',
-            icon: Youtube,
-            description: 'Share a YouTube video',
-            accept: null
-        }
+        // {
+        //     id: 'video',
+        //     label: 'Video',
+        //     icon: Video,
+        //     description: 'Upload a video file',
+        //     accept: 'video/*'
+        // },
+        // {
+        //     id: 'document',
+        //     label: 'Document',
+        //     icon: FileText,
+        //     description: 'Share a document',
+        //     accept: '.pdf,.doc,.docx,.txt'
+        // },
+        // {
+        //     id: 'item',
+        //     label: 'Item',
+        //     icon: Package,
+        //     description: 'Share an item or object',
+        //     accept: 'image/*'
+        // },
+        // {
+        //     id: 'youtube',
+        //     label: 'YouTube',
+        //     icon: Youtube,
+        //     description: 'Share a YouTube video',
+        //     accept: null
+        // }
     ];
 
     const yearOptions = useMemo(() => {
