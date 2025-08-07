@@ -375,7 +375,6 @@ const UploadPost = () => {
                                             className="hidden"
                                             id="file-upload"
                                             type="file"
-                                            multiple
                                             onChange={handleFileChange}
                                             disabled={isUploading}
                                             ref={fileInputRef}
