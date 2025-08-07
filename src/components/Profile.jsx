@@ -8,6 +8,7 @@ import { LogOut, Loader2 } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
+import FollowersFollowingModal from "./FollowersFollowingModal.jsx"; // Import the new modal
 import { useNavigate } from 'react-router-dom';
 
 const Profile = ({ targetUserId }) => {
@@ -32,6 +33,10 @@ const Profile = ({ targetUserId }) => {
     const [lastPostId, setLastPostId] = useState(null);
     const [hasMorePosts, setHasMorePosts] = useState(true);
     const [loadingMorePosts, setLoadingMorePosts] = useState(false);
+
+    // NEW: Modal state for followers/following lists
+    const [followersModalOpen, setFollowersModalOpen] = useState(false);
+    const [followingModalOpen, setFollowingModalOpen] = useState(false);
 
     const isCurrentUserProfile = currentUser?.uid === targetUserId;
 
@@ -172,6 +177,19 @@ const Profile = ({ targetUserId }) => {
         setFollowActionLoading(false);
     };
 
+    // NEW: Handle followers/following clicks
+    const handleFollowersClick = () => {
+        if (isCurrentUserProfile) {
+            setFollowersModalOpen(true);
+        }
+    };
+
+    const handleFollowingClick = () => {
+        if (isCurrentUserProfile) {
+            setFollowingModalOpen(true);
+        }
+    };
+
     if (profileLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -250,7 +268,17 @@ const Profile = ({ targetUserId }) => {
                                         Posts
                                     </div>
                                 </div>
-                                <div className="text-center">
+                                
+                                {/* UPDATED: Make followers clickable for current user only */}
+                                <div 
+                                    className={`text-center ${
+                                        isCurrentUserProfile 
+                                            ? 'cursor-pointer hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors' 
+                                            : ''
+                                    }`}
+                                    onClick={handleFollowersClick}
+                                    title={isCurrentUserProfile ? 'View followers' : ''}
+                                >
                                     <div className="text-xl font-bold text-gray-800">
                                         {profileData?.followersCount || 0}
                                     </div>
@@ -258,7 +286,17 @@ const Profile = ({ targetUserId }) => {
                                         Followers
                                     </div>
                                 </div>
-                                <div className="text-center">
+                                
+                                {/* UPDATED: Make following clickable for current user only */}
+                                <div 
+                                    className={`text-center ${
+                                        isCurrentUserProfile 
+                                            ? 'cursor-pointer hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors' 
+                                            : ''
+                                    }`}
+                                    onClick={handleFollowingClick}
+                                    title={isCurrentUserProfile ? 'View following' : ''}
+                                >
                                     <div className="text-xl font-bold text-gray-800">
                                         {profileData?.followingCount || 0}
                                     </div>
@@ -307,6 +345,23 @@ const Profile = ({ targetUserId }) => {
                     </div>
                 )}
             </div>
+
+            {/* NEW: Followers/Following Modals */}
+            <FollowersFollowingModal
+                open={followersModalOpen}
+                onClose={() => setFollowersModalOpen(false)}
+                userId={targetUserId}
+                listType="followers"
+                initialCount={profileData?.followersCount || 0}
+            />
+
+            <FollowersFollowingModal
+                open={followingModalOpen}
+                onClose={() => setFollowingModalOpen(false)}
+                userId={targetUserId}
+                listType="following"
+                initialCount={profileData?.followingCount || 0}
+            />
         </div>
     );
 };
