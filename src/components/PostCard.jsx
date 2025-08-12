@@ -228,7 +228,7 @@ function PostCard({ post }) {
 
     return (
         <>
-            <Card className="max-w-[500px] min-w-[500px] rounded-lg shadow-lg bg-sidebar">
+            <Card className="max-w-[500px] rounded-lg shadow-lg bg-sidebar">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={userProfilePicUrl || ''} />
