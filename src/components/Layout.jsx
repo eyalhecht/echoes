@@ -41,13 +41,17 @@ function MainContent() {
     return (
         <main className="flex-1">
             <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+            <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 <div className="h-4 w-px bg-border" />
-                <h1 className="text-lg font-semibold">
+                <h1 className="text-lg font-semibold hidden sm:block">
                     {activeSidebarItem || 'Home'}
                 </h1>
-                <div className="ml-auto">
+            </div>
+                <div className="flex-1 flex justify-center px-2 sm:px-4">
                     <SearchBar />
+                </div>
+                <div className="w-8 sm:w-32">
                 </div>
             </header>
 

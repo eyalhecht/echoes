@@ -9,17 +9,22 @@ import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import useUiStore from "../stores/useUiStore.js";
 
 export function SearchBar() {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const isMobile = useIsMobile();
+    
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const searchRef = useRef(null);
     const inputRef = useRef(null);
-    const isMobile = useIsMobile();
 
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+    const [isExpanded, setIsExpanded] = useState(!isMobile);
+
+    useEffect(() => {
+        setIsExpanded(!isMobile);
+    }, [isMobile]);
 
     // Debounced search
     useEffect(() => {
@@ -59,7 +64,7 @@ export function SearchBar() {
         function handleClickOutside(event) {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowDropdown(false);
-                if (!query) {
+                if (isMobile && !query) {
                     setIsExpanded(false);
                 }
             }
@@ -69,13 +74,15 @@ export function SearchBar() {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [query]);
+    }, [query, isMobile]);
 
     // Handle keyboard navigation
     const handleKeyDown = (e) => {
         if (e.key === 'Escape') {
             setShowDropdown(false);
-            setIsExpanded(false);
+            if (isMobile) {
+                setIsExpanded(false);
+            }
             setQuery('');
             inputRef.current?.blur();
         }
@@ -85,7 +92,9 @@ export function SearchBar() {
         setActiveSidebarItem('Profile');
         setActiveProfileView(user.userId);
         setShowDropdown(false);
-        setIsExpanded(false);
+        if (isMobile) {
+            setIsExpanded(false);
+        }
         setQuery('');
     };
 
@@ -114,10 +123,10 @@ export function SearchBar() {
     };
 
     return (
-        <div className="relative" ref={searchRef}>
+        <div className="relative w-full max-w-md" ref={searchRef}>
             <div className={cn(
                 "flex items-center transition-all duration-200 ease-in-out",
-                isExpanded ? (isMobile ? "w-64" : "w-80") : "w-10"
+                isExpanded ? "w-full" : "w-10"
             )}>
                 {!isExpanded ? (
                     <Button
@@ -134,11 +143,11 @@ export function SearchBar() {
                         <Input
                             ref={inputRef}
                             type="text"
-                            placeholder="Search people..."
+                            placeholder="Search..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            className="pl-10 pr-10 h-8"
+                            className="pl-10 pr-10 h-9 w-full"
                             autoComplete="off"
                         />
                         {query && (
@@ -146,7 +155,7 @@ export function SearchBar() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={handleClearClick}
-                                className="absolute right-1 h-6 w-6"
+                                className="absolute right-1 h-7 w-7"
                             >
                                 <X className="h-3 w-3" />
                             </Button>
@@ -156,10 +165,7 @@ export function SearchBar() {
             </div>
 
             {showDropdown && isExpanded && (
-                <div className={cn(
-                    "absolute top-10 bg-background border border-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto",
-                    isMobile ? "left-0 right-0" : "left-0 w-80"
-                )}>
+                <div className="absolute top-11 left-0 right-0 bg-background border border-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                     {isLoading ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
                             Searching...
