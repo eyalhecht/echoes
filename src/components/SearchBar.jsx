@@ -191,7 +191,7 @@ export function SearchBar() {
                             {/* Users Section */}
                             <div className="p-2 border-b">
                                 <span className="text-xs font-medium text-muted-foreground tracking-wider">
-                                    👥 PEOPLE ({results.users.length})
+                                    People ({results.users.length})
                                 </span>
                             </div>
                             <div className="py-1">

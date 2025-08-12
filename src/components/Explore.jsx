@@ -123,10 +123,9 @@ export function Explore() {
             <div className="flex-1 overflow-auto">
                 <div className="max-w-4xl mx-auto p-6">
                     <div className="text-center py-12">
-                        <div className="text-6xl mb-4">🔍</div>
                         <h2 className="text-2xl font-semibold mb-2">Explore Posts and People</h2>
                         <p className="text-muted-foreground mb-6">
-                            Search above to discover posts, photos, and people
+                            Search above to discover posts and people
                         </p>
                         <div className="text-sm text-muted-foreground">
                             <p>Try searching for:</p>
@@ -157,7 +156,7 @@ export function Explore() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-muted-foreground tracking-wider">
-                                👥 PEOPLE {!usersLoading && `(${users.length})`}
+                                People {!usersLoading && `(${users.length})`}
                             </span>
                             {usersLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                         </div>
@@ -207,7 +206,7 @@ export function Explore() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-muted-foreground tracking-wider">
-                            📝 POSTS {!postsLoading && posts.length > 0 && `(${posts.length})`}
+                            Posts {!postsLoading && posts.length > 0 && `(${posts.length})`}
                         </span>
                         {postsLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                     </div>
