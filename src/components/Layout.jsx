@@ -9,6 +9,7 @@ import Profile from "./Profile.jsx";
 import MapPostsView from "./MapPostsView.jsx";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import Bookmarks from "./Bookmarks.jsx";
+import { Explore } from "./Explore.jsx";
 
 function MainContent() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem);
@@ -19,6 +20,8 @@ function MainContent() {
         switch (activeSidebarItem) {
             case 'Home':
                 return <Home />;
+            case 'Explore':
+                return <Explore />;
             case 'Profile':
                 return <Profile targetUserId={activeProfileView || currentUser.uid} />;
             case 'Map':
