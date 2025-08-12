@@ -52,6 +52,7 @@ function PostCard({ post }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
     const [detailViewOpen, setDetailViewOpen] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const deletePost = useUiStore(state => state.deletePost);
@@ -135,9 +136,8 @@ function PostCard({ post }) {
                 <div className="flex justify-center px-4 sm:px-6">
                     {/* This is the "polaroid" wrapper for the image */}
                     <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full z-10">
-                        {/* Year badge in top right corner */}
-                        {formatYear(year) && (
-                            <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20  backdrop-blur-sm">
+                        {formatYear(year) && imageLoaded && (
+                            <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
                                 {formatYear(year)}
                             </div>
 
@@ -146,6 +146,8 @@ function PostCard({ post }) {
                             src={firstFile}
                             alt="Post media"
                             className="w-full max-h-[400px] object-contain"
+                            onLoad={() => setImageLoaded(true)}
+                            onError={() => setImageLoaded(false)}
                         />
                         {/* Empty space at bottom for polaroid effect */}
                         <div className="h-10"></div>
@@ -161,9 +163,11 @@ function PostCard({ post }) {
                         controls
                         src={firstFile}
                         className="max-h-96 w-full"
+                        onLoadedData={() => setImageLoaded(true)}
+                        onError={() => setImageLoaded(false)}
                     />
-                    {year && (
-                        <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20">
+                    {year && imageLoaded && (
+                        <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20 transition-opacity duration-300 animate-in fade-in-0">
                             {formatYear(year)}
                         </div>
                     )}
