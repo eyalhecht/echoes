@@ -1,6 +1,7 @@
 import React from 'react';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar.jsx";
+import { SearchBar } from "@/components/SearchBar.jsx";
 import Home from './Home.jsx';
 import UploadPost from "./UploadPost.jsx";
 import useUiStore from "../stores/useUiStore.js";
@@ -45,6 +46,9 @@ function MainContent() {
                 <h1 className="text-lg font-semibold">
                     {activeSidebarItem || 'Home'}
                 </h1>
+                <div className="ml-auto">
+                    <SearchBar />
+                </div>
             </header>
 
             <div className="flex flex-1 flex-col">
