@@ -9,8 +9,17 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarSeparator, useSidebar,
+    SidebarSeparator, 
+    useSidebar,
 } from "@/components/ui/sidebar"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
     Home,
     User,
@@ -18,20 +27,25 @@ import {
     Bookmark,
     Upload,
     LogOut,
-    Loader2
+    Loader2,
+    Settings,
+    Moon,
+    Sun
 } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
+import { useTheme } from "@/components/theme-provider"
 
 export function AppSidebar() {
     const navigate = useNavigate()
     const currentUser = useAuthStore(state => state.user)
     const { loading } = useAuthStore()
+    const { theme, setTheme } = useTheme()
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem)
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem)
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView)
-    const { open} = useSidebar()
+    const { open, isMobile, setOpenMobile } = useSidebar()
 
     const handleLogout = async () => {
         try {
@@ -40,6 +54,22 @@ export function AppSidebar() {
         } catch (err) {
             console.error("Logout component caught error:", err)
         }
+    }
+
+    const getUserInitials = (user) => {
+        if (!user) return "U"
+        if (user.displayName) {
+            return user.displayName
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2)
+        }
+        if (user.email) {
+            return user.email[0].toUpperCase()
+        }
+        return "U"
     }
 
     const items = [
@@ -74,12 +104,6 @@ export function AppSidebar() {
             callback: () => {},
             isLoading: false
         },
-        {
-            name: 'Logout',
-            icon: LogOut,
-            callback: handleLogout,
-            isLoading: loading
-        },
     ]
 
     return (
@@ -100,6 +124,9 @@ export function AppSidebar() {
                                         onClick={() => {
                                             item.callback()
                                             setActiveSidebarItem(item.name)
+                                            if (isMobile) {
+                                                setOpenMobile(false)
+                                            }
                                         }}
                                         isActive={activeSidebarItem === item.name}
                                     >
@@ -123,6 +150,9 @@ export function AppSidebar() {
                                             item.callback()
                                             if (item.name !== 'Logout') {
                                                 setActiveSidebarItem(item.name)
+                                                if (isMobile) {
+                                                    setOpenMobile(false)
+                                                }
                                             }
                                         }}
                                         disabled={item.isLoading}
@@ -144,9 +174,67 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <div className="px-2 py-2">
-                    <p className="text-xs text-muted-foreground">© 2025 Echoes</p>
-                </div>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuButton
+                                    size="lg"
+                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                >
+                                    <Avatar className="h-8 w-8 rounded-lg">
+                                        <AvatarImage 
+                                            src={currentUser?.photoURL} 
+                                            alt={currentUser?.displayName || currentUser?.email}
+                                        />
+                                        <AvatarFallback className="rounded-lg">
+                                            {getUserInitials(currentUser)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-semibold">
+                                            {currentUser?.displayName || 'User'}
+                                        </span>
+                                        <span className="truncate text-xs">
+                                            {currentUser?.email}
+                                        </span>
+                                    </div>
+                                    <Settings className="ml-auto size-4" />
+                                </SidebarMenuButton>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                                side={open ? "bottom" : "right"}
+                                align="end"
+                                sideOffset={4}
+                            >
+                                <DropdownMenuItem onClick={() => {
+                                    setTheme(theme === "dark" ? "light" : "dark")
+                                }}>
+                                    {theme === "dark" ? (
+                                        <Sun className="mr-2 h-4 w-4" />
+                                    ) : (
+                                        <Moon className="mr-2 h-4 w-4" />
+                                    )}
+                                    Switch to {theme === "dark" ? "light" : "dark"} mode
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                    onClick={handleLogout} 
+                                    disabled={loading}
+                                    className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+                                >
+                                    {loading ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                    )}
+                                    {loading ? 'Logging out...' : 'Log out'}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarFooter>
         </Sidebar>
     )

@@ -14,17 +14,17 @@ const SuggestedUsers = () => {
     const setActiveProfileView = useUiStore(state => state.setActiveProfileView);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
 
-    // Don't render on mobile
-    if (isMobile) {
-        return null;
-    }
-
     const [suggestedUsers, setSuggestedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [followingStates, setFollowingStates] = useState({});
 
     // Fetch suggested users
     useEffect(() => {
+        if (isMobile) {
+            setLoading(false);
+            return;
+        }
+
         const fetchSuggestedUsers = async () => {
             if (!currentUser?.uid) return;
 
@@ -46,7 +46,11 @@ const SuggestedUsers = () => {
         };
 
         fetchSuggestedUsers();
-    }, [currentUser?.uid]);
+    }, [currentUser?.uid, isMobile]);
+
+    if (isMobile) {
+        return null;
+    }
 
     // Handle follow/unfollow
     const handleFollowToggle = async (targetUserId, isCurrentlyFollowing) => {

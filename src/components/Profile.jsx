@@ -251,20 +251,20 @@ const Profile = ({ targetUserId }) => {
                                 </div>
                             </div>
 
-                            <p className="text-muted-foreground mb-3">
+                            {profileData?.username && <p className="text-muted-foreground mb-3">
                                 @{profileData?.username || 'user'}
-                            </p>
+                            </p>}
 
                             <p className="text-sm text-gray-600 mb-6">
-                                {profileData?.bio || 'No bio available.'}
+                                {profileData?.bio}
                             </p>
 
                             <div className="flex gap-8">
                                 <div className="text-center">
-                                    <div className="text-xl font-bold text-gray-800">
+                                    <div className="text-xl font-bold">
                                         {profileData?.postsCount || 0}
                                     </div>
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="text-sm">
                                         Posts
                                     </div>
                                 </div>
@@ -279,10 +279,10 @@ const Profile = ({ targetUserId }) => {
                                     onClick={handleFollowersClick}
                                     title={isCurrentUserProfile ? 'View followers' : ''}
                                 >
-                                    <div className="text-xl font-bold text-gray-800">
+                                    <div className="text-xl font-bold">
                                         {profileData?.followersCount || 0}
                                     </div>
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="text-sm">
                                         Followers
                                     </div>
                                 </div>
@@ -297,10 +297,10 @@ const Profile = ({ targetUserId }) => {
                                     onClick={handleFollowingClick}
                                     title={isCurrentUserProfile ? 'View following' : ''}
                                 >
-                                    <div className="text-xl font-bold text-gray-800">
+                                    <div className="text-xl font-bold">
                                         {profileData?.followingCount || 0}
                                     </div>
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="text-sm">
                                         Following
                                     </div>
                                 </div>
