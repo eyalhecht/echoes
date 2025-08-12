@@ -108,7 +108,7 @@ function Home() {
                 marginLeft: isMobile ? 'auto' : '200px', // Reduced margin to move cards left
                 marginRight: isMobile ? 'auto' : '300px', // Add right margin to avoid overlap
                 paddingBottom: '20px' ,
-                gap: "10px",
+                gap: "8px",
                 display: "flex",
                 flexDirection: 'column',
             }}>
