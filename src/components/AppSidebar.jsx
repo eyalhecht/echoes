@@ -31,7 +31,7 @@ export function AppSidebar() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem)
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem)
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView)
-    const { open} = useSidebar()
+    const { open, isMobile, setOpenMobile } = useSidebar()
 
     const handleLogout = async () => {
         try {
@@ -100,6 +100,9 @@ export function AppSidebar() {
                                         onClick={() => {
                                             item.callback()
                                             setActiveSidebarItem(item.name)
+                                            if (isMobile) {
+                                                setOpenMobile(false)
+                                            }
                                         }}
                                         isActive={activeSidebarItem === item.name}
                                     >
@@ -123,6 +126,9 @@ export function AppSidebar() {
                                             item.callback()
                                             if (item.name !== 'Logout') {
                                                 setActiveSidebarItem(item.name)
+                                                if (isMobile) {
+                                                    setOpenMobile(false)
+                                                }
                                             }
                                         }}
                                         disabled={item.isLoading}
