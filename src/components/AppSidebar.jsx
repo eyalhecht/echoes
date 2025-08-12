@@ -30,7 +30,8 @@ import {
     Loader2,
     Settings,
     Moon,
-    Sun
+    Sun,
+    Search
 } from "lucide-react"
 import { useNavigate } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
@@ -45,6 +46,7 @@ export function AppSidebar() {
     const activeSidebarItem = useUiStore((state) => state.activeSidebarItem)
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem)
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView)
+    const setExploreQuery = useUiStore((state) => state.setExploreQuery)
     const { open, isMobile, setOpenMobile } = useSidebar()
 
     const handleLogout = async () => {
@@ -77,6 +79,13 @@ export function AppSidebar() {
             name: 'Home',
             icon: Home,
             callback: () => {}
+        },
+        {
+            name: 'Explore',
+            icon: Search,
+            callback: () => {
+                setExploreQuery('')
+            }
         },
         {
             name: 'Profile',

@@ -6,6 +6,8 @@ const useUiStore = create((set, get) => ({
     setActiveSidebarItem: (item) => set({ activeSidebarItem: item }),
     activeProfileView: null,
     setActiveProfileView: (item) => set({ activeProfileView: item }),
+    exploreQuery: '',
+    setExploreQuery: (query) => set({ exploreQuery: query }),
     posts: [],
     postsLoading: false,
     postsError: null,
