@@ -1,15 +1,15 @@
 import React, { useEffect, useCallback } from 'react';
-import { Box, useMediaQuery, useTheme } from '@mui/material';
 import {callApiGateway} from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import SuggestedUsers from "./SuggestedUsers.jsx";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
+import { useIsMobile } from "@/hooks/use-mobile.jsx";
+import { cn } from "@/lib/utils";
 
 function Home() {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    
+    const isMobile = useIsMobile();
+
     const { 
         posts, 
         setPosts, 
@@ -102,16 +102,9 @@ function Home() {
     return (
         <>
             {!isMobile && <SuggestedUsers />}
-            <Box sx={{
-                maxWidth: '600px',
-                margin: '0 auto',
-                marginLeft: isMobile ? 'auto' : '200px', // Reduced margin to move cards left
-                marginRight: isMobile ? 'auto' : '300px', // Add right margin to avoid overlap
-                paddingBottom: '20px' ,
-                gap: "8px",
-                display: "flex",
-                flexDirection: 'column',
-            }}>
+            <div className={cn(
+                "max-w-[600px] mx-auto pb-5 gap-2 flex flex-col"
+            )}>
                 {postsLoading && posts.length === 0 && renderSkeletonCards()}
 
                 {posts && posts?.map((post) => (
@@ -120,35 +113,23 @@ function Home() {
 
                 {/* Show loading for pagination (when loading more posts) */}
                 {postsLoading && posts.length > 0 && (
-                    <Box sx={{
-                        textAlign: 'center',
-                        padding: '20px',
-                        color: '#666'
-                    }}>
+                    <div className="text-center py-5 text-muted-foreground">
                         Loading more posts...
-                    </Box>
+                    </div>
                 )}
 
                 {!hasMore && posts.length > 0 && (
-                    <Box sx={{
-                        textAlign: 'center',
-                        padding: '20px',
-                        color: '#666'
-                    }}>
+                    <div className="text-center py-5 text-muted-foreground">
                         No more posts to load
-                    </Box>
+                    </div>
                 )}
 
                 {posts.length === 0 && !postsLoading && (
-                    <Box sx={{
-                        textAlign: 'center',
-                        padding: '40px',
-                        color: '#999'
-                    }}>
+                    <div className="text-center py-10 text-muted-foreground/70">
                         No posts found
-                    </Box>
+                    </div>
                 )}
-            </Box>
+            </div>
         </>
     );
 }
