@@ -9,10 +9,10 @@ function Bookmarks() {
             padding: '20px',
             textAlign: 'center'
         }}>
-            <Typography variant="h4" color="white" gutterBottom>
+            <Typography variant="h4" gutterBottom>
                 Bookmarks
             </Typography>
-            <Typography variant="body1" color="white">
+            <Typography variant="body1">
                 Bookmarks page coming soon...
             </Typography>
         </Box>
