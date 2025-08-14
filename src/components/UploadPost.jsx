@@ -31,7 +31,6 @@ import { storage, auth, functions } from "../firebaseConfig.js";
 import { httpsCallable } from "firebase/functions";
 import { GeoPoint } from "firebase/firestore";
 import LocationPickerModal from './LocationPickerModal';
-import {toast} from "@/hooks/use-toast.js";
 import useUiStore from "@/stores/useUiStore.js";
 
 const UploadPost = () => {
@@ -249,10 +248,6 @@ const UploadPost = () => {
             setSelectedYear('');
             setCurrentStep(1);
             setActiveSidebarItem("Home")
-            toast({
-                title: "Upload complete",
-                description: response.data.message || "Post uploaded successfully!",
-            });
         } catch (err) {
             console.error('Error uploading post:', err);
             let errorMessage = 'Failed to upload post. Please try again.';
