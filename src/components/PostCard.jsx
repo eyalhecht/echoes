@@ -27,7 +27,8 @@ import {
     MapPin,
     Trash2,
     Send,
-    Sparkles, MoreHorizontal,
+    Sparkles,
+    MoreHorizontal,
 } from 'lucide-react';
 import { format, formatDistanceToNowStrict, isToday, isYesterday } from 'date-fns';
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -36,6 +37,7 @@ import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
+import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 
 function PostCard({ post }) {
     const {
@@ -50,9 +52,10 @@ function PostCard({ post }) {
     } = usePostInteractions(post.id);
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-    const [locationModal, setLocationModal] = useState(false);
+    const [locationModal, setLocationModal] = useState(false); // Controls the unified location modal
     const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const deletePost = useUiStore(state => state.deletePost);
@@ -111,17 +114,15 @@ function PostCard({ post }) {
     const handleNameClick = (userId) => {
         setActiveSidebarItem('Profile')
         setActiveProfileView(userId)
-    }
+    };
 
     const handleDeleteClick = async () => {
         await deletePost(postId);
     };
 
-    // Helper function to safely render year data
     const formatYear = (yearData) => {
         if (!yearData) return null;
-        return yearData[0]
-
+        return yearData[0];
     };
 
     const renderMedia = () => {
@@ -134,13 +135,11 @@ function PostCard({ post }) {
         if (type === 'photo' || type === 'document' || type === 'item') {
             return (
                 <div className="flex justify-center px-4 sm:px-6">
-                    {/* This is the "polaroid" wrapper for the image */}
                     <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full z-10">
                         {formatYear(year) && imageLoaded && (
                             <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
                                 {formatYear(year)}
                             </div>
-
                         )}
                         <img
                             src={firstFile}
@@ -149,7 +148,6 @@ function PostCard({ post }) {
                             onLoad={() => setImageLoaded(true)}
                             onError={() => setImageLoaded(false)}
                         />
-                        {/* Empty space at bottom for polaroid effect */}
                         <div className="h-10"></div>
                     </div>
                 </div>
@@ -442,10 +440,13 @@ function PostCard({ post }) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => setLocationModal(true)}
+                                onClick={() => {
+                                    setLocationModal(true); // Open the unified location modal
+                                    setShowMapInModal(true); // Default to showing map
+                                }}
                                 className="h-8 w-8"
                             >
-                                <MapPin className="h-5 w-5" />
+                                <MapPin className="h-5 w-5" /> {/* Icon to open the combined modal */}
                             </Button>
                         )}
                     </div>
@@ -516,13 +517,41 @@ function PostCard({ post }) {
                 </CardContent>
             </Card>
 
-            {/* Location Modal */}
             <Dialog open={locationModal} onOpenChange={setLocationModal}>
-                <DialogContent className="max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Post Location</DialogTitle>
+                <DialogContent className="max-w-md py-7">
+                    <DialogHeader className="flex flex-row justify-between items-center mb-4">
+                        <DialogTitle>{showMapInModal ? 'Location Map' : 'Street View'}</DialogTitle>
+                        {location && (
+                            <div className="flex gap-2">
+                                <Button
+                                    variant={showMapInModal ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setShowMapInModal(true)}
+                                >
+                                    Map
+                                </Button>
+                                <Button
+                                    variant={!showMapInModal ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setShowMapInModal(false)}
+                                >
+                                    Street View
+                                </Button>
+                            </div>
+                        )}
                     </DialogHeader>
-                    <PostMap center={{lat: location?._latitude, lng: location?._longitude}}/>
+
+                    {location ? (
+                        <>
+                            {showMapInModal ? (
+                                <PostMap center={{ lat: location._latitude, lng: location._longitude }} />
+                            ) : (
+                                <StreetViewDisplay coords={post.location}/>
+                            )}
+                        </>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">Location data not available for this post.</p>
+                    )}
                 </DialogContent>
             </Dialog>
 

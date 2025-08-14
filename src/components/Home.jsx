@@ -4,11 +4,9 @@ import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import SuggestedUsers from "./SuggestedUsers.jsx";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
-import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import { cn } from "@/lib/utils";
 
 function Home() {
-    const isMobile = useIsMobile();
 
     const { 
         posts, 
@@ -101,7 +99,9 @@ function Home() {
 
     return (
         <>
-            {!isMobile && <SuggestedUsers />}
+            <div className="hidden lg:block">
+                <SuggestedUsers />
+            </div>
             <div className={cn(
                 "max-w-[600px] mx-auto pb-5 gap-2 flex flex-col"
             )}>
