@@ -36,6 +36,7 @@ import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
+import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 
 function PostCard({ post }) {
     const {
@@ -63,6 +64,7 @@ function PostCard({ post }) {
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
     const [commentError, setCommentError] = useState(null);
     const [showComments, setShowComments] = useState(false);
+    const [showStreetView, setShowStreetView] = useState(false);
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
     const [showAiInsights, setShowAiInsights] = useState(false);
 
@@ -438,6 +440,17 @@ function PostCard({ post }) {
                             <span className="text-sm">{bookmarksCount}</span>
                         </div>
 
+                        <div className="flex items-center gap-1">
+                            <Button
+                                size="icon"
+                                onClick={()=>setShowStreetView(prevState => !prevState)}
+                                className={`h-8 w-8 ${bookmarked ? 'text-blue-600' : ''}`}
+                                disabled={isBookmarkUpdating}
+                            >
+                            </Button>
+                            <span className="text-sm">Street view</span>
+                        </div>
+
                         {location && (
                             <Button
                                 variant="ghost"
@@ -449,6 +462,9 @@ function PostCard({ post }) {
                             </Button>
                         )}
                     </div>
+                    {showStreetView && <div>
+                        <StreetViewDisplay coords={post.location}/>
+                    </div>}
 
                     <div
                         className={`
