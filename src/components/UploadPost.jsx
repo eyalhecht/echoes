@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import {
     Camera,
     X,
@@ -25,20 +26,22 @@ import {
     Package,
     Video,
     Youtube,
+    CheckCircle,
 } from 'lucide-react';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage, auth, functions } from "../firebaseConfig.js";
 import { httpsCallable } from "firebase/functions";
 import { GeoPoint } from "firebase/firestore";
 import LocationPickerModal from './LocationPickerModal';
-import {toast} from "@/hooks/use-toast.js";
 import useUiStore from "@/stores/useUiStore.js";
 
 const UploadPost = () => {
+    const { toast } = useToast();
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     // Step management
     const [currentStep, setCurrentStep] = useState(1);
     const [justCompletedStep, setJustCompletedStep] = useState(null);
+    const [uploadSuccess, setUploadSuccess] = useState(false);
 
     // Refs for scrolling
     const stepRefs = useRef({});
@@ -213,16 +216,32 @@ const UploadPost = () => {
         setIsUploading(true);
         setError(null);
 
+        const uploadingToast = toast({
+            title: "Uploading your post...",
+            description: "Please wait while we process your files and create your post.",
+            duration: Infinity,
+        });
+
         try {
             let fileUrls = [];
 
             if (type !== 'youtube' && files.length > 0) {
+                // Update toast with file upload progress
+                uploadingToast.update({
+                    title: "Uploading files...",
+                    description: `Processing ${files.length} file(s)...`,
+                });
+
                 const uploadPromises = files.map(async (file) => {
                     const storageRef = ref(storage, `post_media/${auth.currentUser?.uid || 'anonymous'}/${Date.now()}_${file.name}`);
                     const uploadTaskSnapshot = await uploadBytes(storageRef, file);
                     return await getDownloadURL(uploadTaskSnapshot.ref);
                 });
                 fileUrls = await Promise.all(uploadPromises);
+                uploadingToast.update({
+                    title: "Creating your post...",
+                    description: "Files uploaded successfully, finalizing your post...",
+                });
             } else if (type === 'youtube' && files.length > 0) {
                 fileUrls = files;
             }
@@ -240,20 +259,34 @@ const UploadPost = () => {
 
             const response = await httpsCallable(functions, 'apiGateway')(payload);
 
-            // Reset form
-            setType('');
-            setFiles([]);
-            setFilePreviews([]);
-            setDescription('');
-            setLocation(null);
-            setSelectedYear('');
-            setCurrentStep(1);
-            setActiveSidebarItem("Home")
+            uploadingToast.dismiss();
+
+            // Show success toast
             toast({
-                title: "Upload complete",
-                description: response.data.message || "Post uploaded successfully!",
+                title: "Post uploaded successfully!",
+                description: "Your post has been shared and is now visible to others.",
+                duration: 7000,
             });
+
+            // Show success state briefly
+            setUploadSuccess(true);
+            
+            // Reset form after a short delay to show success state
+            setTimeout(() => {
+                setType('');
+                setFiles([]);
+                setFilePreviews([]);
+                setDescription('');
+                setLocation(null);
+                setSelectedYear('');
+                setCurrentStep(1);
+                setUploadSuccess(false);
+                setActiveSidebarItem("Home");
+            }, 2000);
         } catch (err) {
+            // Dismiss the uploading toast
+            uploadingToast.dismiss();
+            
             console.error('Error uploading post:', err);
             let errorMessage = 'Failed to upload post. Please try again.';
             if (err.code && err.message) {
@@ -262,6 +295,14 @@ const UploadPost = () => {
                 errorMessage = err.message;
             }
             setError(errorMessage);
+            
+            // Show error toast
+            toast({
+                title: "Upload failed",
+                description: errorMessage,
+                variant: "destructive",
+                duration: 7000,
+            });
         } finally {
             setIsUploading(false);
         }
@@ -553,10 +594,19 @@ const UploadPost = () => {
                         <div className="pt-4 animate-in slide-in-from-bottom-4 duration-500">
                             <Button
                                 onClick={handleUploadPost}
-                                disabled={isUploading || !canProceedToUpload()}
-                                className="w-full h-12 text-base font-semibold"
+                                disabled={isUploading || !canProceedToUpload() || uploadSuccess}
+                                className={`w-full h-12 text-base font-semibold transition-all duration-300 ${
+                                    uploadSuccess 
+                                        ? 'bg-green-600 hover:bg-green-600 text-white' 
+                                        : ''
+                                }`}
                             >
-                                {isUploading ? (
+                                {uploadSuccess ? (
+                                    <>
+                                        <CheckCircle className="h-4 w-4 mr-2" />
+                                        Posted Successfully!
+                                    </>
+                                ) : isUploading ? (
                                     <>
                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                         Uploading...

@@ -1,36 +1,21 @@
-import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Avatar,
-    Card,
-    CardContent,
-    Button,
-    ButtonBase,
-    IconButton
-} from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import { formatDistanceToNowStrict, isToday, isYesterday, format } from 'date-fns';
-import PostDetailView from './PostDetailView.jsx';
-import useUiStore from "../stores/useUiStore.js";
-import { usePostInteractions } from '../hooks/usePostInteractions';
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Heart, Bookmark, MessageCircle } from "lucide-react";
+import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
+import PostDetailView from "./PostDetailView";
+import useUiStore from "../stores/useUiStore";
+import { usePostInteractions } from "../hooks/usePostInteractions";
 
-const MapPostCard = ({ 
-    post, 
-    isSelected = false, 
-    onCardClick, 
-    onCardHover, 
-    onCardLeave 
-}) => {
+export default function MapPostCard({ post, isSelected, onCardClick }) {
     const [detailViewOpen, setDetailViewOpen] = useState(false);
-    const [imageHeight, setImageHeight] = useState(180); // Increased default height
+    const [imageHeight, setImageHeight] = useState(180);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+
+    const setActiveSidebarItem = useUiStore((s) => s.setActiveSidebarItem);
+    const setActiveProfileView = useUiStore((s) => s.setActiveProfileView);
 
     const {
         liked,
@@ -38,299 +23,157 @@ const MapPostCard = ({
         bookmarked,
         bookmarksCount,
         handleLikeToggle,
-        handleBookmarkToggle
+        handleBookmarkToggle,
     } = usePostInteractions(post.id);
 
     const {
-        id: postId,
         userDisplayName,
         userProfilePicUrl,
         description,
         files,
         userId,
         createdAt,
-        distanceKm,
-        commentsCount
+        commentsCount,
     } = post;
 
-    const formatFirebaseTimestamp = (firebaseTimestamp) => {
-        if (!firebaseTimestamp || typeof firebaseTimestamp._seconds !== 'number') {
-            return 'Invalid Date';
-        }
-        const date = new Date(firebaseTimestamp._seconds * 1000 + firebaseTimestamp._nanoseconds / 1000000);
-        const now = new Date();
-        if (isToday(date)) {
-            return formatDistanceToNowStrict(date, { addSuffix: true });
-        } else if (isYesterday(date)) {
-            return `Yesterday`;
-        } else if (Math.abs(date.getTime() - now.getTime()) < 7 * 24 * 60 * 60 * 1000) {
-            return format(date, 'EEE'); // E.g., "Mon"
-        } else {
-            return format(date, 'MMM dd'); // E.g., "Jul 15"
-        }
+    const formatDate = (firebaseTimestamp) => {
+        if (!firebaseTimestamp?._seconds) return "";
+        const date = new Date(
+            firebaseTimestamp._seconds * 1000 +
+            firebaseTimestamp._nanoseconds / 1000000
+        );
+        if (isToday(date)) return formatDistanceToNowStrict(date, { addSuffix: true });
+        if (isYesterday(date)) return "Yesterday";
+        if (Date.now() - date.getTime() < 7 * 864e5) return format(date, "EEE");
+        return format(date, "MMM dd");
+    };
+
+    const handleImageLoad = (e) => {
+        const img = e.target;
+        const aspect = img.naturalHeight / img.naturalWidth;
+        const width = 220;
+        let height = width * aspect;
+        height = Math.max(140, Math.min(height, 350));
+        setImageHeight(height);
+        setImageLoaded(true);
     };
 
     const handleNameClick = (e) => {
         e.stopPropagation();
-        setActiveSidebarItem('Profile');
+        setActiveSidebarItem("Profile");
         setActiveProfileView(userId);
-    };
-
-    const handleCardClick = () => {
-        // Open PostDetailView when card is clicked
-        setDetailViewOpen(true);
-        
-        // Also trigger map interaction if provided
-        if (onCardClick) {
-            onCardClick(post);
-        }
-    };
-
-    const handleImageLoad = (event) => {
-        const img = event.target;
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
-        
-        if (naturalWidth && naturalHeight) {
-            // Calculate card width (approximately 220px for 2-column masonry in 55% panel)
-            const cardWidth = 220;
-            const aspectRatio = naturalHeight / naturalWidth;
-            
-            // Different height ranges based on image orientation - increased for larger cards
-            let calculatedHeight;
-            
-            if (aspectRatio > 1.4) {
-                // Tall/Portrait images: 220-350px
-                calculatedHeight = Math.min(Math.max(cardWidth * aspectRatio, 220), 350);
-            } else if (aspectRatio < 0.7) {
-                // Wide/Landscape images: 100-180px  
-                calculatedHeight = Math.min(Math.max(cardWidth * aspectRatio, 100), 180);
-            } else {
-                // Square-ish images: 160-260px
-                calculatedHeight = Math.min(Math.max(cardWidth * aspectRatio, 160), 260);
-            }
-            
-            setImageHeight(calculatedHeight);
-            setImageLoaded(true);
-            
-            // Debug logging to see the variety
-            console.log(`Image ${post.id}: ${naturalWidth}x${naturalHeight}, ratio: ${aspectRatio.toFixed(2)}, height: ${calculatedHeight}px`);
-        }
-    };
-
-    const truncateText = (text, maxLength = 100) => {
-        if (!text) return '';
-        if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength) + '...';
     };
 
     return (
         <>
             <Card
-                sx={{
-                    width: '100%',
-                    cursor: 'pointer',
-                    mb: 0,
-                    borderRadius: '12px',
-                    boxShadow: isSelected ? '0 4px 16px rgba(25, 118, 210, 0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
-                    border: isSelected ? '2px solid #1976d2' : '1px solid #e0e0e0',
-                    transition: 'all 0.2s ease',
-                    backgroundColor: isSelected ? '#f3f8ff' : 'white',
-                    overflow: 'hidden'
+                onClick={() => {
+                    setDetailViewOpen(true);
+                    onCardClick?.(post);
                 }}
-                onClick={handleCardClick}
-                onMouseEnter={() => onCardHover && onCardHover(post)}
-                onMouseLeave={() => onCardLeave && onCardLeave()}
+                className={cn(
+                    "overflow-hidden border rounded-xl transition hover:shadow-md cursor-pointer",
+                    isSelected && "ring-2 ring-primary"
+                )}
             >
-                <Box
-                    sx={{
-                        height: imageHeight,
-                        width: '100%',
-                        position: 'relative',
-                        backgroundColor: '#f5f5f5',
-                        overflow: 'hidden',
-                        minHeight: 100 // Ensure minimum height even for very wide images
-                    }}
+                {/* Image */}
+                <div
+                    className="relative w-full bg-muted"
+                    style={{ height: imageHeight }}
                 >
-                    {files && files[0] ? (
+                    {files?.[0] ? (
                         <img
                             src={files[0]}
-                            alt="Post preview"
+                            alt=""
                             onLoad={handleImageLoad}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                transition: 'opacity 0.3s ease',
-                                opacity: imageLoaded ? 1 : 0.7
-                            }}
+                            className={cn(
+                                "w-full h-full object-cover transition-opacity",
+                                imageLoaded ? "opacity-100" : "opacity-70"
+                            )}
                         />
                     ) : (
-                        <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center', 
-                            height: '100%',
-                            color: 'text.secondary'
-                        }}>
-                            <Typography variant="body2">No image</Typography>
-                        </Box>
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                            No image
+                        </div>
                     )}
-                    
-                    <IconButton
-                        sx={{ 
-                            position: 'absolute', 
-                            top: 8, 
-                            right: 8,
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(4px)',
-                            width: 32,
-                            height: 32,
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 1)',
-                                transform: 'scale(1.1)'
-                            },
-                            transition: 'all 0.2s ease'
-                        }}
+
+                    {/* Bookmark */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full"
                         onClick={(e) => {
                             e.stopPropagation();
                             handleBookmarkToggle();
                         }}
                     >
-                        {bookmarked ? (
-                            <BookmarkIcon sx={{ fontSize: 18, color: '#1976d2' }} />
-                        ) : (
-                            <BookmarkBorderIcon sx={{ fontSize: 18, color: '#666' }} />
-                        )}
-                    </IconButton>
-                </Box>
-
-                <CardContent sx={{
-                    p: 1.5,
-                    '&:last-child': { pb: 1.5 }
-                }}>
-                    {/* User info */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                        <Avatar 
-                            src={userProfilePicUrl || ''} 
-                            alt={userDisplayName ? userDisplayName.charAt(0) : 'U'}
-                            sx={{ width: 28, height: 28 }}
+                        <Bookmark
+                            className={cn(
+                                "h-4 w-4",
+                                bookmarked && "fill-primary text-primary"
+                            )}
                         />
-                        <ButtonBase
+                    </Button>
+                </div>
+
+                <CardContent className="p-3 space-y-3">
+                    {/* User */}
+                    <div className="flex items-center gap-2">
+                        <Avatar className="h-7 w-7">
+                            <AvatarImage src={userProfilePicUrl} />
+                            <AvatarFallback>{userDisplayName?.[0] ?? "U"}</AvatarFallback>
+                        </Avatar>
+                        <div
                             onClick={handleNameClick}
-                            sx={{
-                                padding: 0,
-                                justifyContent: 'flex-start',
-                                flex: 1,
-                                textAlign: 'left',
-                                '&:hover': {
-                                    backgroundColor: 'transparent',
-                                }
-                            }}
+                            className="flex flex-col leading-none"
                         >
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography 
-                                    variant="subtitle2" 
-                                    fontWeight="600"
-                                    sx={{
-                                        cursor: 'pointer',
-                                        color: 'inherit',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                        fontSize: '14px',
-                                        lineHeight: 1.1
-                                    }}
-                                >
-                                    {userDisplayName || 'Anonymous User'}
-                                </Typography>
-                                <Typography 
-                                    variant="caption" 
-                                    color="text.secondary"
-                                    sx={{ 
-                                        fontSize: '11px',
-                                        lineHeight: 1,
-                                        display: 'block',
-                                        mt: 0.25
-                                    }}
-                                >
-                                    {formatFirebaseTimestamp(createdAt)}
-                                </Typography>
-                            </Box>
-                        </ButtonBase>
-                    </Box>
+              <span className="text-sm font-medium hover:underline">
+                {userDisplayName ?? "Anonymous"}
+              </span>
+                            <span className="text-xs text-muted-foreground">
+                {formatDate(createdAt)}
+              </span>
+                        </div>
+                    </div>
 
-                    <Box sx={{ mb: 1.5 }}>
-                        <Typography 
-                            variant="body2" 
-                            color="text.primary"
-                            sx={{ 
-                                fontSize: '12px',
-                                lineHeight: 1.4,
-                                wordWrap: 'break-word'
-                            }}
-                        >
-                            {description || 'No description available'}
-                        </Typography>
-                    </Box>
+                    {/* Description */}
+                    {description && (
+                        <p className="text-sm text-foreground line-clamp-3">
+                            {description}
+                        </p>
+                    )}
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        {/* Like */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <IconButton 
-                                size="small"
-                                sx={{ 
-                                    p: 0.5,
-                                    '&:hover': {
-                                        transform: 'scale(1.1)',
-                                        backgroundColor: liked ? 'rgba(255, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.05)'
-                                    },
-                                    transition: 'all 0.2s ease',
-                                    backgroundColor: liked ? 'rgba(255, 0, 0, 0.05)' : 'transparent'
-                                }}
+                    {/* Actions */}
+                    <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-3">
+                            {/* Like */}
+                            <button
+                                className="flex items-center gap-1 hover:opacity-80"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    console.log('Like button clicked for post:', post.id);
                                     handleLikeToggle();
                                 }}
                             >
-                                {liked ? (
-                                    <FavoriteIcon sx={{ fontSize: 18, color: '#ff4757' }} />
-                                ) : (
-                                    <FavoriteBorderIcon sx={{ fontSize: 18, color: '#666' }} />
-                                )}
-                            </IconButton>
-                            <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                    fontSize: '13px', 
-                                    fontWeight: 600, 
-                                    color: liked ? '#ff4757' : 'text.primary'
-                                }}
-                            >
-                                {likesCount || 0}
-                            </Typography>
-                        </Box>
+                                <Heart
+                                    className={cn(
+                                        "h-4 w-4",
+                                        liked && "fill-red-500 text-red-500"
+                                    )}
+                                />
+                                {likesCount ?? 0}
+                            </button>
 
-                        {/* Comments */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <ChatBubbleOutlineIcon sx={{ fontSize: 18, color: '#666' }} />
-                            <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                    fontSize: '13px', 
-                                    fontWeight: 600, 
-                                    color: 'text.primary'
-                                }}
-                            >
-                                {commentsCount || 0}
-                            </Typography>
-                        </Box>
-                    </Box>
+                            {/* Comments */}
+                            <div className="flex items-center gap-1 text-muted-foreground">
+                                <MessageCircle className="h-4 w-4" />
+                                {commentsCount ?? 0}
+                            </div>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 
-            {/* PostDetailView Modal */}
+            {/* Detail Modal */}
             {detailViewOpen && (
                 <PostDetailView
                     post={post}
@@ -340,6 +183,4 @@ const MapPostCard = ({
             )}
         </>
     );
-};
-
-export default MapPostCard;
+}

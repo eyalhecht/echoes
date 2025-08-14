@@ -8,6 +8,7 @@ import {
     Heart,
     Bookmark,
     Send,
+    X,
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -118,12 +119,22 @@ const PostDetailView = ({ post, open, onClose }) => {
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent
-                className="p-1 max-w-none w-[90vw] h-[90vh] flex"
+                className="p-1 max-w-none w-[90vw] h-[90vh] flex flex-col md:flex-row"
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
-                <div className="flex h-full w-full relative ">
+                {/* Custom Close Button - Mobile Only */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="absolute right-2 top-2 z-50 bg-background/80 hover:bg-background border border-border/50 backdrop-blur-sm md:hidden"
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+
+                <div className="flex flex-col md:flex-row h-full w-full relative">
                     {files && files[0] && (
-                        <div className="flex-1 bg-black flex justify-center items-center rounded">
+                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1">
                             {type === 'photo' && (
                                 <img
                                     src={files[0]}
@@ -141,7 +152,7 @@ const PostDetailView = ({ post, open, onClose }) => {
                         </div>
                     )}
 
-                    <div className={`flex flex-col overflow-auto ${files && files[0] ? 'flex-1 max-w-[400px]' : 'w-full'}`}>
+                    <div className={`flex flex-col overflow-auto h-1/2 md:h-full ${files && files[0] ? 'md:flex-1 md:max-w-[400px]' : 'w-full'}`}>
                         <div className="p-4 flex-grow flex flex-col"> {/* Added flex-grow to ensure content pushes input to bottom */}
                             {/* User info */}
                             <div className="flex items-center mb-4">
