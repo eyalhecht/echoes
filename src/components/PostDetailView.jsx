@@ -8,6 +8,7 @@ import {
     Heart,
     Bookmark,
     Send,
+    X,
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -121,6 +122,16 @@ const PostDetailView = ({ post, open, onClose }) => {
                 className="p-1 max-w-none w-[90vw] h-[90vh] flex flex-col md:flex-row"
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
+                {/* Custom Close Button - Mobile Only */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="absolute right-2 top-2 z-50 bg-background/80 hover:bg-background border border-border/50 backdrop-blur-sm md:hidden"
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+
                 <div className="flex flex-col md:flex-row h-full w-full relative">
                     {files && files[0] && (
                         <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1">
