@@ -5,11 +5,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import {
     Github,
-    Loader2
+    Loader2,
+    Sparkles
 } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { useNavigate } from "react-router-dom";
 
+// Google Icon Component
 const GoogleIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -39,7 +41,7 @@ function Login() {
     const handleGoogleLogin = async () => {
         try {
             await useAuthStore.getState().signInWithGoogle();
-            navigate('/dashboard'); // <--- Redirect to dashboard on success
+            navigate('/dashboard');
         } catch (err) {
             console.error("Google Login component caught error:", err);
         }
@@ -48,9 +50,9 @@ function Login() {
     const handleGitHubLogin = async () => {
         try {
             await useAuthStore.getState().signInWithGitHub();
-            navigate('/dashboard'); // <--- Redirect to dashboard on success
+            navigate('/dashboard');
         } catch (err) {
-            console.error("Google Login component caught error:", err);
+            console.error("GitHub Login component caught error:", err);
         }
     };
 
@@ -59,13 +61,20 @@ function Login() {
             <div className="w-full max-w-lg">
                 <Card className="shadow-lg">
                     <CardContent className="pt-10 px-10 pb-10">
+                        {/* Header */}
                         <div className="text-center mb-10">
-                            <h1 className="text-3xl font-bold">Echoes</h1>
+                            <div className="relative inline-block">
+                                <h1 className="text-3xl font-bold">Echoes</h1>
+                                <div className="absolute -top-2 -right-2">
+                                    <Sparkles className="h-5 w-5 text-blue-500" />
+                                </div>
+                            </div>
                             <p className="text-muted-foreground mt-3 text-base">
                                 Sign in to continue
                             </p>
                         </div>
 
+                        {/* Login Buttons */}
                         <div className="space-y-4">
                             <Button
                                 variant="outline"
@@ -100,7 +109,7 @@ function Login() {
 
                         {/* Error Display */}
                         {error && (
-                            <Alert variant="destructive" className="mt-4">
+                            <Alert variant="destructive" className="mt-6">
                                 <AlertDescription>
                                     {error}
                                 </AlertDescription>
@@ -112,11 +121,11 @@ function Login() {
                             <Separator className="mb-6" />
                             <p className="text-sm text-muted-foreground">
                                 By continuing, you agree to our{' '}
-                                <button className="text-primary hover:underline">
+                                <button className="text-primary hover:underline font-medium">
                                     Terms of Service
                                 </button>
                                 {' '}and{' '}
-                                <button className="text-primary hover:underline">
+                                <button className="text-primary hover:underline font-medium">
                                     Privacy Policy
                                 </button>
                             </p>
@@ -124,7 +133,7 @@ function Login() {
                             <div className="mt-4">
                                 <p className="text-sm text-muted-foreground">
                                     Need help?{' '}
-                                    <button className="text-primary hover:underline">
+                                    <button className="text-primary hover:underline font-medium">
                                         Contact Support
                                     </button>
                                 </p>
