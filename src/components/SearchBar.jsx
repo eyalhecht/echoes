@@ -155,7 +155,7 @@ export function SearchBar() {
                     </Button>
                 ) : (
                     <div className="relative flex items-center w-full">
-                        <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-3 h-4 w-4" />
                         <Input
                             ref={inputRef}
                             type="text"
@@ -181,7 +181,7 @@ export function SearchBar() {
             </div>
 
             {showDropdown && isExpanded && (
-                <div className="absolute top-11 left-0 right-0 bg-background border border-border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-11 left-0 right-0 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                     {isLoading ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
                             Searching...
