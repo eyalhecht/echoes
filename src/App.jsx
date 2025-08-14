@@ -12,6 +12,7 @@ import Login from "./components/Login.jsx";
 import Signup from "./components/Signup.jsx";
 import ProtectedRoute from './components/ProtectedRoute.jsx'; // Your gatekeeper component
 import {useAuthStore} from "./stores/useAuthStore.js"; // Your gatekeeper component
+import { Toaster } from "@/components/ui/toaster";
 
 function App() {
     const { loading: authLoading, isAuthenticated, error: authError } = useAuthStore();
@@ -48,6 +49,7 @@ function App() {
                 {/* 404 for unmatched routes */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            <Toaster />
         </>
     );
 }
