@@ -312,43 +312,53 @@ const PostDetailView = ({ post, open, onClose }) => {
 
                             {/* Action Buttons */}
                             <div className="flex items-center gap-1 mb-4">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={handleLikeToggle}
-                                    disabled={isLikeUpdating}
-                                >
-                                    {liked ? <Heart className="h-5 w-5 text-red-500 fill-red-500" /> : <Heart className="h-5 w-5" />}
-                                </Button>
-                                <span className="text-sm">{likesCount}</span>
-
-                                <div className="flex items-center ">
-                                    <MessageCircle className="h-5 w-5 " />
-                                    <span className="text-sm">{commentsCount}</span>
-                                </div>
-
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={handleBookmarkToggle}
-                                    disabled={isBookmarkUpdating}
-                                >
-                                    {bookmarked ? <Bookmark className="h-5 w-5 text-blue-600 fill-blue-600" /> : <Bookmark className="h-5 w-5" />}
-                                </Button>
-                                <span className="text-sm">{bookmarksCount}</span>
-
-                                {location && (
+                                <div className="flex items-center gap-1">
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => {
-                                            setLocationModal(true);
-                                            setShowMapInModal(true);
-                                        }}
+                                        onClick={handleLikeToggle}
+                                        disabled={isLikeUpdating}
                                         className="h-8 w-8"
                                     >
-                                        <MapPin className="h-5 w-5" />
+                                        <Heart className={`h-5 w-5 ${liked ? 'text-red-500 fill-current' : ''}`} />
                                     </Button>
+                                    <span className="text-sm">{likesCount}</span>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <div className="h-8 w-8 flex items-center justify-center">
+                                        <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                    <span className="text-sm">{commentsCount}</span>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleBookmarkToggle}
+                                        disabled={isBookmarkUpdating}
+                                        className="h-8 w-8"
+                                    >
+                                        <Bookmark className={`h-5 w-5 ${bookmarked ? 'text-blue-600 fill-current' : ''}`} />
+                                    </Button>
+                                    <span className="text-sm">{bookmarksCount}</span>
+                                </div>
+
+                                {location && (
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => {
+                                                setLocationModal(true);
+                                                setShowMapInModal(true);
+                                            }}
+                                            className="h-8 w-8"
+                                        >
+                                            <MapPin className="h-5 w-5" />
+                                        </Button>
+                                    </div>
                                 )}
                             </div>
 
