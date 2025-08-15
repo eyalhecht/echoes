@@ -110,11 +110,6 @@ function Bookmarks() {
         <div className={cn(
             "max-w-[600px] mx-auto pb-5 gap-2 flex flex-col"
         )}>
-            {/* Header */}
-            <div className="flex items-center gap-3 p-4 border-b">
-                <BookmarkIcon className="h-6 w-6" />
-                <h1 className="text-xl font-semibold">Your Bookmarks</h1>
-            </div>
 
             {/* Error state */}
             {bookmarksError && (
