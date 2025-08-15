@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, UserPlus, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { callApiGateway } from "../firebaseConfig.js";
+import useUiStore from "../stores/useUiStore.js";
 
 const FollowersFollowingModal = ({ 
     open, 
@@ -27,6 +28,9 @@ const FollowersFollowingModal = ({
     const [error, setError] = useState(null);
     const [hasMore, setHasMore] = useState(true);
     const [lastUserId, setLastUserId] = useState(null);
+    
+    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
+    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
     // Reset state when modal opens or listType changes
     useEffect(() => {
@@ -90,10 +94,19 @@ const FollowersFollowingModal = ({
         }
     }, [loadUsers, hasMore, loadingMore, loading]);
 
+    const handleUserClick = (clickedUserId) => {
+        setActiveProfileView(clickedUserId);
+        setActiveSidebarItem('Profile');
+        onClose(); // Close the modal
+    };
+
     const UserItem = ({ user }) => (
         <div className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-lg transition-colors">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Avatar className="h-12 w-12">
+                <Avatar 
+                    className="h-12 w-12 cursor-pointer" 
+                    onClick={() => handleUserClick(user.userId)}
+                >
                     <AvatarImage 
                         src={user.profilePictureUrl || '/default-avatar.png'} 
                         alt={user.displayName} 
@@ -105,7 +118,10 @@ const FollowersFollowingModal = ({
                 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                        <h3 className="font-semibold truncate">
+                        <h3 
+                            className="font-semibold truncate cursor-pointer hover:underline"
+                            onClick={() => handleUserClick(user.userId)}
+                        >
                             {user.displayName}
                         </h3>
                     </div>
