@@ -5,11 +5,12 @@ export const usePostInteractions = (postId) => {
     const { user } = useAuthStore();
     const {
         posts,
+        bookmarks,
         togglePostLike,
         togglePostBookmark
     } = useUiStore();
 
-    const post = posts.find(p => p.id === postId);
+    const post = posts.find(p => p.id === postId) || bookmarks.find(p => p.id === postId);
 
     const handleLikeToggle = async () => {
             postId && user?.uid && await togglePostLike(postId, user.uid);

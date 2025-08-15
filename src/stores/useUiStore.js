@@ -13,12 +13,34 @@ const useUiStore = create((set, get) => ({
     postsError: null,
     lastDocId: null,
     hasMore: true,
+    
+    // Bookmarks state
+    bookmarks: [],
+    bookmarksLoading: false,
+    bookmarksError: null,
+    bookmarksLastDocId: null,
+    bookmarksHasMore: true,
     setPosts: (posts) => set({ posts }),
     addPosts: (newPosts) => set((state) => ({
         posts: [...state.posts, ...newPosts]
     })),
     setLastDocId: (lastDocId) => set({ lastDocId }),
     setHasMore: (hasMore) => set({ hasMore }),
+    
+    // Bookmarks actions
+    setBookmarks: (bookmarks) => set({ bookmarks }),
+    addBookmarks: (newBookmarks) => set((state) => ({
+        bookmarks: [...state.bookmarks, ...newBookmarks]
+    })),
+    setBookmarksLastDocId: (lastDocId) => set({ bookmarksLastDocId: lastDocId }),
+    setBookmarksHasMore: (hasMore) => set({ bookmarksHasMore: hasMore }),
+    setBookmarksLoading: (loading) => set({ bookmarksLoading: loading }),
+    setBookmarksError: (error) => set({ bookmarksError: error }),
+    
+    // Remove bookmark from local state when unbookmarked
+    removeBookmark: (postId) => set((state) => ({
+        bookmarks: state.bookmarks.filter(post => post.id !== postId)
+    })),
     addPost: (post) => set((state) => ({
         posts: [post, ...state.posts]
     })),
@@ -121,7 +143,8 @@ const useUiStore = create((set, get) => ({
 
     togglePostBookmark: async (postId, userId) => {
         const state = get();
-        const post = state.posts.find(p => p.id === postId);
+        // Check both posts and bookmarks arrays
+        const post = state.posts.find(p => p.id === postId) || state.bookmarks.find(p => p.id === postId);
 
         if (!post || !userId || post.isBookmarkUpdating) return false;
 
@@ -129,9 +152,19 @@ const useUiStore = create((set, get) => ({
         const originalCount = post.bookmarksCount || 0;
 
         try {
-            // Optimistic update
+            // Optimistic update for both posts and bookmarks arrays
             set((state) => ({
                 posts: state.posts.map(p =>
+                    p.id === postId
+                        ? {
+                            ...p,
+                            bookmarkedByCurrentUser: !wasBookmarked,
+                            bookmarksCount: !wasBookmarked ? originalCount + 1 : Math.max(0, originalCount - 1),
+                            isBookmarkUpdating: true,
+                        }
+                        : p
+                ),
+                bookmarks: state.bookmarks.map(p =>
                     p.id === postId
                         ? {
                             ...p,
@@ -148,13 +181,30 @@ const useUiStore = create((set, get) => ({
                 payload: { postId }
             });
 
-            set((state) => ({
-                posts: state.posts.map(p =>
-                    p.id === postId
-                        ? { ...p, isBookmarkUpdating: false }
-                        : p
-                )
-            }));
+            // If unbookmarked, remove from bookmarks array
+            if (wasBookmarked) {
+                set((state) => ({
+                    posts: state.posts.map(p =>
+                        p.id === postId
+                            ? { ...p, isBookmarkUpdating: false }
+                            : p
+                    ),
+                    bookmarks: state.bookmarks.filter(p => p.id !== postId)
+                }));
+            } else {
+                set((state) => ({
+                    posts: state.posts.map(p =>
+                        p.id === postId
+                            ? { ...p, isBookmarkUpdating: false }
+                            : p
+                    ),
+                    bookmarks: state.bookmarks.map(p =>
+                        p.id === postId
+                            ? { ...p, isBookmarkUpdating: false }
+                            : p
+                    )
+                }));
+            }
 
             return true;
 
@@ -164,6 +214,16 @@ const useUiStore = create((set, get) => ({
             // Revert optimistic update
             set((state) => ({
                 posts: state.posts.map(p =>
+                    p.id === postId
+                        ? {
+                            ...p,
+                            bookmarkedByCurrentUser: wasBookmarked,
+                            bookmarksCount: originalCount,
+                            isBookmarkUpdating: false,
+                        }
+                        : p
+                ),
+                bookmarks: state.bookmarks.map(p =>
                     p.id === postId
                         ? {
                             ...p,
