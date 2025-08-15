@@ -6,11 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
+    Dialog as LocationDialog,
+    DialogContent as LocationDialogContent,
+    DialogHeader as LocationDialogHeader,
+    DialogTitle as LocationDialogTitle,
+} from "@/components/ui/dialog";
+import {
     Heart,
     Bookmark,
     Send,
     X,
     Sparkles,
+    MapPin
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -18,6 +25,8 @@ import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import useUiStore from '../stores/useUiStore.js';
 import {formatFirebaseTimestamp} from "./utils.js";
+import PostMap from "./PostMap.jsx";
+import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -38,6 +47,8 @@ const PostDetailView = ({ post, open, onClose }) => {
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
     const [showAiInsights, setShowAiInsights] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [locationModal, setLocationModal] = useState(false);
+    const [showMapInModal, setShowMapInModal] = useState(true);
     
     const currentUser = useAuthStore((state) => state.user);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
@@ -52,6 +63,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         type,
         files,
         year,
+        location,
         createdAt,
     } = post;
 
@@ -317,6 +329,20 @@ const PostDetailView = ({ post, open, onClose }) => {
                                     {bookmarked ? <Bookmark className="h-5 w-5 text-blue-600 fill-blue-600" /> : <Bookmark className="h-5 w-5" />}
                                 </Button>
                                 <span className="text-sm">{bookmarksCount}</span>
+
+                                {location && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => {
+                                            setLocationModal(true);
+                                            setShowMapInModal(true);
+                                        }}
+                                        className="h-8 w-8"
+                                    >
+                                        <MapPin className="h-5 w-5" />
+                                    </Button>
+                                )}
                             </div>
 
                             <Separator className="my-4" />
@@ -403,6 +429,44 @@ const PostDetailView = ({ post, open, onClose }) => {
                     </div> {/* End of right panel */}
                 </div>
             </DialogContent>
+
+            <LocationDialog open={locationModal} onOpenChange={setLocationModal}>
+                <LocationDialogContent className="max-w-md py-7">
+                    <LocationDialogHeader className="flex flex-row justify-between items-center mb-4">
+                        <LocationDialogTitle>{showMapInModal ? 'Location Map' : 'Street View'}</LocationDialogTitle>
+                        {location && (
+                            <div className="flex gap-2">
+                                <Button
+                                    variant={showMapInModal ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setShowMapInModal(true)}
+                                >
+                                    Map
+                                </Button>
+                                <Button
+                                    variant={!showMapInModal ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setShowMapInModal(false)}
+                                >
+                                    Street View
+                                </Button>
+                            </div>
+                        )}
+                    </LocationDialogHeader>
+
+                    {location ? (
+                        <>
+                            {showMapInModal ? (
+                                <PostMap center={{ lat: location._latitude, lng: location._longitude }} />
+                            ) : (
+                                <StreetViewDisplay coords={post.location}/>
+                            )}
+                        </>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">Location data not available for this post.</p>
+                    )}
+                </LocationDialogContent>
+            </LocationDialog>
         </Dialog>
     );
 };
