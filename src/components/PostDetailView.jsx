@@ -4,11 +4,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
     Heart,
     Bookmark,
     Send,
     X,
+    Sparkles,
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -34,6 +36,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
     const [commentError, setCommentError] = useState(null);
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
+    const [showAiInsights, setShowAiInsights] = useState(false);
     
     const currentUser = useAuthStore((state) => state.user);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
@@ -173,6 +176,101 @@ const PostDetailView = ({ post, open, onClose }) => {
                             <p className="text-sm mb-4 whitespace-pre-wrap">
                                 {description}
                             </p>
+
+                            {/* AI Insights Panel */}
+                            {post.AiMetadata && (
+                                <div className="mb-4">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowAiInsights(!showAiInsights)}
+                                        className={`mb-3 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600'}`}
+                                    >
+                                        <Sparkles className="h-4 w-4 mr-2" />
+                                        AI Analysis
+                                    </Button>
+
+                                    {showAiInsights && (
+                                        <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                                            <div className="flex items-center gap-2 mb-3 opacity-80">
+                                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
+                                                    AI Analysis
+                                                </span>
+                                            </div>
+
+                                            {post.AiMetadata.description && (
+                                                <div className="mb-4">
+                                                    <div className="text-xs text-muted-foreground font-medium mb-2 opacity-80">
+                                                        Historical Analysis
+                                                    </div>
+                                                    <p className="text-sm text-foreground leading-relaxed">
+                                                        {post.AiMetadata.description}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                                                        People Identified
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {post.AiMetadata.people_identified.map((person, index) => (
+                                                            <Badge
+                                                                key={index}
+                                                                variant="outline"
+                                                                className="text-xs h-5 border-blue-300 text-blue-600"
+                                                            >
+                                                                {person}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                                                        AI-Detected Location
+                                                    </p>
+                                                    <div className="flex items-center gap-2">
+                                                        {post.AiMetadata?.location ? (
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {post.AiMetadata.location
+                                                                    .split(',')
+                                                                    .map(loc => loc.trim())
+                                                                    .filter(Boolean)
+                                                                    .map((loc, i) => (
+                                                                        <Badge key={i} variant="outline" className="text-xs">
+                                                                            {loc}
+                                                                        </Badge>
+                                                                    ))}
+                                                            </div>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                                                        Estimated Period
+                                                    </p>
+                                                    <p className="text-xs text-foreground">
+                                                        {post.AiMetadata.date_estimate}
+                                                        {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
+                                                            <span className="text-muted-foreground ml-1">
+                                                                ({post.AiMetadata.date_confidence})
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Action Buttons */}
                             <div className="flex items-center gap-1 mb-4">
