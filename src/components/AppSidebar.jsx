@@ -132,6 +132,7 @@ export function AppSidebar() {
     ]
 
     return (
+        <>
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 <div className="px-2">
@@ -208,8 +209,8 @@ export function AppSidebar() {
                                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
-                                        <AvatarImage 
-                                            src={currentUser?.photoURL} 
+                                        <AvatarImage
+                                            src={currentUser?.photoURL}
                                             alt={currentUser?.displayName || currentUser?.email}
                                         />
                                         <AvatarFallback className="rounded-lg">
@@ -244,8 +245,8 @@ export function AppSidebar() {
                                     Switch to {theme === "dark" ? "light" : "dark"} mode
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem 
-                                    onClick={confirmLogout} 
+                                <DropdownMenuItem
+                                    onClick={confirmLogout}
                                     disabled={loading}
                                     className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                                 >
@@ -261,9 +262,11 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
+            </Sidebar>
 
+            {/* Logout confirmation dialog - outside sidebar for proper z-index */}
             <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
-                <AlertDialogContent>
+                <AlertDialogContent className="z-[9999]">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -281,6 +284,6 @@ export function AppSidebar() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </Sidebar>
+        </>
     )
 }
