@@ -318,19 +318,11 @@ function PostCard({ post }) {
 
                             {post.AiMetadata.description && (
                                 <div className="mb-4">
-                                    <p className="text-sm italic text-muted-foreground leading-relaxed">
-                                        "{post.AiMetadata.description}"
-                                    </p>
-                                </div>
-                            )}
-
-                            {post.AiMetadata.cultural_context && (
-                                <div className="mb-3">
-                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                        Cultural Context
-                                    </p>
-                                    <p className="text-xs text-foreground">
-                                        {post.AiMetadata.cultural_context}
+                                    <div className="text-xs text-muted-foreground font-medium mb-2 opacity-80">
+                                        Historical Analysis
+                                    </div>
+                                    <p className="text-sm text-foreground leading-relaxed">
+                                        {post.AiMetadata.description}
                                     </p>
                                 </div>
                             )}

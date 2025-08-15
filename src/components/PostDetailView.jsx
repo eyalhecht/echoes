@@ -4,11 +4,29 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import {
+    Dialog as LocationDialog,
+    DialogContent as LocationDialogContent,
+    DialogHeader as LocationDialogHeader,
+    DialogTitle as LocationDialogTitle,
+} from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
     Heart,
     Bookmark,
     Send,
     X,
+    Sparkles,
+    MapPin,
+    MessageCircle,
+    MoreHorizontal,
+    Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -16,6 +34,8 @@ import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import useUiStore from '../stores/useUiStore.js';
 import {formatFirebaseTimestamp} from "./utils.js";
+import PostMap from "./PostMap.jsx";
+import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -34,10 +54,15 @@ const PostDetailView = ({ post, open, onClose }) => {
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
     const [commentError, setCommentError] = useState(null);
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
+    const [showAiInsights, setShowAiInsights] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [locationModal, setLocationModal] = useState(false);
+    const [showMapInModal, setShowMapInModal] = useState(true);
     
     const currentUser = useAuthStore((state) => state.user);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+    const deletePost = useUiStore(state => state.deletePost);
 
     if (!post) return null;
 
@@ -47,7 +72,11 @@ const PostDetailView = ({ post, open, onClose }) => {
         description,
         type,
         files,
+        year,
+        location,
         createdAt,
+        commentsCount,
+        userId,
     } = post;
 
     const fetchComments = useCallback(async () => {
@@ -116,6 +145,16 @@ const PostDetailView = ({ post, open, onClose }) => {
         handleAddComment();
     };
 
+    const formatYear = (yearData) => {
+        if (!yearData) return null;
+        return yearData[0];
+    };
+
+    const handleDeleteClick = async () => {
+        await deletePost(post.id);
+        onClose();
+    };
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent
@@ -134,21 +173,38 @@ const PostDetailView = ({ post, open, onClose }) => {
 
                 <div className="flex flex-col md:flex-row h-full w-full relative">
                     {files && files[0] && (
-                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1">
-                            {type === 'photo' && (
-                                <img
-                                    src={files[0]}
-                                    alt="Post media"
-                                    className="max-h-full max-w-full w-auto h-auto object-contain"
-                                />
-                            )}
-                            {type === 'video' && (
-                                <video
-                                    controls
-                                    src={files[0]}
-                                    className="max-h-full max-w-full w-auto h-auto"
-                                />
-                            )}
+                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1 relative">
+                            {type === 'photo' || type === 'document' || type === 'item' ? (
+                                <div className="relative max-h-full max-w-full">
+                                    {formatYear(year) && imageLoaded && (
+                                        <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
+                                            {formatYear(year)}
+                                        </div>
+                                    )}
+                                    <img
+                                        src={files[0]}
+                                        alt="Post media"
+                                        className="max-h-full max-w-full w-auto h-auto object-contain"
+                                        onLoad={() => setImageLoaded(true)}
+                                        onError={() => setImageLoaded(false)}
+                                    />
+                                </div>
+                            ) : type === 'video' ? (
+                                <div className="relative max-h-full max-w-full">
+                                    {year && imageLoaded && (
+                                        <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20 transition-opacity duration-300 animate-in fade-in-0">
+                                            {formatYear(year)}
+                                        </div>
+                                    )}
+                                    <video
+                                        controls
+                                        src={files[0]}
+                                        className="max-h-full max-w-full w-auto h-auto"
+                                        onLoadedData={() => setImageLoaded(true)}
+                                        onError={() => setImageLoaded(false)}
+                                    />
+                                </div>
+                            ) : null}
                         </div>
                     )}
 
@@ -160,41 +216,183 @@ const PostDetailView = ({ post, open, onClose }) => {
                                     <AvatarImage src={userProfilePicUrl || ''} />
                                     <AvatarFallback>{userDisplayName?.charAt(0) || 'U'}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <p className="text-base font-semibold">
+                                <div className="flex-1">
+                                    <button
+                                        onClick={() => handleNameClick(userId)}
+                                        className="text-base font-semibold hover:underline text-left"
+                                    >
                                         {userDisplayName}
-                                    </p>
+                                    </button>
                                     <p className="text-xs text-muted-foreground">
                                         {formatFirebaseTimestamp(createdAt)}
                                     </p>
                                 </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    {currentUser?.uid && userId === currentUser.uid && (
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={handleDeleteClick}>
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Delete Post
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    )}
+                                </DropdownMenu>
                             </div>
 
                             <p className="text-sm mb-4 whitespace-pre-wrap">
                                 {description}
                             </p>
 
+                            {/* AI Insights Panel */}
+                            {post.AiMetadata && (
+                                <div className="mb-4">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowAiInsights(!showAiInsights)}
+                                        className={`mb-3 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600'}`}
+                                    >
+                                        <Sparkles className="h-4 w-4 mr-2" />
+                                        AI Analysis
+                                    </Button>
+
+                                    {showAiInsights && (
+                                        <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                                            <div className="flex items-center gap-2 mb-3 opacity-80">
+                                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
+                                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
+                                                    AI Analysis
+                                                </span>
+                                            </div>
+
+                                            {post.AiMetadata.description && (
+                                                <div className="mb-4">
+                                                    <div className="text-xs text-muted-foreground font-medium mb-2 opacity-80">
+                                                        Historical Analysis
+                                                    </div>
+                                                    <p className="text-sm text-foreground leading-relaxed">
+                                                        {post.AiMetadata.description}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                                                        People Identified
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {post.AiMetadata.people_identified.map((person, index) => (
+                                                            <Badge
+                                                                key={index}
+                                                                variant="outline"
+                                                                className="text-xs h-5 border-blue-300 text-blue-600"
+                                                            >
+                                                                {person}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
+                                                <div className="mb-3">
+                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                                                        AI-Detected Location
+                                                    </p>
+                                                    <div className="flex items-center gap-2">
+                                                        {post.AiMetadata?.location ? (
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {post.AiMetadata.location
+                                                                    .split(',')
+                                                                    .map(loc => loc.trim())
+                                                                    .filter(Boolean)
+                                                                    .map((loc, i) => (
+                                                                        <Badge key={i} variant="outline" className="text-xs">
+                                                                            {loc}
+                                                                        </Badge>
+                                                                    ))}
+                                                            </div>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
+                                                <div>
+                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                                                        Estimated Period
+                                                    </p>
+                                                    <p className="text-xs text-foreground">
+                                                        {post.AiMetadata.date_estimate}
+                                                        {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
+                                                            <span className="text-muted-foreground ml-1">
+                                                                ({post.AiMetadata.date_confidence})
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Action Buttons */}
                             <div className="flex items-center gap-1 mb-4">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={handleLikeToggle}
-                                    disabled={isLikeUpdating}
-                                >
-                                    {liked ? <Heart className="h-5 w-5 text-red-500 fill-red-500" /> : <Heart className="h-5 w-5" />}
-                                </Button>
-                                <span className="text-sm">{likesCount}</span>
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleLikeToggle}
+                                        disabled={isLikeUpdating}
+                                        className="h-8 w-8"
+                                    >
+                                        <Heart className={`h-5 w-5 ${liked ? 'text-red-500 fill-current' : ''}`} />
+                                    </Button>
+                                    <span className="text-sm">{likesCount}</span>
+                                </div>
 
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={handleBookmarkToggle}
-                                    disabled={isBookmarkUpdating}
-                                >
-                                    {bookmarked ? <Bookmark className="h-5 w-5 text-blue-600 fill-blue-600" /> : <Bookmark className="h-5 w-5" />}
-                                </Button>
-                                <span className="text-sm">{bookmarksCount}</span>
+                                <div className="flex items-center gap-1">
+                                    <div className="h-8 w-8 flex items-center justify-center">
+                                        <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                    <span className="text-sm">{commentsCount}</span>
+                                </div>
+
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleBookmarkToggle}
+                                        disabled={isBookmarkUpdating}
+                                        className="h-8 w-8"
+                                    >
+                                        <Bookmark className={`h-5 w-5 ${bookmarked ? 'text-blue-600 fill-current' : ''}`} />
+                                    </Button>
+                                    <span className="text-sm">{bookmarksCount}</span>
+                                </div>
+
+                                {location && (
+                                    <div className="flex items-center gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => {
+                                                setLocationModal(true);
+                                                setShowMapInModal(true);
+                                            }}
+                                            className="h-8 w-8"
+                                        >
+                                            <MapPin className="h-5 w-5" />
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
 
                             <Separator className="my-4" />
@@ -281,6 +479,44 @@ const PostDetailView = ({ post, open, onClose }) => {
                     </div> {/* End of right panel */}
                 </div>
             </DialogContent>
+
+            <LocationDialog open={locationModal} onOpenChange={setLocationModal}>
+                <LocationDialogContent className="max-w-md py-7">
+                    <LocationDialogHeader className="flex flex-row justify-between items-center mb-4">
+                        <LocationDialogTitle>{showMapInModal ? 'Location Map' : 'Street View'}</LocationDialogTitle>
+                        {location && (
+                            <div className="flex gap-2">
+                                <Button
+                                    variant={showMapInModal ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setShowMapInModal(true)}
+                                >
+                                    Map
+                                </Button>
+                                <Button
+                                    variant={!showMapInModal ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setShowMapInModal(false)}
+                                >
+                                    Street View
+                                </Button>
+                            </div>
+                        )}
+                    </LocationDialogHeader>
+
+                    {location ? (
+                        <>
+                            {showMapInModal ? (
+                                <PostMap center={{ lat: location._latitude, lng: location._longitude }} />
+                            ) : (
+                                <StreetViewDisplay coords={post.location}/>
+                            )}
+                        </>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">Location data not available for this post.</p>
+                    )}
+                </LocationDialogContent>
+            </LocationDialog>
         </Dialog>
     );
 };
