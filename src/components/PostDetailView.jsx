@@ -37,6 +37,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     const [commentError, setCommentError] = useState(null);
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
     const [showAiInsights, setShowAiInsights] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
     
     const currentUser = useAuthStore((state) => state.user);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
@@ -50,6 +51,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         description,
         type,
         files,
+        year,
         createdAt,
     } = post;
 
@@ -119,6 +121,11 @@ const PostDetailView = ({ post, open, onClose }) => {
         handleAddComment();
     };
 
+    const formatYear = (yearData) => {
+        if (!yearData) return null;
+        return yearData[0];
+    };
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent
@@ -137,21 +144,38 @@ const PostDetailView = ({ post, open, onClose }) => {
 
                 <div className="flex flex-col md:flex-row h-full w-full relative">
                     {files && files[0] && (
-                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1">
-                            {type === 'photo' && (
-                                <img
-                                    src={files[0]}
-                                    alt="Post media"
-                                    className="max-h-full max-w-full w-auto h-auto object-contain"
-                                />
-                            )}
-                            {type === 'video' && (
-                                <video
-                                    controls
-                                    src={files[0]}
-                                    className="max-h-full max-w-full w-auto h-auto"
-                                />
-                            )}
+                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1 relative">
+                            {type === 'photo' || type === 'document' || type === 'item' ? (
+                                <div className="relative max-h-full max-w-full">
+                                    {formatYear(year) && imageLoaded && (
+                                        <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
+                                            {formatYear(year)}
+                                        </div>
+                                    )}
+                                    <img
+                                        src={files[0]}
+                                        alt="Post media"
+                                        className="max-h-full max-w-full w-auto h-auto object-contain"
+                                        onLoad={() => setImageLoaded(true)}
+                                        onError={() => setImageLoaded(false)}
+                                    />
+                                </div>
+                            ) : type === 'video' ? (
+                                <div className="relative max-h-full max-w-full">
+                                    {year && imageLoaded && (
+                                        <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20 transition-opacity duration-300 animate-in fade-in-0">
+                                            {formatYear(year)}
+                                        </div>
+                                    )}
+                                    <video
+                                        controls
+                                        src={files[0]}
+                                        className="max-h-full max-w-full w-auto h-auto"
+                                        onLoadedData={() => setImageLoaded(true)}
+                                        onError={() => setImageLoaded(false)}
+                                    />
+                                </div>
+                            ) : null}
                         </div>
                     )}
 
