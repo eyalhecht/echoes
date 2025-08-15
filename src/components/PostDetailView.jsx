@@ -17,7 +17,8 @@ import {
     Send,
     X,
     Sparkles,
-    MapPin
+    MapPin,
+    MessageCircle,
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -65,6 +66,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         year,
         location,
         createdAt,
+        commentsCount,
     } = post;
 
     const fetchComments = useCallback(async () => {
@@ -319,6 +321,11 @@ const PostDetailView = ({ post, open, onClose }) => {
                                     {liked ? <Heart className="h-5 w-5 text-red-500 fill-red-500" /> : <Heart className="h-5 w-5" />}
                                 </Button>
                                 <span className="text-sm">{likesCount}</span>
+
+                                <div className="flex items-center ">
+                                    <MessageCircle className="h-5 w-5 " />
+                                    <span className="text-sm">{commentsCount}</span>
+                                </div>
 
                                 <Button
                                     variant="ghost"
