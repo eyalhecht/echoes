@@ -19,6 +19,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
     Home,
@@ -37,6 +47,7 @@ import { useNavigate } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
 import { useTheme } from "@/components/theme-provider"
+import { useState } from "react"
 
 export function AppSidebar() {
     const navigate = useNavigate()
@@ -48,6 +59,7 @@ export function AppSidebar() {
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView)
     const setExploreQuery = useUiStore((state) => state.setExploreQuery)
     const { open, isMobile, setOpenMobile } = useSidebar()
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
     const handleLogout = async () => {
         try {
@@ -56,6 +68,10 @@ export function AppSidebar() {
         } catch (err) {
             console.error("Logout component caught error:", err)
         }
+    }
+
+    const confirmLogout = () => {
+        setShowLogoutConfirm(true)
     }
 
     const getUserInitials = (user) => {
@@ -229,7 +245,7 @@ export function AppSidebar() {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem 
-                                    onClick={handleLogout} 
+                                    onClick={confirmLogout} 
                                     disabled={loading}
                                     className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                                 >
@@ -245,6 +261,26 @@ export function AppSidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
+
+            <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            You will be signed out of your account and redirected to the login page.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                            onClick={handleLogout}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                        >
+                            Log out
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Sidebar>
     )
 }
