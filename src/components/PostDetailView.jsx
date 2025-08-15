@@ -12,6 +12,12 @@ import {
     DialogTitle as LocationDialogTitle,
 } from "@/components/ui/dialog";
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
     Heart,
     Bookmark,
     Send,
@@ -19,6 +25,8 @@ import {
     Sparkles,
     MapPin,
     MessageCircle,
+    MoreHorizontal,
+    Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
@@ -54,6 +62,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     const currentUser = useAuthStore((state) => state.user);
     const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
     const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
+    const deletePost = useUiStore(state => state.deletePost);
 
     if (!post) return null;
 
@@ -67,6 +76,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         location,
         createdAt,
         commentsCount,
+        userId,
     } = post;
 
     const fetchComments = useCallback(async () => {
@@ -140,6 +150,11 @@ const PostDetailView = ({ post, open, onClose }) => {
         return yearData[0];
     };
 
+    const handleDeleteClick = async () => {
+        await deletePost(post.id);
+        onClose();
+    };
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent
@@ -201,14 +216,32 @@ const PostDetailView = ({ post, open, onClose }) => {
                                     <AvatarImage src={userProfilePicUrl || ''} />
                                     <AvatarFallback>{userDisplayName?.charAt(0) || 'U'}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <p className="text-base font-semibold">
+                                <div className="flex-1">
+                                    <button
+                                        onClick={() => handleNameClick(userId)}
+                                        className="text-base font-semibold hover:underline text-left"
+                                    >
                                         {userDisplayName}
-                                    </p>
+                                    </button>
                                     <p className="text-xs text-muted-foreground">
                                         {formatFirebaseTimestamp(createdAt)}
                                     </p>
                                 </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    {currentUser?.uid && userId === currentUser.uid && (
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={handleDeleteClick}>
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Delete Post
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    )}
+                                </DropdownMenu>
                             </div>
 
                             <p className="text-sm mb-4 whitespace-pre-wrap">
