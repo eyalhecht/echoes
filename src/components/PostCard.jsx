@@ -21,6 +21,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
     Heart,
     MessageCircle,
     Bookmark,
@@ -38,6 +44,7 @@ import useUiStore from "../stores/useUiStore.js";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
+import AiBadge from "@/components/AiBadge.jsx";
 
 function PostCard({ post }) {
     const {
@@ -230,6 +237,7 @@ function PostCard({ post }) {
 
     return (
         <>
+            <TooltipProvider>
             <Card className="w-[360px] md:w-[500px] rounded-lg shadow-lg">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <Avatar className="h-10 w-10">
@@ -248,11 +256,18 @@ function PostCard({ post }) {
                         </p>
                     </div>
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>More options</p>
+                            </TooltipContent>
+                        </Tooltip>
                         {currentUser?.uid && userId === currentUser.uid && (
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={handleDeleteClick}>
@@ -278,20 +293,19 @@ function PostCard({ post }) {
                 </div>
 
                 <CardContent className="pt-4">
+
                     <div className="flex items-start gap-2 mb-2">
                         <p className="text-sm flex-1 whitespace-pre-wrap">
                             {getDisplayedText()}
                         </p>
 
                         {post.AiMetadata && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setShowAiInsights(!showAiInsights)}
-                                className={`p-1 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600 hover:scale-110'}`}
-                            >
-                                <Sparkles className="h-5 w-5" />
-                            </Button>
+                            <div className="mb-3">
+                                <AiBadge
+                                    onClick={() => setShowAiInsights(!showAiInsights)}
+                                    className="mb-2"
+                                />
+                            </div>
                         )}
                     </div>
 
@@ -353,19 +367,44 @@ function PostCard({ post }) {
                                     </p>
                                     <div className="flex items-center gap-2">
                                         <MapPin className="h-3.5 w-3.5 text-blue-600" />
-                                        {post.AiMetadata?.location ? (
-                                            <div className="flex flex-wrap gap-1">
-                                                {post.AiMetadata.location
-                                                    .split(',')
-                                                    .map(loc => loc.trim())
-                                                    .filter(Boolean)
-                                                    .map((loc, i) => (
-                                                        <Badge key={i} variant="outline" className="text-xs">
-                                                            {loc}
-                                                        </Badge>
-                                                    ))}
-                                            </div>
-                                        ) : null}
+                                        {(() => {
+                                            const location = post.AiMetadata.location;
+                                            
+                                            if (typeof location === 'string') {
+                                                // Handle string locations (comma-separated)
+                                                return (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {location
+                                                            .split(',')
+                                                            .map(loc => loc.trim())
+                                                            .filter(Boolean)
+                                                            .map((loc, i) => (
+                                                                <Badge key={i} variant="outline" className="text-xs">
+                                                                    {loc}
+                                                                </Badge>
+                                                            ))}
+                                                    </div>
+                                                );
+                                            } else if (typeof location === 'object' && location !== null) {
+                                                // Handle object locations
+                                                return (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {Object.entries(location).map(([key, value], i) => (
+                                                            <Badge key={i} variant="outline" className="text-xs">
+                                                                {String(value)}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            } else {
+                                                // Handle other types
+                                                return (
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {String(location)}
+                                                    </Badge>
+                                                );
+                                            }
+                                        })()}
                                     </div>
                                 </div>
                             )}
@@ -391,55 +430,83 @@ function PostCard({ post }) {
                     {/* Action Buttons */}
                     <div className="pb-2 flex items-center gap-4">
                         <div className="flex items-center gap-1">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleLikeToggle}
-                                className={`h-8 w-8 ${liked ? 'text-red-500' : ''}`}
-                                disabled={isLikeUpdating}
-                            >
-                                <Heart className={`h-5 w-5 ${liked ? 'fill-current' : ''}`} />
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleLikeToggle}
+                                        className={`h-8 w-8 ${liked ? 'text-red-500' : ''}`}
+                                        disabled={isLikeUpdating}
+                                    >
+                                        <Heart className={`h-5 w-5 ${liked ? 'fill-current' : ''}`} />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{liked ? 'Unlike' : 'Like'}</p>
+                                </TooltipContent>
+                            </Tooltip>
                             <span className="text-sm">{likesCount}</span>
                         </div>
 
                         <div className="flex items-center gap-1">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleToggleComments}
-                                className="h-8 w-8"
-                            >
-                                <MessageCircle className="h-5 w-5" />
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleToggleComments}
+                                        className="h-8 w-8"
+                                    >
+                                        <MessageCircle className="h-5 w-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{showComments ? 'Hide comments' : 'Show comments'}</p>
+                                </TooltipContent>
+                            </Tooltip>
                             <span className="text-sm">{actualCommentsCount}</span>
                         </div>
 
                         <div className="flex items-center gap-1">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleBookmarkToggle}
-                                className={`h-8 w-8 ${bookmarked ? 'text-blue-600' : ''}`}
-                                disabled={isBookmarkUpdating}
-                            >
-                                <Bookmark className={`h-5 w-5 ${bookmarked ? 'fill-current' : ''}`} />
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleBookmarkToggle}
+                                        className={`h-8 w-8 ${bookmarked ? 'text-blue-600' : ''}`}
+                                        disabled={isBookmarkUpdating}
+                                    >
+                                        <Bookmark className={`h-5 w-5 ${bookmarked ? 'fill-current' : ''}`} />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{bookmarked ? 'Remove bookmark' : 'Bookmark'}</p>
+                                </TooltipContent>
+                            </Tooltip>
                             <span className="text-sm">{bookmarksCount}</span>
                         </div>
 
                         {location && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                    setLocationModal(true); // Open the unified location modal
-                                    setShowMapInModal(true); // Default to showing map
-                                }}
-                                className="h-8 w-8"
-                            >
-                                <MapPin className="h-5 w-5" /> {/* Icon to open the combined modal */}
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => {
+                                            setLocationModal(true); // Open the unified location modal
+                                            setShowMapInModal(true); // Default to showing map
+                                        }}
+                                        className="h-8 w-8"
+                                    >
+                                        <MapPin className="h-5 w-5" /> {/* Icon to open the combined modal */}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>View location</p>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
                     </div>
 
@@ -555,6 +622,7 @@ function PostCard({ post }) {
                     onClose={() => setDetailViewOpen(false)}
                 />
             )}
+            </TooltipProvider>
         </>
     );
 }
