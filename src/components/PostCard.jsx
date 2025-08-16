@@ -38,6 +38,7 @@ import useUiStore from "../stores/useUiStore.js";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
+import AiBadge from "@/components/AiBadge.jsx";
 
 function PostCard({ post }) {
     const {
@@ -278,20 +279,19 @@ function PostCard({ post }) {
                 </div>
 
                 <CardContent className="pt-4">
+
                     <div className="flex items-start gap-2 mb-2">
                         <p className="text-sm flex-1 whitespace-pre-wrap">
                             {getDisplayedText()}
                         </p>
 
                         {post.AiMetadata && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setShowAiInsights(!showAiInsights)}
-                                className={`p-1 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600 hover:scale-110'}`}
-                            >
-                                <Sparkles className="h-5 w-5" />
-                            </Button>
+                            <div className="mb-3">
+                                <AiBadge
+                                    onClick={() => setShowAiInsights(!showAiInsights)}
+                                    className="mb-2"
+                                />
+                            </div>
                         )}
                     </div>
 
