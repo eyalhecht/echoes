@@ -173,9 +173,9 @@ const PostDetailView = ({ post, open, onClose }) => {
 
                 <div className="flex flex-col md:flex-row h-full w-full relative">
                     {files && files[0] && (
-                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1 relative">
+                        <div className="flex-shrink-0 bg-black flex justify-center items-center rounded h-1/2 md:h-full md:flex-1 relative overflow-hidden">
                             {type === 'photo' || type === 'document' || type === 'item' ? (
-                                <div className="relative max-h-full max-w-full">
+                                <div className="relative w-full h-full flex items-center justify-center">
                                     {formatYear(year) && imageLoaded && (
                                         <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
                                             {formatYear(year)}
@@ -190,7 +190,7 @@ const PostDetailView = ({ post, open, onClose }) => {
                                     />
                                 </div>
                             ) : type === 'video' ? (
-                                <div className="relative max-h-full max-w-full">
+                                <div className="relative w-full h-full flex items-center justify-center">
                                     {year && imageLoaded && (
                                         <div className="absolute bottom-12 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold backdrop-blur border border-white/20 transition-opacity duration-300 animate-in fade-in-0">
                                             {formatYear(year)}
