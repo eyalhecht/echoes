@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { callApiGateway } from "../firebaseConfig.js";
 import useUiStore from "../stores/useUiStore.js";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
+import TrendingContent from "./TrendingContent.jsx";
 
 export function Explore() {
     const isMobile = useIsMobile();
@@ -117,28 +118,9 @@ export function Explore() {
             .slice(0, 2);
     };
 
-    // Empty state
+    // Empty state - show trending content
     if (!exploreQuery || exploreQuery.trim().length === 0) {
-        return (
-            <div className="flex-1 overflow-auto">
-                <div className="max-w-4xl mx-auto p-6">
-                    <div className="text-center py-12">
-                        <h2 className="text-2xl font-semibold mb-2">Explore Posts and People</h2>
-                        <p className="text-muted-foreground mb-6">
-                            Search above to discover posts and people
-                        </p>
-                        <div className="text-sm text-muted-foreground">
-                            <p>Try searching for:</p>
-                            <div className="mt-2 space-x-2">
-                                <span className="inline-block bg-muted px-2 py-1 rounded">vintage cars</span>
-                                <span className="inline-block bg-muted px-2 py-1 rounded">photography</span>
-                                <span className="inline-block bg-muted px-2 py-1 rounded">1980s</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <TrendingContent />;
     }
 
     return (
