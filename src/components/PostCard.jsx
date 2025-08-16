@@ -353,19 +353,44 @@ function PostCard({ post }) {
                                     </p>
                                     <div className="flex items-center gap-2">
                                         <MapPin className="h-3.5 w-3.5 text-blue-600" />
-                                        {post.AiMetadata?.location ? (
-                                            <div className="flex flex-wrap gap-1">
-                                                {post.AiMetadata.location
-                                                    .split(',')
-                                                    .map(loc => loc.trim())
-                                                    .filter(Boolean)
-                                                    .map((loc, i) => (
-                                                        <Badge key={i} variant="outline" className="text-xs">
-                                                            {loc}
-                                                        </Badge>
-                                                    ))}
-                                            </div>
-                                        ) : null}
+                                        {(() => {
+                                            const location = post.AiMetadata.location;
+                                            
+                                            if (typeof location === 'string') {
+                                                // Handle string locations (comma-separated)
+                                                return (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {location
+                                                            .split(',')
+                                                            .map(loc => loc.trim())
+                                                            .filter(Boolean)
+                                                            .map((loc, i) => (
+                                                                <Badge key={i} variant="outline" className="text-xs">
+                                                                    {loc}
+                                                                </Badge>
+                                                            ))}
+                                                    </div>
+                                                );
+                                            } else if (typeof location === 'object' && location !== null) {
+                                                // Handle object locations
+                                                return (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {Object.entries(location).map(([key, value], i) => (
+                                                            <Badge key={i} variant="outline" className="text-xs">
+                                                                {String(value)}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            } else {
+                                                // Handle other types
+                                                return (
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {String(location)}
+                                                    </Badge>
+                                                );
+                                            }
+                                        })()}
                                     </div>
                                 </div>
                             )}

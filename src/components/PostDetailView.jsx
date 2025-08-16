@@ -306,9 +306,14 @@ const PostDetailView = ({ post, open, onClose }) => {
                                                         AI-Detected Location
                                                     </p>
                                                     <div className="flex items-center gap-2">
-                                                        {post.AiMetadata?.location ? (
+                                                        {(() => {
+                                                            const location = post.AiMetadata.location;
+                                                            
+                                                            if (typeof location === 'string') {
+                                                                // Handle string locations (comma-separated)
+                                                                return (
                                                             <div className="flex flex-wrap gap-1">
-                                                                {post.AiMetadata.location
+                                                                {location
                                                                     .split(',')
                                                                     .map(loc => loc.trim())
                                                                     .filter(Boolean)
@@ -317,8 +322,28 @@ const PostDetailView = ({ post, open, onClose }) => {
                                                                             {loc}
                                                                         </Badge>
                                                                     ))}
-                                                            </div>
-                                                        ) : null}
+                                                                    </div>
+                                                                );
+                                                            } else if (typeof location === 'object' && location !== null) {
+                                                                // Handle object locations
+                                                                return (
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        {Object.entries(location).map(([key, value], i) => (
+                                                                            <Badge key={i} variant="outline" className="text-xs">
+                                                                                {String(value)}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                );
+                                                            } else {
+                                                                // Handle other types
+                                                                return (
+                                                                    <Badge variant="outline" className="text-xs">
+                                                                        {String(location)}
+                                                                    </Badge>
+                                                                );
+                                                            }
+                                                        })()}
                                                     </div>
                                                 </div>
                                             )}
