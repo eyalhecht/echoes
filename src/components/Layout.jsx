@@ -3,8 +3,18 @@ import { Outlet } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar.jsx";
 import { SearchBar } from "@/components/SearchBar.jsx";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function MainContent() {
+    const { theme, setTheme } = useTheme();
 
     return (
         <main className="flex-1">
@@ -15,7 +25,28 @@ function MainContent() {
                 <div className="flex-1 flex justify-center px-2 sm:px-4">
                     <SearchBar />
                 </div>
-                <div className="w-8 sm:w-32">
+                <div className="flex items-center justify-end">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                    className="h-8 w-8"
+                                >
+                                    {theme === "dark" ? (
+                                        <Sun className="h-4 w-4" />
+                                    ) : (
+                                        <Moon className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Switch to {theme === "dark" ? "light" : "dark"} mode</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </header>
 

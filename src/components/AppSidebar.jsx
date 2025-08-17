@@ -16,7 +16,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -45,14 +44,11 @@ import {
     LogOut,
     Loader2,
     Settings,
-    Moon,
-    Sun,
     Search
 } from "lucide-react"
 import { useNavigate, useLocation } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
-import { useTheme } from "@/components/theme-provider"
 import { useState } from "react"
 
 export function AppSidebar() {
@@ -60,7 +56,6 @@ export function AppSidebar() {
     const location = useLocation()
     const currentUser = useAuthStore(state => state.user)
     const { loading } = useAuthStore()
-    const { theme, setTheme } = useTheme()
     const setExploreQuery = useUiStore((state) => state.setExploreQuery)
     const { open, isMobile, setOpenMobile } = useSidebar()
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
@@ -255,17 +250,6 @@ export function AppSidebar() {
                                 align="end"
                                 sideOffset={4}
                             >
-                                <DropdownMenuItem onClick={() => {
-                                    setTheme(theme === "dark" ? "light" : "dark")
-                                }}>
-                                    {theme === "dark" ? (
-                                        <Sun className="mr-2 h-4 w-4" />
-                                    ) : (
-                                        <Moon className="mr-2 h-4 w-4" />
-                                    )}
-                                    Switch to {theme === "dark" ? "light" : "dark"} mode
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={confirmLogout}
                                     disabled={loading}
