@@ -48,11 +48,6 @@ export default function TrendingContent() {
         return (
             <div className="flex-1 overflow-auto">
                 <div className="max-w-4xl mx-auto p-4 md:p-6">
-                    <div className="flex items-center gap-2 mb-6">
-                        <TrendingUp className="h-6 w-6 text-primary" />
-                        <h1 className="text-xl md:text-2xl font-semibold">Trending Posts</h1>
-                    </div>
-                    
                     <div className="flex justify-center py-12">
                         <div className="flex items-center gap-2">
                             <Loader2 className="h-5 w-5 animate-spin" />
