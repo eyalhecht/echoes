@@ -6,13 +6,13 @@ import { callApiGateway } from "../firebaseConfig.js";
 import useUiStore from "../stores/useUiStore.js";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import TrendingContent from "./TrendingContent.jsx";
+import {useNavigate} from "react-router-dom";
 
 export function Explore() {
+    const navigate = useNavigate();
     const isMobile = useIsMobile();
     const exploreQuery = useUiStore((state) => state.exploreQuery);
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
-    
+
     const [users, setUsers] = useState([]);
     const [posts, setPosts] = useState([]);
     const [usersLoading, setUsersLoading] = useState(false);
@@ -98,8 +98,7 @@ export function Explore() {
     };
 
     const handleUserClick = (user) => {
-        setActiveSidebarItem('Profile');
-        setActiveProfileView(user.userId);
+        navigate(`/profile/${user.userId}`);
     };
 
     const handleLoadMorePosts = () => {

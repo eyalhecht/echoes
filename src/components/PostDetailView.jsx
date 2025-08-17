@@ -36,6 +36,7 @@ import useUiStore from '../stores/useUiStore.js';
 import {formatFirebaseTimestamp} from "./utils.js";
 import PostMap from "./PostMap.jsx";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
+import {useNavigate} from "react-router-dom";
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -49,6 +50,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         handleBookmarkToggle,
     } = usePostInteractions(post.id);
 
+    const navigate = useNavigate();
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
@@ -131,8 +133,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     };
 
     const handleNameClick = (userId) => {
-        setActiveSidebarItem('Profile');
-        setActiveProfileView(userId);
+        navigate(`/profile/${userId}`);
     };
 
     useEffect(() => {

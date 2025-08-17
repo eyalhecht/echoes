@@ -64,6 +64,7 @@ const Profile = () => {
                 }
             } catch (err) {
                 console.error(err);
+                navigate('/home');
             } finally {
                 setProfileLoading(false);
             }

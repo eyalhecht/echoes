@@ -8,14 +8,13 @@ import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fn
 import PostDetailView from "./PostDetailView";
 import useUiStore from "../stores/useUiStore";
 import { usePostInteractions } from "../hooks/usePostInteractions";
+import {useNavigate} from "react-router-dom";
 
 export default function MapPostCard({ post, isSelected, onCardClick }) {
+    const navigate = useNavigate();
     const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageHeight, setImageHeight] = useState(180);
     const [imageLoaded, setImageLoaded] = useState(false);
-
-    const setActiveSidebarItem = useUiStore((s) => s.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((s) => s.setActiveProfileView);
 
     const {
         liked,
@@ -60,8 +59,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
 
     const handleNameClick = (e) => {
         e.stopPropagation();
-        setActiveSidebarItem("Profile");
-        setActiveProfileView(userId);
+        navigate(`/profile/${userId}`);
     };
 
     return (

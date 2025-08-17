@@ -34,11 +34,11 @@ import { httpsCallable } from "firebase/functions";
 import { GeoPoint } from "firebase/firestore";
 import LocationPickerModal from './LocationPickerModal';
 import useUiStore from "@/stores/useUiStore.js";
+import {useNavigate} from "react-router-dom";
 
 const UploadPost = () => {
+    const navigate = useNavigate()
     const { toast } = useToast();
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    // Step management
     const [currentStep, setCurrentStep] = useState(1);
     const [justCompletedStep, setJustCompletedStep] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -281,7 +281,7 @@ const UploadPost = () => {
                 setSelectedYear('');
                 setCurrentStep(1);
                 setUploadSuccess(false);
-                setActiveSidebarItem("Home");
+                navigate('/home');
             }, 2000);
         } catch (err) {
             // Dismiss the uploading toast
