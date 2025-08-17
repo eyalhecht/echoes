@@ -23,7 +23,7 @@ const MapPostsView = () => {
     const cardRefs = useRef({});
 
     // Get global posts and post management functions
-    const { posts, updatePost, setPosts } = useUiStore();
+    const { posts, setPosts } = useUiStore();
 
     const mapContainerStyle = {
         width: '100%',
@@ -94,7 +94,6 @@ const MapPostsView = () => {
             console.log('Got posts:', normalizedPosts.length);
         } catch (err) {
             console.error('Error fetching posts:', err);
-            setError('Failed to load posts for this area');
         } finally {
             setLoading(false);
         }
@@ -175,9 +174,9 @@ const MapPostsView = () => {
                     }
                     fetchPosts(newCenter, radiusKm);
                 },
-                (error) => {
-                    console.error('Error getting location:', error);
-                    setError('Could not get your location');
+                (geolocationError) => {
+                    console.log('Error getting location:', geolocationError);
+                    fetchPosts(mapCenter, radiusKm);
                 }
             );
         }
@@ -185,7 +184,7 @@ const MapPostsView = () => {
 
     // Initial load
     useEffect(() => {
-        fetchPosts(mapCenter, radiusKm);
+        getCurrentLocation();
     }, []);
 
     return (

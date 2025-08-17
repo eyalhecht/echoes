@@ -45,8 +45,10 @@ import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import AiBadge from "@/components/AiBadge.jsx";
+import { useNavigate } from 'react-router-dom';
 
 function PostCard({ post }) {
+    const navigate = useNavigate();
     const {
         liked,
         likesCount,
@@ -63,8 +65,6 @@ function PostCard({ post }) {
     const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const deletePost = useUiStore(state => state.deletePost);
     const currentUser = useAuthStore((state) => state.user);
 
@@ -119,8 +119,7 @@ function PostCard({ post }) {
     };
 
     const handleNameClick = (userId) => {
-        setActiveSidebarItem('Profile')
-        setActiveProfileView(userId)
+        navigate(`/profile/${userId}`);
     };
 
     const handleDeleteClick = async () => {
@@ -321,11 +320,23 @@ function PostCard({ post }) {
                     )}
 
                     {/* AI Insights Panel */}
-                    {post.AiMetadata && showAiInsights && (
-                        <div className="mt-4 mb-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                            <div className="flex items-center gap-2 mb-3 opacity-80">
-                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
+                    {post.AiMetadata && (
+                        <div
+                            className={`
+                                mt-4 overflow-hidden
+                                transition-all duration-300 ease-in-out
+                                ${showAiInsights
+                                ? 'max-h-[800px] opacity-100'
+                                : 'max-h-0 opacity-0'
+                            }
+                            `}
+                        >
+                            <div
+                                className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800 transform transition-transform duration-300 ease-out">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3 opacity-80">
+                                        <Sparkles className="h-3.5 w-3.5 text-blue-600"/>
+                                        <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
                                     AI Analysis
                                 </span>
                             </div>
@@ -424,11 +435,13 @@ function PostCard({ post }) {
                                     </p>
                                 </div>
                             )}
+                                </div>
+                            </div>
                         </div>
                     )}
 
                     {/* Action Buttons */}
-                    <div className="pb-2 flex items-center gap-4">
+                    <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>

@@ -16,9 +16,14 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -39,24 +44,18 @@ import {
     LogOut,
     Loader2,
     Settings,
-    Moon,
-    Sun,
     Search
 } from "lucide-react"
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
-import { useTheme } from "@/components/theme-provider"
 import { useState } from "react"
 
 export function AppSidebar() {
     const navigate = useNavigate()
+    const location = useLocation()
     const currentUser = useAuthStore(state => state.user)
     const { loading } = useAuthStore()
-    const { theme, setTheme } = useTheme()
-    const activeSidebarItem = useUiStore((state) => state.activeSidebarItem)
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem)
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView)
     const setExploreQuery = useUiStore((state) => state.setExploreQuery)
     const { open, isMobile, setOpenMobile } = useSidebar()
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
@@ -90,15 +89,29 @@ export function AppSidebar() {
         return "U"
     }
 
+    const isActiveRoute = (routePath) => {
+        return location.pathname === routePath || location.pathname.startsWith(routePath + '/');
+    }
+
+    const handleNavigation = (path, callback) => {
+        if (callback) callback();
+        navigate(path);
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    }
+
     const items = [
         {
             name: 'Home',
             icon: Home,
-            callback: () => {}
+            path: '/home',
+            callback: null
         },
         {
             name: 'Explore',
             icon: Search,
+            path: '/explore',
             callback: () => {
                 setExploreQuery('')
             }
@@ -106,19 +119,20 @@ export function AppSidebar() {
         {
             name: 'Profile',
             icon: User,
-            callback: () => {
-                setActiveProfileView(currentUser.uid)
-            }
+            path: `/profile/${currentUser?.uid}`,
+            callback: null
         },
         {
             name: 'Map',
             icon: MapPin,
-            callback: () => {}
+            path: '/map',
+            callback: null
         },
         {
             name: 'Bookmarks',
             icon: Bookmark,
-            callback: () => {}
+            path: '/bookmarks',
+            callback: null
         },
     ]
 
@@ -126,16 +140,17 @@ export function AppSidebar() {
         {
             name: 'Upload',
             icon: Upload,
-            callback: () => {},
+            path: '/upload',
+            callback: null,
             isLoading: false
         },
     ]
 
     return (
-        <>
+        <TooltipProvider>
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <div className="px-2">
+                <div className={open ? "px-2" : "px-3"}>
                     <h2 className="text-lg font-semibold">{open ? "ECHOES" : "E"}</h2>
                 </div>
             </SidebarHeader>
@@ -146,19 +161,20 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.name}>
-                                    <SidebarMenuButton
-                                        onClick={() => {
-                                            item.callback()
-                                            setActiveSidebarItem(item.name)
-                                            if (isMobile) {
-                                                setOpenMobile(false)
-                                            }
-                                        }}
-                                        isActive={activeSidebarItem === item.name}
-                                    >
-                                        <item.icon />
-                                        <span>{item.name}</span>
-                                    </SidebarMenuButton>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <SidebarMenuButton
+                                                onClick={() => handleNavigation(item.path, item.callback)}
+                                                isActive={isActiveRoute(item.path)}
+                                            >
+                                                <item.icon />
+                                                <span>{item.name}</span>
+                                            </SidebarMenuButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className={open ? "hidden" : ""}>
+                                            <p>{item.name}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>
@@ -171,27 +187,27 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {actionItems.map((item) => (
                                 <SidebarMenuItem key={item.name}>
-                                    <SidebarMenuButton
-                                        onClick={() => {
-                                            item.callback()
-                                            if (item.name !== 'Logout') {
-                                                setActiveSidebarItem(item.name)
-                                                if (isMobile) {
-                                                    setOpenMobile(false)
-                                                }
-                                            }
-                                        }}
-                                        disabled={item.isLoading}
-                                    >
-                                        {item.isLoading ? (
-                                            <Loader2 className="animate-spin" />
-                                        ) : (
-                                            <item.icon />
-                                        )}
-                                        <span>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <SidebarMenuButton
+                                                onClick={() => handleNavigation(item.path, item.callback)}
+                                                disabled={item.isLoading}
+                                                isActive={isActiveRoute(item.path)}
+                                            >
+                                                {item.isLoading ? (
+                                                    <Loader2 className="animate-spin" />
+                                                ) : (
+                                                    <item.icon />
+                                                )}
+                                                <span>
                       {item.isLoading && item.name === 'Logout' ? 'Logging out...' : item.name}
                     </span>
-                                    </SidebarMenuButton>
+                                            </SidebarMenuButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className={open ? "hidden" : ""}>
+                                            <p>{item.isLoading && item.name === 'Logout' ? 'Logging out...' : item.name}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>
@@ -234,17 +250,6 @@ export function AppSidebar() {
                                 align="end"
                                 sideOffset={4}
                             >
-                                <DropdownMenuItem onClick={() => {
-                                    setTheme(theme === "dark" ? "light" : "dark")
-                                }}>
-                                    {theme === "dark" ? (
-                                        <Sun className="mr-2 h-4 w-4" />
-                                    ) : (
-                                        <Moon className="mr-2 h-4 w-4" />
-                                    )}
-                                    Switch to {theme === "dark" ? "light" : "dark"} mode
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     onClick={confirmLogout}
                                     disabled={loading}
@@ -284,6 +289,6 @@ export function AppSidebar() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </>
+        </TooltipProvider>
     )
 }

@@ -36,6 +36,8 @@ import useUiStore from '../stores/useUiStore.js';
 import {formatFirebaseTimestamp} from "./utils.js";
 import PostMap from "./PostMap.jsx";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
+import {useNavigate} from "react-router-dom";
+import AiBadge from "@/components/AiBadge.jsx";
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -49,6 +51,7 @@ const PostDetailView = ({ post, open, onClose }) => {
         handleBookmarkToggle,
     } = usePostInteractions(post.id);
 
+    const navigate = useNavigate();
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
@@ -131,8 +134,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     };
 
     const handleNameClick = (userId) => {
-        setActiveSidebarItem('Profile');
-        setActiveProfileView(userId);
+        navigate(`/profile/${userId}`);
     };
 
     useEffect(() => {
@@ -251,15 +253,10 @@ const PostDetailView = ({ post, open, onClose }) => {
                             {/* AI Insights Panel */}
                             {post.AiMetadata && (
                                 <div className="mb-4">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
+                                    <AiBadge
                                         onClick={() => setShowAiInsights(!showAiInsights)}
-                                        className={`mb-3 transition-all ${showAiInsights ? 'text-foreground' : 'text-blue-600'}`}
-                                    >
-                                        <Sparkles className="h-4 w-4 mr-2" />
-                                        AI Analysis
-                                    </Button>
+                                        className="mb-2"
+                                    />
 
                                     {showAiInsights && (
                                         <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">

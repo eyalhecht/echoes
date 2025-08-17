@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, UserPlus, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { callApiGateway } from "../firebaseConfig.js";
-import useUiStore from "../stores/useUiStore.js";
+import { useNavigate } from 'react-router-dom';
 
 const FollowersFollowingModal = ({ 
     open, 
@@ -22,15 +22,13 @@ const FollowersFollowingModal = ({
     listType, // 'followers' or 'following'
     initialCount = 0 
 }) => {
+    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState(null);
     const [hasMore, setHasMore] = useState(true);
     const [lastUserId, setLastUserId] = useState(null);
-    
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
 
     // Reset state when modal opens or listType changes
     useEffect(() => {
@@ -95,8 +93,7 @@ const FollowersFollowingModal = ({
     }, [loadUsers, hasMore, loadingMore, loading]);
 
     const handleUserClick = (clickedUserId) => {
-        setActiveProfileView(clickedUserId);
-        setActiveSidebarItem('Profile');
+        navigate(`/profile/${clickedUserId}`);
         onClose(); // Close the modal
     };
 

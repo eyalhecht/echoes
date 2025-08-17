@@ -9,9 +9,11 @@ import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import FollowersFollowingModal from "./FollowersFollowingModal.jsx"; // Import the new modal
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const Profile = ({ targetUserId }) => {
+const Profile = () => {
+    const { userId: targetUserId } = useParams(); // Get userId from URL params
+    const effectiveUserId = targetUserId || currentUser?.uid;
     const isMobile = useMediaQuery('(max-width: 768px)');
     const navigate = useNavigate();
     const currentUser = useAuthStore(state => state.user);
@@ -19,7 +21,7 @@ const Profile = ({ targetUserId }) => {
     const toggleFollow = async (userId, isFollowing) => {
         return await callApiGateway({
             action: isFollowing ? 'unfollowUser' : 'followUser',
-            payload: { targetUserId: targetUserId }
+            payload: { targetUserId: effectiveUserId }
         });
     }
 
@@ -38,12 +40,12 @@ const Profile = ({ targetUserId }) => {
     const [followersModalOpen, setFollowersModalOpen] = useState(false);
     const [followingModalOpen, setFollowingModalOpen] = useState(false);
 
-    const isCurrentUserProfile = currentUser?.uid === targetUserId;
+    const isCurrentUserProfile = currentUser?.uid === effectiveUserId;
 
     // --- Fetch Profile Data ---
     useEffect(() => {
         const loadProfile = async () => {
-            if (!targetUserId) {
+            if (!effectiveUserId) {
                 setProfileLoading(false);
                 return;
             }
@@ -53,7 +55,7 @@ const Profile = ({ targetUserId }) => {
                 const data = await callApiGateway({
                     action: 'getProfile',
                     payload: {
-                        profileUserId: targetUserId,
+                        profileUserId: effectiveUserId,
                     }
                 });
                 if (data) {
@@ -62,12 +64,13 @@ const Profile = ({ targetUserId }) => {
                 }
             } catch (err) {
                 console.error(err);
+                navigate('/home');
             } finally {
                 setProfileLoading(false);
             }
         };
         loadProfile();
-    }, [targetUserId]);
+    }, [effectiveUserId]);
 
     const loadMorePosts = useCallback(async (isInitial = false) => {
         if (!targetUserId) {
@@ -118,8 +121,8 @@ const Profile = ({ targetUserId }) => {
 
     // Load initial posts
     useEffect(() => {
-        if (targetUserId) {
-            // Reset states when targetUserId changes
+        if (effectiveUserId) {
+            // Reset states when effectiveUserId changes
             setUserPosts([]);
             setLastPostId(null);
             setHasMorePosts(true);
@@ -127,7 +130,7 @@ const Profile = ({ targetUserId }) => {
 
             loadMorePosts(true);
         }
-    }, [targetUserId]);
+    }, [effectiveUserId]);
 
     // Infinite scroll handler
     useEffect(() => {
@@ -350,7 +353,7 @@ const Profile = ({ targetUserId }) => {
             <FollowersFollowingModal
                 open={followersModalOpen}
                 onClose={() => setFollowersModalOpen(false)}
-                userId={targetUserId}
+                userId={effectiveUserId}
                 listType="followers"
                 initialCount={profileData?.followersCount || 0}
             />
@@ -358,7 +361,7 @@ const Profile = ({ targetUserId }) => {
             <FollowersFollowingModal
                 open={followingModalOpen}
                 onClose={() => setFollowingModalOpen(false)}
-                userId={targetUserId}
+                userId={effectiveUserId}
                 listType="following"
                 initialCount={profileData?.followingCount || 0}
             />
