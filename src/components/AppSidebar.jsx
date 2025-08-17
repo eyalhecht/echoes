@@ -20,6 +20,12 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -146,7 +152,7 @@ export function AppSidebar() {
     ]
 
     return (
-        <>
+        <TooltipProvider>
         <Sidebar collapsible="icon">
             <SidebarHeader>
                 <div className="px-2">
@@ -160,13 +166,20 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.name}>
-                                    <SidebarMenuButton
-                                        onClick={() => handleNavigation(item.path, item.callback)}
-                                        isActive={isActiveRoute(item.path)}
-                                    >
-                                        <item.icon />
-                                        <span>{item.name}</span>
-                                    </SidebarMenuButton>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <SidebarMenuButton
+                                                onClick={() => handleNavigation(item.path, item.callback)}
+                                                isActive={isActiveRoute(item.path)}
+                                            >
+                                                <item.icon />
+                                                <span>{item.name}</span>
+                                            </SidebarMenuButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className={open ? "hidden" : ""}>
+                                            <p>{item.name}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>
@@ -179,20 +192,27 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {actionItems.map((item) => (
                                 <SidebarMenuItem key={item.name}>
-                                    <SidebarMenuButton
-                                        onClick={() => handleNavigation(item.path, item.callback)}
-                                        disabled={item.isLoading}
-                                        isActive={isActiveRoute(item.path)}
-                                    >
-                                        {item.isLoading ? (
-                                            <Loader2 className="animate-spin" />
-                                        ) : (
-                                            <item.icon />
-                                        )}
-                                        <span>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <SidebarMenuButton
+                                                onClick={() => handleNavigation(item.path, item.callback)}
+                                                disabled={item.isLoading}
+                                                isActive={isActiveRoute(item.path)}
+                                            >
+                                                {item.isLoading ? (
+                                                    <Loader2 className="animate-spin" />
+                                                ) : (
+                                                    <item.icon />
+                                                )}
+                                                <span>
                       {item.isLoading && item.name === 'Logout' ? 'Logging out...' : item.name}
                     </span>
-                                    </SidebarMenuButton>
+                                            </SidebarMenuButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right" className={open ? "hidden" : ""}>
+                                            <p>{item.isLoading && item.name === 'Logout' ? 'Logging out...' : item.name}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>
@@ -285,6 +305,6 @@ export function AppSidebar() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </>
+        </TooltipProvider>
     )
 }
