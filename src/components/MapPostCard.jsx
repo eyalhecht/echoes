@@ -13,7 +13,7 @@ import {useNavigate} from "react-router-dom";
 export default function MapPostCard({ post, isSelected, onCardClick }) {
     const navigate = useNavigate();
     const [detailViewOpen, setDetailViewOpen] = useState(false);
-    const [imageHeight, setImageHeight] = useState(180);
+    const [imageHeight, setImageHeight] = useState(280);
     const [imageLoaded, setImageLoaded] = useState(false);
 
     const {
@@ -52,7 +52,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
         const aspect = img.naturalHeight / img.naturalWidth;
         const width = 220;
         let height = width * aspect;
-        height = Math.max(140, Math.min(height, 350));
+        height = Math.max(200, Math.min(height, 350));
         setImageHeight(height);
         setImageLoaded(true);
     };
@@ -71,7 +71,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                 }}
                 className={cn(
                     "overflow-hidden border rounded-xl transition hover:shadow-md cursor-pointer",
-                    isSelected && "ring-2 ring-primary"
+                    isSelected && "ring-4 ring-primary"
                 )}
             >
                 {/* Image */}
@@ -115,7 +115,6 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                 </div>
 
                 <CardContent className="p-3 space-y-3">
-                    {/* User */}
                     <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
                             <AvatarImage src={userProfilePicUrl} />
