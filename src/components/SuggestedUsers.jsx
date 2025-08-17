@@ -5,14 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
-import useUiStore from '../stores/useUiStore.js';
 import { SuggestedUsersSkeleton } from "@/components/SuggestedUsersSkeleton.jsx";
+import { useNavigate } from 'react-router-dom';
 
 const SuggestedUsers = () => {
+    const navigate = useNavigate();
     const isMobile = useMediaQuery('(max-width: 768px)'); // Using direct media query
     const currentUser = useAuthStore(state => state.user);
-    const setActiveProfileView = useUiStore(state => state.setActiveProfileView);
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
 
     const [suggestedUsers, setSuggestedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -78,8 +77,7 @@ const SuggestedUsers = () => {
     };
 
     const handleProfileClick = (userId) => {
-        setActiveSidebarItem('Profile')
-        setActiveProfileView(userId);
+        navigate(`/profile/${userId}`);
     };
 
     if (loading) {

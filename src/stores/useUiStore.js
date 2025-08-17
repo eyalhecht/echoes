@@ -2,10 +2,6 @@ import { create } from 'zustand';
 import { callApiGateway } from '../firebaseConfig';
 
 const useUiStore = create((set, get) => ({
-    activeSidebarItem: 'Home',
-    setActiveSidebarItem: (item) => set({ activeSidebarItem: item }),
-    activeProfileView: null,
-    setActiveProfileView: (item) => set({ activeProfileView: item }),
     exploreQuery: '',
     setExploreQuery: (query) => set({ exploreQuery: query }),
     posts: [],

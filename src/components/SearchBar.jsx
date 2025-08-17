@@ -7,8 +7,10 @@ import { callApiGateway } from "../firebaseConfig.js";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import useUiStore from "../stores/useUiStore.js";
+import { useNavigate } from 'react-router-dom';
 
 export function SearchBar() {
+    const navigate = useNavigate();
     const isMobile = useIsMobile();
 
     const [results, setResults] = useState({ users: [], posts: [] });
@@ -19,8 +21,6 @@ export function SearchBar() {
     const inputRef = useRef(null);
 
     // Use global state for query
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const exploreQuery = useUiStore((state) => state.exploreQuery);
     const setExploreQuery = useUiStore((state) => state.setExploreQuery);
 
@@ -97,7 +97,7 @@ export function SearchBar() {
 
     // Navigate to Explore with current query
     const handleExploreNavigation = () => {
-        setActiveSidebarItem('Explore');
+        navigate('/explore');
         setShowDropdown(false);
         if (isMobile) {
             setIsExpanded(false);
@@ -105,8 +105,7 @@ export function SearchBar() {
     };
 
     const handleUserClick = (user) => {
-        setActiveSidebarItem('Profile');
-        setActiveProfileView(user.userId);
+        navigate(`/profile/${user.userId}`);
         setShowDropdown(false);
         if (isMobile) {
             setIsExpanded(false);

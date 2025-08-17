@@ -45,8 +45,10 @@ import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import AiBadge from "@/components/AiBadge.jsx";
+import { useNavigate } from 'react-router-dom';
 
 function PostCard({ post }) {
+    const navigate = useNavigate();
     const {
         liked,
         likesCount,
@@ -63,8 +65,6 @@ function PostCard({ post }) {
     const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const deletePost = useUiStore(state => state.deletePost);
     const currentUser = useAuthStore((state) => state.user);
 
@@ -119,8 +119,7 @@ function PostCard({ post }) {
     };
 
     const handleNameClick = (userId) => {
-        setActiveSidebarItem('Profile')
-        setActiveProfileView(userId)
+        navigate(`/profile/${userId}`);
     };
 
     const handleDeleteClick = async () => {
