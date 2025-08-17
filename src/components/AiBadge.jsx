@@ -18,7 +18,7 @@ function AiBadge({ onClick, className = "" }) {
             disabled={!onClick}
         >
             <Sparkles className="h-3 w-3 fill-current" />
-            <span>AI Analyzed</span>
+            <span>Ask AI</span>
         </button>
     );
 }
