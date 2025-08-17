@@ -11,13 +11,8 @@ export default function TrendingContent() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [timeframe, setTimeframe] = useState('7d');
+    const [timeframe, setTimeframe] = useState('30d');
 
-    const timeframeOptions = [
-        { value: '1d', label: isMobile ? 'Today' : 'Today', icon: '🔥' },
-        { value: '7d', label: isMobile ? 'Week' : 'This Week', icon: '📈' },
-        { value: '30d', label: isMobile ? 'Month' : 'This Month', icon: '⭐' }
-    ];
 
     const fetchTrendingPosts = async (selectedTimeframe = timeframe) => {
         try {
@@ -28,7 +23,7 @@ export default function TrendingContent() {
                 action: 'getTrending',
                 payload: {
                     timeframe: selectedTimeframe,
-                    limit: isMobile ? 15 : 20
+                    limit: isMobile ? 20 : 40
                 }
             });
 
@@ -98,7 +93,7 @@ export default function TrendingContent() {
                                 <div key={post.id} className="break-inside-avoid mb-4 relative">
                                     {index < 3 && (
                                         <Badge 
-                                            className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
+                                            className="absolute -top-2 -left-2 z-10 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg"
                                         >
                                             <span className="hidden sm:inline">#{index + 1} Trending</span>
                                             <span className="sm:hidden">#{index + 1}</span>
