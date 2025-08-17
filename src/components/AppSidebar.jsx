@@ -155,7 +155,7 @@ export function AppSidebar() {
         <TooltipProvider>
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <div className="px-2">
+                <div className={open ? "px-2" : "px-3"}>
                     <h2 className="text-lg font-semibold">{open ? "ECHOES" : "E"}</h2>
                 </div>
             </SidebarHeader>

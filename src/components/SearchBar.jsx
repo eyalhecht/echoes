@@ -180,7 +180,7 @@ export function SearchBar() {
             </div>
 
             {showDropdown && isExpanded && (
-                <div className="absolute top-11 left-0 right-0 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-11 left-0 right-0 bg-background border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                     {isLoading ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
                             Searching...
