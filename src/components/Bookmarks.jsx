@@ -142,7 +142,7 @@ function Bookmarks() {
             {/* End of list message */}
             {!bookmarksHasMore && bookmarks.length > 0 && (
                 <div className="text-center py-5 text-muted-foreground">
-                    No more bookmarks to load
+                    No more bookmarks
                 </div>
             )}
 
