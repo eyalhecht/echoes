@@ -320,11 +320,23 @@ function PostCard({ post }) {
                     )}
 
                     {/* AI Insights Panel */}
-                    {post.AiMetadata && showAiInsights && (
-                        <div className="mt-4 mb-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                            <div className="flex items-center gap-2 mb-3 opacity-80">
-                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
+                    {post.AiMetadata && (
+                        <div
+                            className={`
+                                mt-4 overflow-hidden
+                                transition-all duration-300 ease-in-out
+                                ${showAiInsights
+                                ? 'max-h-[800px] opacity-100'
+                                : 'max-h-0 opacity-0'
+                            }
+                            `}
+                        >
+                            <div
+                                className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800 transform transition-transform duration-300 ease-out">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-3 opacity-80">
+                                        <Sparkles className="h-3.5 w-3.5 text-blue-600"/>
+                                        <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
                                     AI Analysis
                                 </span>
                             </div>
@@ -423,11 +435,13 @@ function PostCard({ post }) {
                                     </p>
                                 </div>
                             )}
+                                </div>
+                            </div>
                         </div>
                     )}
 
                     {/* Action Buttons */}
-                    <div className="pb-2 flex items-center gap-4">
+                    <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
