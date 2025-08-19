@@ -47,7 +47,7 @@ function AppRouter() {
         <Route path="post/:postId" element={<PostPage />} />
         
         {/* Default redirect to home for any unmatched nested routes */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route index element={<Navigate to="/home" replace />} />
       </Route>
     </Routes>
   );
