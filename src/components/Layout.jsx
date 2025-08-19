@@ -64,8 +64,6 @@ function MainContent() {
     // Listen for URL parameter changes
     useEffect(() => {
         const postId = searchParams.get('post');
-        console.log("Post ID: ", postId);
-        
         if (postId) {
             setModalPostId(postId);
             
@@ -144,7 +142,6 @@ function MainContent() {
                 </div>
             </div>
             
-            {/* Post Modal */}
             {modalPostId && modalPost && !isLoadingModalPost && (
                 <PostDetailView 
                     post={modalPost} 

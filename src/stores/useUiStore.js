@@ -70,7 +70,7 @@ const useUiStore = create((set, get) => ({
 
     getPost: (postId) => {
         const state = get();
-        return state.posts.find(post => post.id === postId) || null;
+        return state.posts.find(post => post.id === postId) || state.bookmarks.find(post => post.id === postId) || null;
     },
 
     fetchPost: async (postId) => {
