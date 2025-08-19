@@ -49,6 +49,10 @@ function Home() {
     // Load initial posts
     useEffect(() => {
         const getPosts = async () => {
+            if (posts.length > 0) {
+                console.log('Posts already loaded, skipping initial load');
+                return;
+            }
             setPostsLoading(true);
             try {
                 const response = await callApiGateway({
@@ -69,7 +73,7 @@ function Home() {
             }
         }
         getPosts();
-    }, [setPosts, setLastDocId, setHasMore, setPostsLoading]);
+    }, []); // Empty dependency array - only run once on mount
 
     // Infinite scroll handler
     useEffect(() => {
