@@ -62,7 +62,6 @@ function PostCard({ post }) {
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false); // Controls the unified location modal
-    const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
     const deletePost = useUiStore(state => state.deletePost);
@@ -280,10 +279,10 @@ function PostCard({ post }) {
 
                 <div
                     className="cursor-pointer"
-                    onClick={() => setDetailViewOpen(true)}
+                    onClick={() => navigate(`/post/${postId}`)}
                     onKeyDown={(e) => {
                         if (e.key === ' ') {
-                            setDetailViewOpen(true)
+                            navigate(`/post/${postId}`)
                         }
                     }}
                     tabIndex={0}
@@ -628,13 +627,6 @@ function PostCard({ post }) {
             </Dialog>
 
             {/* Detail View */}
-            {detailViewOpen && (
-                <PostDetailView
-                    post={post}
-                    open={detailViewOpen}
-                    onClose={() => setDetailViewOpen(false)}
-                />
-            )}
             </TooltipProvider>
         </>
     );

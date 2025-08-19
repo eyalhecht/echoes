@@ -13,6 +13,7 @@ import Profile from '../components/Profile.jsx';
 import MapPostsView from '../components/MapPostsView.jsx';
 import UploadPost from '../components/UploadPost.jsx';
 import Bookmarks from '../components/Bookmarks.jsx';
+import PostPage from '../components/PostPage.jsx';
 
 function AppRouter() {
   const { isAuthenticated } = useAuthStore();
@@ -22,7 +23,7 @@ function AppRouter() {
       {/* Public Routes */}
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/home" replace /> : <Login />}
+        element={isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />}
       />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
@@ -43,6 +44,7 @@ function AppRouter() {
         <Route path="map" element={<MapPostsView />} />
         <Route path="upload" element={<UploadPost />} />
         <Route path="bookmarks" element={<Bookmarks />} />
+        <Route path="post/:postId" element={<PostPage />} />
         
         {/* Default redirect to home for any unmatched nested routes */}
         <Route path="*" element={<Navigate to="/home" replace />} />
