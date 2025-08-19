@@ -5,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Heart, Bookmark } from "lucide-react";
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
-import PostDetailView from "./PostDetailView";
-import useUiStore from "../stores/useUiStore";
 import { usePostInteractions } from "../hooks/usePostInteractions";
+import SharePost from "./SharePost.jsx";
 import {useNavigate} from "react-router-dom";
 
 export default function MapPostCard({ post, isSelected, onCardClick }) {
     const navigate = useNavigate();
-    const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageHeight, setImageHeight] = useState(280);
     const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -65,7 +63,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
         <>
             <Card
                 onClick={() => {
-                    setDetailViewOpen(true);
+                    window.history.pushState({}, '', `?post=${post.id}`);
                     onCardClick?.(post);
                 }}
                 className={cn(
@@ -128,6 +126,12 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                                 )}
                             />
                         </Button>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <SharePost 
+                                postId={post.id} 
+                                className="bg-background/80 backdrop-blur-sm rounded-full h-[36px] w-[36px]"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -158,15 +162,6 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                     )}
                 </CardContent>
             </Card>
-
-            {/* Detail Modal */}
-            {detailViewOpen && (
-                <PostDetailView
-                    post={post}
-                    open={detailViewOpen}
-                    onClose={() => setDetailViewOpen(false)}
-                />
-            )}
         </>
     );
 }

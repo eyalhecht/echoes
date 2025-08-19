@@ -9,7 +9,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // Google Icon Component
 const GoogleIcon = () => (
@@ -23,16 +23,19 @@ const GoogleIcon = () => (
 
 function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { loading, error } = useAuthStore();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const from = location.state?.from || '/home';
+
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
             await useAuthStore.getState().loginWithEmail({ email, password });
-            navigate('/dashboard');
+            navigate(from, { replace: true });
         } catch (err) {
             console.error("Login component caught error:", err);
         }
@@ -41,7 +44,7 @@ function Login() {
     const handleGoogleLogin = async () => {
         try {
             await useAuthStore.getState().signInWithGoogle();
-            navigate('/dashboard');
+            navigate(from, { replace: true });
         } catch (err) {
             console.error("Google Login component caught error:", err);
         }
@@ -50,7 +53,7 @@ function Login() {
     const handleGitHubLogin = async () => {
         try {
             await useAuthStore.getState().signInWithGitHub();
-            navigate('/dashboard');
+            navigate(from, { replace: true });
         } catch (err) {
             console.error("GitHub Login component caught error:", err);
         }

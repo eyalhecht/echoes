@@ -70,7 +70,47 @@ const useUiStore = create((set, get) => ({
 
     getPost: (postId) => {
         const state = get();
-        return state.posts.find(post => post.id === postId) || null;
+        return state.posts.find(post => post.id === postId) || state.bookmarks.find(post => post.id === postId) || null;
+    },
+
+    fetchPost: async (postId) => {
+        try {
+            set({ postsLoading: true, postsError: null });
+            
+            const response = await callApiGateway({
+                action: 'getPost',
+                payload: { postId }
+            });
+
+            if (response.data.post) {
+                const post = response.data.post;
+                set((state) => {
+                    const existingPost = state.posts.find(p => p.id === postId);
+                    if (!existingPost) {
+                        return {
+                            posts: [post, ...state.posts],
+                            postsLoading: false
+                        };
+                    }
+                    return {
+                        posts: state.posts.map(p => p.id === postId ? post : p),
+                        postsLoading: false
+                    };
+                });
+                
+                return post;
+            }
+            set({ postsLoading: false });
+            return null;
+            
+        } catch (error) {
+            console.error('Error fetching post:', error);
+            set({ 
+                postsLoading: false, 
+                postsError: error.message || 'Failed to fetch post' 
+            });
+            throw error;
+        }
     },
 
     togglePostLike: async (postId, userId) => {

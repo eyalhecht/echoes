@@ -22,7 +22,7 @@ function AppRouter() {
       {/* Public Routes */}
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/home" replace /> : <Login />}
+        element={isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />}
       />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
@@ -43,9 +43,9 @@ function AppRouter() {
         <Route path="map" element={<MapPostsView />} />
         <Route path="upload" element={<UploadPost />} />
         <Route path="bookmarks" element={<Bookmarks />} />
-        
+
         {/* Default redirect to home for any unmatched nested routes */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route index element={<Navigate to="/home" replace />} />
       </Route>
     </Routes>
   );

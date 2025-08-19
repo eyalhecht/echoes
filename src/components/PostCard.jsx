@@ -45,6 +45,7 @@ import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import AiBadge from "@/components/AiBadge.jsx";
+import SharePost from "@/components/SharePost.jsx";
 import { useNavigate } from 'react-router-dom';
 
 function PostCard({ post }) {
@@ -62,7 +63,6 @@ function PostCard({ post }) {
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false); // Controls the unified location modal
-    const [detailViewOpen, setDetailViewOpen] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
     const deletePost = useUiStore(state => state.deletePost);
@@ -280,10 +280,12 @@ function PostCard({ post }) {
 
                 <div
                     className="cursor-pointer"
-                    onClick={() => setDetailViewOpen(true)}
+                    onClick={() => {
+                        window.history.pushState({}, '', `?post=${postId}`);
+                    }}
                     onKeyDown={(e) => {
                         if (e.key === ' ') {
-                            setDetailViewOpen(true)
+                            window.history.pushState({}, '', `?post=${postId}`);
                         }
                     }}
                     tabIndex={0}
@@ -521,6 +523,7 @@ function PostCard({ post }) {
                                 </TooltipContent>
                             </Tooltip>
                         )}
+                        <SharePost postId={postId} />
                     </div>
 
                     <div
@@ -628,13 +631,6 @@ function PostCard({ post }) {
             </Dialog>
 
             {/* Detail View */}
-            {detailViewOpen && (
-                <PostDetailView
-                    post={post}
-                    open={detailViewOpen}
-                    onClose={() => setDetailViewOpen(false)}
-                />
-            )}
             </TooltipProvider>
         </>
     );
