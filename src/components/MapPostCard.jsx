@@ -63,7 +63,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
         <>
             <Card
                 onClick={() => {
-                    navigate(`/post/${post.id}`);
+                    navigate(`/post/${post.id}`, { state: { fromApp: true } });
                     onCardClick?.(post);
                 }}
                 className={cn(

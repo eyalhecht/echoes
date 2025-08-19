@@ -280,10 +280,10 @@ function PostCard({ post }) {
 
                 <div
                     className="cursor-pointer"
-                    onClick={() => navigate(`/post/${postId}`)}
+                    onClick={() => navigate(`/post/${postId}`, { state: { fromApp: true } })}
                     onKeyDown={(e) => {
                         if (e.key === ' ') {
-                            navigate(`/post/${postId}`)
+                            navigate(`/post/${postId}`, { state: { fromApp: true } })
                         }
                     }}
                     tabIndex={0}

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import useUiStore from '../stores/useUiStore.js';
 import PostDetailView from './PostDetailView.jsx';
 
 function PostPage() {
     const { postId } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
     const { getPost, fetchPost, postsLoading, postsError } = useUiStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
     
-    // Debug log
-    console.log('PostPage mounted with postId:', postId);
-    
+
     // Find the post in the store
     const post = getPost(postId);
     console.log('Post from store:', post);
@@ -79,12 +79,20 @@ function PostPage() {
 
     // Render the post if found
     if (post) {
+        const handleClose = () => {
+            if (!location.state?.fromApp) {
+                navigate('/home');
+            } else {
+                window.history.back();
+            }
+        };
+
         return (
             <div className="max-w-4xl mx-auto">
                 <PostDetailView 
                     post={post} 
                     open={true} 
-                    onClose={() => window.history.back()}
+                    onClose={handleClose}
                 />
             </div>
         );
