@@ -63,7 +63,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
         <>
             <Card
                 onClick={() => {
-                    navigate(`/post/${post.id}`, { state: { fromApp: true } });
+                    window.history.pushState({}, '', `?post=${post.id}`);
                     onCardClick?.(post);
                 }}
                 className={cn(

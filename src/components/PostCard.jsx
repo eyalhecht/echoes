@@ -280,10 +280,12 @@ function PostCard({ post }) {
 
                 <div
                     className="cursor-pointer"
-                    onClick={() => navigate(`/post/${postId}`, { state: { fromApp: true } })}
+                    onClick={() => {
+                        window.history.pushState({}, '', `?post=${postId}`);
+                    }}
                     onKeyDown={(e) => {
                         if (e.key === ' ') {
-                            navigate(`/post/${postId}`, { state: { fromApp: true } })
+                            window.history.pushState({}, '', `?post=${postId}`);
                         }
                     }}
                     tabIndex={0}

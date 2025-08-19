@@ -1,5 +1,5 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar.jsx";
 import { SearchBar } from "@/components/SearchBar.jsx";
@@ -12,9 +12,97 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import PostDetailView from "./PostDetailView.jsx";
+import useUiStore from "../stores/useUiStore.js";
+
+// Custom hook to listen for URL changes including pushState/replaceState
+function useURLSearchParams() {
+    const [searchParams, setSearchParams] = useState(
+        () => new URLSearchParams(window.location.search)
+    );
+
+    useEffect(() => {
+        const handlePopState = () => {
+            setSearchParams(new URLSearchParams(window.location.search));
+        };
+
+        // Listen for back/forward button
+        window.addEventListener('popstate', handlePopState);
+
+        // Override pushState and replaceState to trigger updates
+        const originalPushState = window.history.pushState;
+        const originalReplaceState = window.history.replaceState;
+
+        window.history.pushState = function(...args) {
+            originalPushState.apply(window.history, args);
+            setSearchParams(new URLSearchParams(window.location.search));
+        };
+
+        window.history.replaceState = function(...args) {
+            originalReplaceState.apply(window.history, args);
+            setSearchParams(new URLSearchParams(window.location.search));
+        };
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+            window.history.pushState = originalPushState;
+            window.history.replaceState = originalReplaceState;
+        };
+    }, []);
+
+    return searchParams;
+}
 
 function MainContent() {
     const { theme, setTheme } = useTheme();
+    const searchParams = useURLSearchParams(); // Use our custom hook instead
+    const { getPost, fetchPost } = useUiStore();
+    const [modalPostId, setModalPostId] = useState(null);
+    const [modalPost, setModalPost] = useState(null);
+    const [isLoadingModalPost, setIsLoadingModalPost] = useState(false);
+
+    // Listen for URL parameter changes
+    useEffect(() => {
+        const postId = searchParams.get('post');
+        console.log("Post ID: ", postId);
+        
+        if (postId) {
+            setModalPostId(postId);
+            
+            // Try to find post in store first
+            const existingPost = getPost(postId);
+            if (existingPost) {
+                setModalPost(existingPost);
+            } else {
+                // Fetch post if not in store
+                setIsLoadingModalPost(true);
+                fetchPost(postId)
+                    .then((fetchedPost) => {
+                        setModalPost(fetchedPost);
+                    })
+                    .catch((error) => {
+                        console.error('Failed to fetch post for modal:', error);
+                        // Close modal on error
+                        setModalPostId(null);
+                        setModalPost(null);
+                    })
+                    .finally(() => {
+                        setIsLoadingModalPost(false);
+                    });
+            }
+        } else {
+            setModalPostId(null);
+            setModalPost(null);
+        }
+    }, [searchParams, getPost, fetchPost]); // Now depends on searchParams instead of location.search
+
+    const handleCloseModal = () => {
+        // Remove post parameter from URL without navigating
+        window.history.replaceState({}, '', window.location.pathname);
+        
+        setModalPostId(null);
+        setModalPost(null);
+    };
 
     return (
         <main className="flex-1">
@@ -55,6 +143,15 @@ function MainContent() {
                     <Outlet />
                 </div>
             </div>
+            
+            {/* Post Modal */}
+            {modalPostId && modalPost && !isLoadingModalPost && (
+                <PostDetailView 
+                    post={modalPost} 
+                    open={true} 
+                    onClose={handleCloseModal}
+                />
+            )}
         </main>
     );
 }
