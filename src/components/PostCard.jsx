@@ -45,6 +45,7 @@ import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import AiBadge from "@/components/AiBadge.jsx";
+import SharePost from "@/components/SharePost.jsx";
 import { useNavigate } from 'react-router-dom';
 
 function PostCard({ post }) {
@@ -520,6 +521,7 @@ function PostCard({ post }) {
                                 </TooltipContent>
                             </Tooltip>
                         )}
+                        <SharePost postId={postId} />
                     </div>
 
                     <div

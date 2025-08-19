@@ -36,6 +36,7 @@ import useUiStore from '../stores/useUiStore.js';
 import {formatFirebaseTimestamp} from "./utils.js";
 import PostMap from "./PostMap.jsx";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
+import SharePost from "./SharePost.jsx";
 import {useNavigate} from "react-router-dom";
 import AiBadge from "@/components/AiBadge.jsx";
 
@@ -415,6 +416,10 @@ const PostDetailView = ({ post, open, onClose }) => {
                                         </Button>
                                     </div>
                                 )}
+
+                                <div className="flex items-center gap-1">
+                                    <SharePost postId={post.id} />
+                                </div>
                             </div>
 
                             <Separator className="my-4" />

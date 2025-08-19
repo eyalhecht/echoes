@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Heart, Bookmark } from "lucide-react";
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
 import { usePostInteractions } from "../hooks/usePostInteractions";
+import SharePost from "./SharePost.jsx";
 import {useNavigate} from "react-router-dom";
 
 export default function MapPostCard({ post, isSelected, onCardClick }) {
@@ -125,6 +126,12 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                                 )}
                             />
                         </Button>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <SharePost 
+                                postId={post.id} 
+                                className="bg-background/80 backdrop-blur-sm rounded-full h-[36px] w-[36px]"
+                            />
+                        </div>
                     </div>
                 </div>
 
