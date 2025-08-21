@@ -237,7 +237,7 @@ function PostCard({ post }) {
     return (
         <>
             <TooltipProvider>
-            <Card className="w-[360px] md:w-[500px] rounded-lg shadow-lg">
+            <Card className="w-[360px] md:w-[500px] rounded-lg shadow-lg bg-sidebar">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={userProfilePicUrl || ''} />
