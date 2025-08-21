@@ -6,7 +6,10 @@ import { Separator } from "@/components/ui/separator";
 import {
     Github,
     Loader2,
-    Sparkles
+    Sparkles,
+    Clock,
+    Search,
+    MapPin
 } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -60,90 +63,170 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-full max-w-lg">
-                <Card className="shadow-lg">
-                    <CardContent className="pt-10 px-10 pb-10">
-                        {/* Header */}
-                        <div className="text-center mb-10">
+        <div className="min-h-screen bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 flex">
+            {/* Left Side - Branding */}
+            <div className="hidden lg:flex lg:flex-1 relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 via-orange-900/5 to-yellow-900/10"></div>
+                <div className="absolute inset-0" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a574' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                    opacity: 0.3
+                }}></div>
+                
+                {/* Content */}
+                <div className="relative z-10 flex flex-col justify-center px-16 py-20">
+                    <div className="max-w-lg">
+                        {/* Main Logo */}
+                        <div className="mb-8">
                             <div className="relative inline-block">
-                                <h1 className="text-3xl font-bold">Echoes</h1>
-                                <div className="absolute -top-2 -right-2">
-                                    <Sparkles className="h-5 w-5 text-blue-500" />
+                                <h1 className="text-7xl font-bold text-amber-900 tracking-tight">
+                                    ECHOES
+                                </h1>
+                                <div className="absolute -top-6 -right-6">
+                                    <Sparkles className="h-8 w-8 text-amber-600" />
                                 </div>
                             </div>
-                            <p className="text-muted-foreground mt-3 text-base">
-                                Sign in to continue
+                        </div>
+
+                        {/* Main Headline */}
+                        <div className="mb-12">
+                            <h2 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                                Discover History
+                            </h2>
+                            <p className="text-xl text-gray-700 leading-relaxed">
+                                AI-powered historical photo analysis that brings your memories to life with AI expert insights.
                             </p>
                         </div>
 
-                        {/* Login Buttons */}
-                        <div className="space-y-4">
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                className="w-full h-12 text-base"
-                                onClick={handleGoogleLogin}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                ) : (
-                                    <GoogleIcon />
-                                )}
-                                <span className="ml-2">Continue with Google</span>
-                            </Button>
-
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                className="w-full h-12 text-base"
-                                onClick={handleGitHubLogin}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                ) : (
-                                    <Github className="mr-2 h-5 w-5" />
-                                )}
-                                Continue with GitHub
-                            </Button>
+                        {/* Features */}
+                        <div className="space-y-6">
+                            <div className="flex items-center space-x-4">
+                                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                                    <Clock className="h-5 w-5 text-amber-700" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-gray-900">Historical Dating</p>
+                                    <p className="text-sm text-gray-600">AI estimates photo periods</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-4">
+                                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                                    <MapPin className="h-5 w-5 text-amber-700" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-gray-900">Smart Geolocation</p>
+                                    <p className="text-sm text-gray-600">Identifies landmarks and locations</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-4">
+                                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                                    <Search className="h-5 w-5 text-amber-700" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-gray-900">Intelligent Search</p>
+                                    <p className="text-sm text-gray-600">Multi-dimensional search across AI metadata</p>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        {/* Error Display */}
-                        {error && (
-                            <Alert variant="destructive" className="mt-6">
-                                <AlertDescription>
-                                    {error}
-                                </AlertDescription>
-                            </Alert>
-                        )}
+            {/* Right Side - Login Form */}
+            <div className="flex-1 lg:max-w-md xl:max-w-lg flex items-center justify-center p-6 lg:p-8">
+                <div className="w-full max-w-sm">
+                    <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+                        <CardContent className="pt-10 px-8 pb-8">
+                            {/* Mobile Header */}
+                            <div className="lg:hidden text-center mb-8">
+                                <div className="relative inline-block">
+                                    <h1 className="text-3xl font-bold text-amber-900">Echoes</h1>
+                                    <div className="absolute -top-2 -right-2">
+                                        <Sparkles className="h-5 w-5 text-amber-600" />
+                                    </div>
+                                </div>
+                            </div>
 
-                        {/* Footer */}
-                        <div className="mt-8 text-center">
-                            <Separator className="mb-6" />
-                            <p className="text-sm text-muted-foreground">
-                                By continuing, you agree to our{' '}
-                                <button className="text-primary hover:underline font-medium">
-                                    Terms of Service
-                                </button>
-                                {' '}and{' '}
-                                <button className="text-primary hover:underline font-medium">
-                                    Privacy Policy
-                                </button>
-                            </p>
+                            {/* Header */}
+                            <div className="text-center mb-8">
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                    Join today.
+                                </h2>
+                                <p className="text-gray-600">
+                                    Discover the stories behind your photos
+                                </p>
+                            </div>
 
-                            <div className="mt-4">
-                                <p className="text-sm text-muted-foreground">
-                                    Need help?{' '}
-                                    <button className="text-primary hover:underline font-medium">
-                                        Contact Support
+                            {/* Login Buttons */}
+                            <div className="space-y-3">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="w-full h-12 text-base border-2 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                                    onClick={handleGoogleLogin}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    ) : (
+                                        <GoogleIcon />
+                                    )}
+                                    <span className="ml-2 font-medium">Continue with Google</span>
+                                </Button>
+
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="w-full h-12 text-base border-2 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                                    onClick={handleGitHubLogin}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    ) : (
+                                        <Github className="mr-2 h-5 w-5" />
+                                    )}
+                                    <span className="font-medium">Continue with GitHub</span>
+                                </Button>
+                            </div>
+
+                            {/* Error Display */}
+                            {error && (
+                                <Alert variant="destructive" className="mt-6">
+                                    <AlertDescription>
+                                        {error}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+
+                            {/* Footer */}
+                            <div className="mt-8 text-center">
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    By continuing, you agree to our{' '}
+                                    <button className="text-amber-700 hover:underline font-medium">
+                                        Terms of Service
+                                    </button>
+                                    {' '}and{' '}
+                                    <button className="text-amber-700 hover:underline font-medium">
+                                        Privacy Policy
                                     </button>
                                 </p>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+
+                    {/* Bottom Help */}
+                    <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-600">
+                            Need help?{' '}
+                            <button className="text-amber-700 hover:underline font-medium">
+                                Contact Support
+                            </button>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );
