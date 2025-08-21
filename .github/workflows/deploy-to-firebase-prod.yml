@@ -2,11 +2,6 @@ name: Deploy to Production Firebase Hosting
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to deploy from'
-        required: true
-        default: 'master'
 
 jobs:
   build_and_deploy_prod:
