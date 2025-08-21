@@ -8,12 +8,12 @@ import { getStorage} from 'firebase/storage';
 // --- YOUR ACTUAL FIREBASE PROJECT CONFIG ---
 // Replace these with the values you copied from the Firebase Console
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
+    apiKey: "AIzaSyAaZVcHeVYDWmrYk_steQOIgMvheidB5oM",
+    authDomain: "echoes-677.firebaseapp.com",
+    projectId: "echoes-677",
+    storageBucket: "echoes-677.firebasestorage.app",
+    messagingSenderId: "1081224881260",
+    appId: "1:1081224881260:web:a733ad783db7371aa26449"
 };
 
 // Initialize Firebase App
@@ -28,7 +28,7 @@ export const storage = getStorage(app);
 // --- Emulator Connection (Crucial for Local Development) ---
 // This ensures your app connects to local emulators when running in development
 // and to production Firebase services when deployed.
-if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
     console.log('Connecting to Firebase Emulators...');
     // Connect to the Auth Emulator (default port 9099)
     // connectAuthEmulator(auth, 'http://localhost:9099');
