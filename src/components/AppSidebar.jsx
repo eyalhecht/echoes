@@ -90,7 +90,7 @@ export function AppSidebar() {
     }
 
     const isActiveRoute = (routePath) => {
-        return location.pathname === routePath || location.pathname.startsWith(routePath + '/');
+        return location.pathname.includes(routePath);
     }
 
     const handleNavigation = (path, callback) => {
