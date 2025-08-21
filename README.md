@@ -1,12 +1,15 @@
-# React + Vite
+# ECHOES
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Echoes is a social media platform for discovering and sharing history through photos, stories, and places. Users upload historical photos or memories, and AI acts like a personal historian — analyzing each photo to uncover hidden details like time period, location, cultural context, and historical significance.
 
-Currently, two official plugins are available:
+It’s not just about the past — it’s about connecting people through their shared heritage. Echoes combines AI insights, community interaction, and geolocation to create a living archive where history comes alive through conversations, likes, and exploration.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Why Echoes Stands Out?
 
-## Expanding the ESLint configuration
+It’s social-first: a feed of posts, likes, comments, and shares.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+It’s AI-powered: every photo is enriched with metadata and expert-like insights.
+
+It’s location-aware: posts are connected to real places, letting users explore history on the map.
+
+It’s community-driven: history is discovered together, not in isolation.

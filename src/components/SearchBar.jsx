@@ -154,7 +154,7 @@ export function SearchBar() {
                     </Button>
                 ) : (
                     <div className="relative flex items-center w-full">
-                        <Search className="absolute left-3 h-4 w-4" />
+                        <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
                         <Input
                             ref={inputRef}
                             type="text"

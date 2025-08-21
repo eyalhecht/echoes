@@ -26,7 +26,7 @@ import {
 function SharePost({ postId, className = "" }) {
     const [copied, setCopied] = useState(false);
     
-    const postUrl = `${window.location.origin}/post/${postId}`;
+    const postUrl = `${window.location.origin}/home/?post=${postId}`;
     
     const handleCopyUrl = async () => {
         try {
