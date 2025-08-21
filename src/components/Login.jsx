@@ -94,7 +94,7 @@ function Login() {
                                 Discover History
                             </h2>
                             <p className="text-xl text-gray-700 leading-relaxed">
-                                AI-powered historical photo analysis that brings your memories to life with AI expert insights.
+                                Discover and share history through AI-powered historical analysis that brings your memories to life.
                             </p>
                         </div>
 
@@ -154,9 +154,6 @@ function Login() {
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                                     Join today.
                                 </h2>
-                                <p className="text-gray-600">
-                                    Discover the stories behind your photos
-                                </p>
                             </div>
 
                             {/* Login Buttons */}
