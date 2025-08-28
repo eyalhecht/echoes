@@ -218,7 +218,14 @@ function Login() {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
                             Need help?{' '}
-                            <button className="text-amber-700 hover:underline font-medium">
+                            <button 
+                                className="text-amber-700 hover:underline font-medium"
+                                onClick={() => {
+                                    const subject = encodeURIComponent('Echoes Support Request');
+                                    const body = encodeURIComponent('Hi Echoes Support,\n\nI need help with:\n\n[Please describe your issue here]\n\nThanks!');
+                                    window.location.href = `mailto:eyalhe3@gmail.com?subject=${subject}&body=${body}`;
+                                }}
+                            >
                                 Contact Support
                             </button>
                         </p>
