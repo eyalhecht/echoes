@@ -11,18 +11,14 @@ import {
     Users,
     ArrowRight,
     Menu,
-    X,
-    Moon,
-    Sun
+    X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useTheme } from "@/components/theme-provider";
 
 function LandingPage() {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { theme, setTheme } = useTheme();
 
     const scrollToSection = (sectionId) => {
         document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
@@ -59,6 +55,12 @@ function LandingPage() {
                                 className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
                             >
                                 How It Works
+                            </button>
+                            <button 
+                                onClick={() => scrollToSection('social-proof')}
+                                className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
+                            >
+                                Reviews
                             </button>
                             <Button
                                 onClick={() => navigate('/login')}
@@ -99,6 +101,12 @@ function LandingPage() {
                                     className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
                                 >
                                     How It Works
+                                </button>
+                                <button 
+                                    onClick={() => scrollToSection('social-proof')}
+                                    className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
+                                >
+                                    Reviews
                                 </button>
                                 <button 
                                     onClick={() => navigate('/login')}
@@ -181,6 +189,85 @@ function LandingPage() {
                 </div>
             </section>
 
+            {/* Problem Section */}
+            <section className="py-20 bg-gradient-to-br from-gray-50 to-amber-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+                            Your Photos Have Stories to Tell
+                        </h2>
+                        <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-700">
+                            But without context, these visual memories lose their historical significance
+                        </p>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-8">
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-3 h-3 bg-red-500 rounded-full mt-2"></div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                        Millions of photos sit forgotten in albums and devices
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Family treasures and historical discoveries gathering digital dust because nobody knows their story.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-3 h-3 bg-red-500 rounded-full mt-2"></div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                        Traditional photo apps can't tell you when or where history happened
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        Basic metadata only shows file info—not the rich historical context that makes photos meaningful.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start space-x-4">
+                                <div className="flex-shrink-0 w-3 h-3 bg-red-500 rounded-full mt-2"></div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                        Without context, visual memories lose their historical value
+                                    </h3>
+                                    <p className="text-gray-600">
+                                        A photo becomes just an image instead of a window into the past with stories worth preserving.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <Card className="overflow-hidden shadow-xl border-0 bg-white">
+                                <CardContent className="p-8">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center space-x-3 p-4 bg-gray-100 rounded-lg">
+                                            <div className="w-12 h-12 bg-gray-300 rounded"></div>
+                                            <div className="flex-1">
+                                                <div className="h-3 bg-gray-300 rounded mb-2"></div>
+                                                <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+                                            </div>
+                                        </div>
+                                        <div className="text-center text-gray-500 font-medium">
+                                            Traditional Photo Apps
+                                        </div>
+                                        <div className="text-center text-sm text-gray-400">
+                                            "Just another old photo..."
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <div className="absolute -bottom-4 -right-4 bg-amber-600 text-white p-3 rounded-full">
+                                <ArrowRight className="h-6 w-6" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Features Section */}
             <section id="features" className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -204,7 +291,7 @@ function LandingPage() {
                                     AI Historical Dating
                                 </h3>
                                 <p className="text-gray-600 leading-relaxed">
-                                    Our AI analyzes architectural styles, clothing, vehicles, and visual cues to estimate 
+                                    Our AI analyzes architectural styles, clothing, vehicles, and visual cues to estimate
                                     when your photo was taken. From mystery to history in seconds.
                                 </p>
                             </CardContent>
@@ -220,7 +307,7 @@ function LandingPage() {
                                     Smart Geolocation
                                 </h3>
                                 <p className="text-gray-600 leading-relaxed">
-                                    Identifies landmarks, buildings, and geographical features to pinpoint where 
+                                    Identifies landmarks, buildings, and geographical features to pinpoint where
                                     historical moments happened. Discover the stories behind the places.
                                 </p>
                             </CardContent>
@@ -236,11 +323,245 @@ function LandingPage() {
                                     Intelligent Search
                                 </h3>
                                 <p className="text-gray-600 leading-relaxed">
-                                    Search across all AI-generated metadata. Find photos by era, location, 
+                                    Search across all AI-generated metadata. Find photos by era, location,
                                     architectural style, or any historical element our AI identifies.
                                 </p>
                             </CardContent>
                         </Card>
+                    </div>
+                </div>
+            </section>
+
+            {/* Social Proof Section */}
+            <section id="social-proof" className="py-20 bg-amber-600">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                            Trusted by History Enthusiasts Worldwide
+                        </h2>
+                        <p className="max-w-2xl mx-auto text-xl text-amber-100">
+                            Join thousands who've already discovered the stories hidden in their photos
+                        </p>
+                    </div>
+
+                    {/* Statistics */}
+                    <div className="grid md:grid-cols-4 gap-8 mb-16">
+                        <div className="text-center">
+                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">50K+</div>
+                            <div className="text-amber-100">Photos Analyzed</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">95%</div>
+                            <div className="text-amber-100">Accuracy Rate</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">12K+</div>
+                            <div className="text-amber-100">Active Users</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">89%</div>
+                            <div className="text-amber-100">Would Recommend</div>
+                        </div>
+                    </div>
+
+                    {/* Testimonials */}
+                    <div className="grid lg:grid-cols-3 gap-8">
+                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
+                            <CardContent className="p-8">
+                                <div className="flex items-center mb-4">
+                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
+                                        <span className="font-bold text-amber-900">MH</span>
+                                    </div>
+                                    <div>
+                                        <div className="font-semibold">Maria H.</div>
+                                        <div className="text-amber-200 text-sm">Family Historian</div>
+                                    </div>
+                                </div>
+                                <p className="text-amber-100 leading-relaxed">
+                                    "Echoes helped me date my grandmother's photos from the 1940s. The AI identified the exact decade based on clothing and architecture. Amazing!"
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
+                            <CardContent className="p-8">
+                                <div className="flex items-center mb-4">
+                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
+                                        <span className="font-bold text-amber-900">DR</span>
+                                    </div>
+                                    <div>
+                                        <div className="font-semibold">Dr. Robert K.</div>
+                                        <div className="text-amber-200 text-sm">Museum Curator</div>
+                                    </div>
+                                </div>
+                                <p className="text-amber-100 leading-relaxed">
+                                    "As a museum professional, I'm impressed by the accuracy. Echoes identified architectural periods that matched our expert assessments."
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
+                            <CardContent className="p-8">
+                                <div className="flex items-center mb-4">
+                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
+                                        <span className="font-bold text-amber-900">SL</span>
+                                    </div>
+                                    <div>
+                                        <div className="font-semibold">Sarah L.</div>
+                                        <div className="text-amber-200 text-sm">Photography Enthusiast</div>
+                                    </div>
+                                </div>
+                                <p className="text-amber-100 leading-relaxed">
+                                    "I collect vintage photographs, and Echoes has become my go-to tool for understanding their historical context. Game-changer!"
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Trust Badges */}
+                    <div className="text-center mt-16">
+                        <p className="text-amber-200 mb-8">Trusted by professionals at:</p>
+                        <div className="flex flex-wrap justify-center items-center gap-8 opacity-70">
+                            <div className="bg-white/20 px-6 py-3 rounded-lg">
+                                <span className="text-white font-semibold">Museums</span>
+                            </div>
+                            <div className="bg-white/20 px-6 py-3 rounded-lg">
+                                <span className="text-white font-semibold">Universities</span>
+                            </div>
+                            <div className="bg-white/20 px-6 py-3 rounded-lg">
+                                <span className="text-white font-semibold">Archives</span>
+                            </div>
+                            <div className="bg-white/20 px-6 py-3 rounded-lg">
+                                <span className="text-white font-semibold">Genealogists</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Demo/Preview Section */}
+            <section className="py-20 bg-gradient-to-br from-gray-50 to-amber-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                            See Echoes in Action
+                        </h2>
+                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600">
+                            Watch how our AI transforms a mysterious old photo into a rich historical discovery
+                        </p>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        {/* Before */}
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <div className="inline-flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium mb-4">
+                                    Before: Mystery Photo
+                                </div>
+                            </div>
+                            <Card className="overflow-hidden shadow-lg border-2 border-red-200">
+                                <CardContent className="p-8">
+                                    <div className="aspect-square bg-gray-100 rounded-lg mb-6 flex items-center justify-center">
+                                        <div className="text-center text-gray-500">
+                                            <div className="w-20 h-20 bg-gray-300 rounded mx-auto mb-4"></div>
+                                            <p className="font-medium">Unknown Photo</p>
+                                            <p className="text-sm">No historical context</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Date:</span>
+                                            <span className="text-red-600">Unknown</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Location:</span>
+                                            <span className="text-red-600">Unknown</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Context:</span>
+                                            <span className="text-red-600">None</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* After */}
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <div className="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-4">
+                                    After: Historical Discovery
+                                </div>
+                            </div>
+                            <Card className="overflow-hidden shadow-xl border-2 border-green-200">
+                                <CardContent className="p-8">
+                                    <div className="aspect-square bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg mb-6 flex items-center justify-center relative">
+                                        <div className="text-center text-gray-700">
+                                            <div className="w-20 h-20 bg-amber-300 rounded mx-auto mb-4 flex items-center justify-center">
+                                                <Brain className="h-10 w-10 text-amber-700" />
+                                            </div>
+                                            <p className="font-medium">AI-Analyzed Photo</p>
+                                            <p className="text-sm">Rich historical insights</p>
+                                        </div>
+                                        {/* AI Analysis Overlays */}
+                                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                                            1940s Architecture
+                                        </div>
+                                        <div className="absolute top-2 right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
+                                            Victorian Era
+                                        </div>
+                                        <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                            London, UK
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Date:</span>
+                                            <span className="text-green-600 font-medium">1940-1945</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Location:</span>
+                                            <span className="text-green-600 font-medium">London, England</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Architecture:</span>
+                                            <span className="text-green-600 font-medium">Victorian</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Confidence:</span>
+                                            <span className="text-green-600 font-medium">94%</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-6 p-4 bg-amber-50 rounded-lg">
+                                        <p className="text-sm text-gray-700">
+                                            <span className="font-medium">AI Insight:</span> This photograph appears to be taken during WWII era, showing typical London residential architecture. The style and visual cues suggest wartime period.
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+
+                    {/* Call-to-Action */}
+                    <div className="text-center mt-16">
+                        <div className="inline-flex items-center space-x-4 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+                            <div className="text-left">
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                    Ready to discover your photos' stories?
+                                </h3>
+                                <p className="text-gray-600">
+                                    Upload your first photo and see the magic happen in seconds
+                                </p>
+                            </div>
+                            <Button 
+                                size="lg"
+                                onClick={() => navigate('/login')}
+                                className="bg-amber-600 hover:bg-amber-700 text-white whitespace-nowrap"
+                            >
+                                Try It Free
+                                <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -270,7 +591,7 @@ function LandingPage() {
                                 Upload Your Photo
                             </h3>
                             <p className="text-gray-600">
-                                Simply drag and drop any historical photo from your collection. 
+                                Simply drag and drop any historical photo from your collection.
                                 Family photos, vintage finds, or mysterious old images.
                             </p>
                         </div>
@@ -287,7 +608,7 @@ function LandingPage() {
                                 AI Analyzes History
                             </h3>
                             <p className="text-gray-600">
-                                Our advanced AI examines every detail - architecture, clothing, vehicles, 
+                                Our advanced AI examines every detail - architecture, clothing, vehicles,
                                 and context clues to determine the historical period and location.
                             </p>
                         </div>
@@ -304,7 +625,7 @@ function LandingPage() {
                                 Share & Discover
                             </h3>
                             <p className="text-gray-600">
-                                Share your discoveries with the community and explore others' findings. 
+                                Share your discoveries with the community and explore others' findings.
                                 Build connections through shared historical interests.
                             </p>
                         </div>
