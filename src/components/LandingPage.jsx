@@ -51,6 +51,12 @@ function LandingPage() {
                                 Features
                             </button>
                             <button 
+                                onClick={() => scrollToSection('demo')}
+                                className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
+                            >
+                                Demo
+                            </button>
+                            <button 
                                 onClick={() => scrollToSection('how-it-works')}
                                 className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
                             >
@@ -89,6 +95,12 @@ function LandingPage() {
                                     className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
                                 >
                                     Features
+                                </button>
+                                <button 
+                                    onClick={() => scrollToSection('demo')}
+                                    className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
+                                >
+                                    Demo
                                 </button>
                                 <button 
                                     onClick={() => scrollToSection('how-it-works')}
@@ -269,7 +281,7 @@ function LandingPage() {
 
 
             {/* Demo/Preview Section */}
-            <section className="py-20 bg-gradient-to-br from-amber-400 to-amber-50">
+            <section id="demo" className="py-20 bg-gradient-to-br from-amber-400 to-amber-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -331,6 +343,16 @@ function LandingPage() {
                                             </div>
                                             <p className="font-medium">AI-Analyzed Photo</p>
                                             <p className="text-sm">Rich historical insights</p>
+                                        </div>
+                                        {/* AI Analysis Overlays */}
+                                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                                            1940s Architecture
+                                        </div>
+                                        <div className="absolute top-2 right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
+                                            Victorian Era
+                                        </div>
+                                        <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                                            London, UK
                                         </div>
                                     </div>
                                     <div className="space-y-3">
