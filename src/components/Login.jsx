@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 import {
     Github,
     Loader2,
@@ -29,20 +28,7 @@ function Login() {
     const location = useLocation();
     const { loading, error } = useAuthStore();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
     const from = location.state?.from || '/home';
-
-    const handleEmailLogin = async (e) => {
-        e.preventDefault();
-        try {
-            await useAuthStore.getState().loginWithEmail({ email, password });
-            navigate(from, { replace: true });
-        } catch (err) {
-            console.error("Login component caught error:", err);
-        }
-    };
 
     const handleGoogleLogin = async () => {
         try {
@@ -63,13 +49,13 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 flex">
+        <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white flex">
             {/* Left Side - Branding */}
             <div className="hidden lg:flex lg:flex-1 relative overflow-hidden">
                 {/* Background Pattern */}
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-900/10 via-orange-900/5 to-yellow-900/10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/10 via-slate-900/5 to-slate-900/10"></div>
                 <div className="absolute inset-0" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a574' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a78bfa' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
                     opacity: 0.3
                 }}></div>
                 
@@ -79,21 +65,21 @@ function Login() {
                         {/* Main Logo */}
                         <div className="mb-8">
                             <div className="relative inline-block">
-                                <h1 className="text-7xl font-bold text-amber-900 tracking-tight">
+                                <h1 className="text-7xl font-bold text-slate-800 tracking-tight">
                                     ECHOES
                                 </h1>
                                 <div className="absolute -top-6 -right-6">
-                                    <Sparkles className="h-8 w-8 text-amber-600" />
+                                    <Sparkles className="h-8 w-8 text-violet-600" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Main Headline */}
                         <div className="mb-12">
-                            <h2 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                            <h2 className="text-4xl font-bold text-slate-900 mb-4 leading-tight">
                                 Discover History
                             </h2>
-                            <p className="text-xl text-gray-700 leading-relaxed">
+                            <p className="text-xl text-slate-700 leading-relaxed">
                                 Discover and share history through AI-powered historical analysis that brings your memories to life.
                             </p>
                         </div>
@@ -101,32 +87,32 @@ function Login() {
                         {/* Features */}
                         <div className="space-y-6">
                             <div className="flex items-center space-x-4">
-                                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                                    <Clock className="h-5 w-5 text-amber-700" />
+                                <div className="flex-shrink-0 w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
+                                    <Clock className="h-5 w-5 text-violet-700" />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-gray-900">Historical Dating</p>
-                                    <p className="text-sm text-gray-600">AI estimates photo periods</p>
+                                    <p className="font-semibold text-slate-900">Historical Dating</p>
+                                    <p className="text-sm text-slate-600">AI estimates photo periods</p>
                                 </div>
                             </div>
                             
                             <div className="flex items-center space-x-4">
-                                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                                    <MapPin className="h-5 w-5 text-amber-700" />
+                                <div className="flex-shrink-0 w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
+                                    <MapPin className="h-5 w-5 text-violet-700" />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-gray-900">Smart Geolocation</p>
-                                    <p className="text-sm text-gray-600">Identifies landmarks and locations</p>
+                                    <p className="font-semibold text-slate-900">Smart Geolocation</p>
+                                    <p className="text-sm text-slate-600">Identifies landmarks and locations</p>
                                 </div>
                             </div>
                             
                             <div className="flex items-center space-x-4">
-                                <div className="flex-shrink-0 w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                                    <Search className="h-5 w-5 text-amber-700" />
+                                <div className="flex-shrink-0 w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
+                                    <Search className="h-5 w-5 text-violet-700" />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-gray-900">Intelligent Search</p>
-                                    <p className="text-sm text-gray-600">Multi-dimensional search across AI metadata</p>
+                                    <p className="font-semibold text-slate-900">Intelligent Search</p>
+                                    <p className="text-sm text-slate-600">Multi-dimensional search across AI metadata</p>
                                 </div>
                             </div>
                         </div>
@@ -142,16 +128,16 @@ function Login() {
                             {/* Mobile Header */}
                             <div className="lg:hidden text-center mb-8">
                                 <div className="relative inline-block">
-                                    <h1 className="text-3xl font-bold text-amber-900">Echoes</h1>
+                                    <h1 className="text-3xl font-bold text-slate-800">Echoes</h1>
                                     <div className="absolute -top-2 -right-2">
-                                        <Sparkles className="h-5 w-5 text-amber-600" />
+                                        <Sparkles className="h-5 w-5 text-violet-600" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Header */}
                             <div className="text-center mb-8">
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">
                                     Join today.
                                 </h2>
                             </div>
@@ -161,7 +147,7 @@ function Login() {
                                 <Button
                                     variant="outline"
                                     size="lg"
-                                    className="w-full h-12 text-base border-2 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                                    className="w-full h-12 text-base border-2 hover:bg-violet-50 hover:border-violet-300 transition-colors"
                                     onClick={handleGoogleLogin}
                                     disabled={loading}
                                 >
@@ -176,7 +162,7 @@ function Login() {
                                 <Button
                                     variant="outline"
                                     size="lg"
-                                    className="w-full h-12 text-base border-2 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                                    className="w-full h-12 text-base border-2 hover:bg-violet-50 hover:border-violet-300 transition-colors"
                                     onClick={handleGitHubLogin}
                                     disabled={loading}
                                 >
@@ -200,13 +186,13 @@ function Login() {
 
                             {/* Footer */}
                             <div className="mt-8 text-center">
-                                <p className="text-xs text-gray-500 leading-relaxed">
+                                <p className="text-xs text-slate-500 leading-relaxed">
                                     By continuing, you agree to our{' '}
-                                    <button className="text-amber-700 hover:underline font-medium">
+                                    <button className="text-violet-700 hover:underline font-medium">
                                         Terms of Service
                                     </button>
                                     {' '}and{' '}
-                                    <button className="text-amber-700 hover:underline font-medium">
+                                    <button className="text-violet-700 hover:underline font-medium">
                                         Privacy Policy
                                     </button>
                                 </p>
@@ -216,10 +202,10 @@ function Login() {
 
                     {/* Bottom Help */}
                     <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-600">
                             Need help?{' '}
                             <button 
-                                className="text-amber-700 hover:underline font-medium"
+                                className="text-violet-700 hover:underline font-medium"
                                 onClick={() => {
                                     const subject = encodeURIComponent('Echoes Support Request');
                                     const body = encodeURIComponent('Hi Echoes Support,\n\nI need help with:\n\n[Please describe your issue here]\n\nThanks!');
