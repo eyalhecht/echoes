@@ -26,9 +26,9 @@ function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
             {/* Navigation */}
-            <nav className="bg-white/80 backdrop-blur-sm border-b border-amber-100 sticky top-0 z-50">
+            <nav className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         {/* Logo */}
@@ -37,8 +37,8 @@ function LandingPage() {
                                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                                 className="flex items-center space-x-2"
                             >
-                                <Sparkles className="h-8 w-8 text-amber-600" />
-                                <span className="text-2xl font-bold text-amber-900">Echoes</span>
+                                <Sparkles className="h-8 w-8 text-violet-600" />
+                                <span className="text-2xl font-bold text-slate-800">Echoes</span>
                             </button>
                         </div>
 
@@ -46,25 +46,25 @@ function LandingPage() {
                         <div className="hidden md:flex items-center space-x-8">
                             <button 
                                 onClick={() => scrollToSection('features')}
-                                className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
+                                className="text-slate-700 hover:text-violet-700 font-medium transition-colors"
                             >
                                 Features
                             </button>
                             <button 
+                                onClick={() => scrollToSection('demo')}
+                                className="text-slate-700 hover:text-violet-700 font-medium transition-colors"
+                            >
+                                Demo
+                            </button>
+                            <button 
                                 onClick={() => scrollToSection('how-it-works')}
-                                className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
+                                className="text-slate-700 hover:text-violet-700 font-medium transition-colors"
                             >
                                 How It Works
                             </button>
-                            <button 
-                                onClick={() => scrollToSection('social-proof')}
-                                className="text-gray-700 hover:text-amber-700 font-medium transition-colors"
-                            >
-                                Reviews
-                            </button>
                             <Button
                                 onClick={() => navigate('/login')}
-                                className="bg-amber-600 hover:bg-amber-700 text-white"
+                                className="bg-violet-600 hover:bg-violet-700 text-white"
                             >
                                 Get Started
                             </Button>
@@ -88,35 +88,35 @@ function LandingPage() {
 
                     {/* Mobile menu */}
                     {mobileMenuOpen && (
-                        <div className="md:hidden border-t border-amber-100 bg-white/95 backdrop-blur-sm">
+                        <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-sm">
                             <div className="px-2 pt-2 pb-3 space-y-1">
                                 <button 
                                     onClick={() => scrollToSection('features')}
-                                    className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
+                                    className="block px-3 py-2 text-slate-700 hover:text-violet-700 font-medium w-full text-left"
                                 >
                                     Features
                                 </button>
                                 <button 
+                                    onClick={() => scrollToSection('demo')}
+                                    className="block px-3 py-2 text-slate-700 hover:text-violet-700 font-medium w-full text-left"
+                                >
+                                    Demo
+                                </button>
+                                <button 
                                     onClick={() => scrollToSection('how-it-works')}
-                                    className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
+                                    className="block px-3 py-2 text-slate-700 hover:text-violet-700 font-medium w-full text-left"
                                 >
                                     How It Works
                                 </button>
                                 <button 
-                                    onClick={() => scrollToSection('social-proof')}
-                                    className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
-                                >
-                                    Reviews
-                                </button>
-                                <button 
                                     onClick={() => navigate('/login')}
-                                    className="block px-3 py-2 text-gray-700 hover:text-amber-700 font-medium w-full text-left"
+                                    className="block px-3 py-2 text-slate-700 hover:text-violet-700 font-medium w-full text-left"
                                 >
                                     Log In
                                 </button>
                                 <Button
                                     onClick={() => navigate('/login')}
-                                    className="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white"
+                                    className="w-full mt-2 bg-violet-600 hover:bg-violet-700 text-white"
                                 >
                                     Get Started
                                 </Button>
@@ -127,24 +127,24 @@ function LandingPage() {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative overflow-hidden py-20 lg:py-32">
+            <section className="relative overflow-hidden py-20 lg:py-12">
                 {/* Background Pattern */}
                 <div className="absolute inset-0" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a574' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a78bfa' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
                 }}></div>
                 
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         {/* Hero Title */}
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight">
                             Turn Your Photos Into
-                            <span className="block text-amber-600">Historical Discoveries</span>
+                            <span className="block text-violet-600">Historical Discoveries</span>
                         </h1>
                         
                         {/* Hero Subtitle */}
-                        <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-gray-700 mb-12 leading-relaxed">
-                            Upload any photo and let AI reveal its historical context, date period, and geographical significance. 
-                            Connect with a community passionate about preserving visual history.
+                        <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-700 mb-12 leading-relaxed">
+                            Upload any photo and let AI reveal its historical context, date period, and location.
+                            Connect with a community passionate about preserving history.
                         </p>
 
                         {/* Hero CTA */}
@@ -152,7 +152,7 @@ function LandingPage() {
                             <Button 
                                 size="lg"
                                 onClick={() => navigate('/login')}
-                                className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg font-semibold h-auto"
+                                className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto"
                             >
                                 Start Discovering
                                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -161,109 +161,56 @@ function LandingPage() {
                                 variant="outline"
                                 size="lg"
                                 onClick={() => scrollToSection('how-it-works')}
-                                className="border-2 border-amber-600 text-amber-700 hover:bg-amber-50 px-8 py-4 text-lg font-semibold h-auto"
+                                className="border-2 border-violet-600 text-violet-700 hover:bg-violet-50 px-8 py-4 text-lg font-semibold h-auto"
                             >
                                 See How It Works
                             </Button>
-                        </div>
-
-                        {/* Hero Visual Placeholder */}
-                        <div className="max-w-4xl mx-auto">
-                            <Card className="overflow-hidden shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
-                                <CardContent className="p-8">
-                                    <div className="aspect-video bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg flex items-center justify-center">
-                                        <div className="text-center">
-                                            <Brain className="h-16 w-16 text-amber-600 mx-auto mb-4" />
-                                            <p className="text-lg font-semibold text-gray-700">
-                                                AI Analysis Demo Coming Soon
-                                            </p>
-                                            <p className="text-gray-600 mt-2">
-                                                See a photo transform with historical insights
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Problem Section */}
-            <section className="py-20 bg-gradient-to-br from-gray-50 to-amber-50">
+            <section className="py-20 bg-gradient-to-br from-slate-100 to-slate-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
                             Your Photos Have Stories to Tell
                         </h2>
-                        <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-700">
+                        <p className="max-w-3xl mx-auto text-lg md:text-xl text-slate-700">
                             But without context, these visual memories lose their historical significance
                         </p>
                     </div>
 
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-8">
-                            <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-3 h-3 bg-red-500 rounded-full mt-2"></div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                        Millions of photos sit forgotten in albums and devices
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Family treasures and historical discoveries gathering digital dust because nobody knows their story.
-                                    </p>
-                                </div>
+                    <div className="flex justify-center">
+                        <div className="relative w-80 bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col items-center transform hover:scale-105 transition-transform duration-300">
+                            {/* Photo */}
+                            <div className="w-full bg-gray-200">
+                                <img
+                                    src="https://images.unsplash.com/photo-1610225526504-3c690a6ca814?q=80&w=694&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    alt="Historical photo of Paris"
+                                    className="w-full h-80 object-cover"
+                                />
                             </div>
 
-                            <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-3 h-3 bg-red-500 rounded-full mt-2"></div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                        Traditional photo apps can't tell you when or where history happened
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Basic metadata only shows file info—not the rich historical context that makes photos meaningful.
-                                    </p>
+                            {/* Polaroid bottom area */}
+                            <div className="w-full bg-white p-6 flex flex-col items-center">
+                                {/* AI Insight */}
+                                <div className="text-center text-violet-700 text-sm font-bold mb-3">
+                                    ✨ AI Insight
                                 </div>
-                            </div>
-
-                            <div className="flex items-start space-x-4">
-                                <div className="flex-shrink-0 w-3 h-3 bg-red-500 rounded-full mt-2"></div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                        Without context, visual memories lose their historical value
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        A photo becomes just an image instead of a window into the past with stories worth preserving.
-                                    </p>
+                                <div className="text-center text-slate-700 text-sm leading-relaxed">
+                                    Likely taken in Paris around the 1990s. Notice the Eiffel Tower and cobblestone streets typical of that era.
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="relative">
-                            <Card className="overflow-hidden shadow-xl border-0 bg-white">
-                                <CardContent className="p-8">
-                                    <div className="space-y-6">
-                                        <div className="flex items-center space-x-3 p-4 bg-gray-100 rounded-lg">
-                                            <div className="w-12 h-12 bg-gray-300 rounded"></div>
-                                            <div className="flex-1">
-                                                <div className="h-3 bg-gray-300 rounded mb-2"></div>
-                                                <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                                            </div>
-                                        </div>
-                                        <div className="text-center text-gray-500 font-medium">
-                                            Traditional Photo Apps
-                                        </div>
-                                        <div className="text-center text-sm text-gray-400">
-                                            "Just another old photo..."
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <div className="absolute -bottom-4 -right-4 bg-amber-600 text-white p-3 rounded-full">
-                                <ArrowRight className="h-6 w-6" />
-                            </div>
-                        </div>
+                    {/* Subtitle below photo */}
+                    <div className="text-center mt-12">
+                        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                            With Echoes, every photo becomes a window into history with AI-powered context and insights.
+                        </p>
                     </div>
                 </div>
             </section>
@@ -272,10 +219,10 @@ function LandingPage() {
             <section id="features" className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                             Powered by AI, Driven by History
                         </h2>
-                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600">
+                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-600">
                             Unlike other photo apps, Echoes reveals the hidden stories in your images
                         </p>
                     </div>
@@ -284,13 +231,13 @@ function LandingPage() {
                         {/* Feature 1 */}
                         <Card className="text-center p-8 border-0 shadow-lg hover:shadow-xl transition-shadow">
                             <CardContent className="pt-6">
-                                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Clock className="h-8 w-8 text-amber-700" />
+                                <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Clock className="h-8 w-8 text-violet-700" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                <h3 className="text-xl font-bold text-slate-900 mb-4">
                                     AI Historical Dating
                                 </h3>
-                                <p className="text-gray-600 leading-relaxed">
+                                <p className="text-slate-600 leading-relaxed">
                                     Our AI analyzes architectural styles, clothing, vehicles, and visual cues to estimate
                                     when your photo was taken. From mystery to history in seconds.
                                 </p>
@@ -300,13 +247,13 @@ function LandingPage() {
                         {/* Feature 2 */}
                         <Card className="text-center p-8 border-0 shadow-lg hover:shadow-xl transition-shadow">
                             <CardContent className="pt-6">
-                                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <MapPin className="h-8 w-8 text-amber-700" />
+                                <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <MapPin className="h-8 w-8 text-violet-700" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                <h3 className="text-xl font-bold text-slate-900 mb-4">
                                     Smart Geolocation
                                 </h3>
-                                <p className="text-gray-600 leading-relaxed">
+                                <p className="text-slate-600 leading-relaxed">
                                     Identifies landmarks, buildings, and geographical features to pinpoint where
                                     historical moments happened. Discover the stories behind the places.
                                 </p>
@@ -316,13 +263,13 @@ function LandingPage() {
                         {/* Feature 3 */}
                         <Card className="text-center p-8 border-0 shadow-lg hover:shadow-xl transition-shadow">
                             <CardContent className="pt-6">
-                                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Search className="h-8 w-8 text-amber-700" />
+                                <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Search className="h-8 w-8 text-violet-700" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                                <h3 className="text-xl font-bold text-slate-900 mb-4">
                                     Intelligent Search
                                 </h3>
-                                <p className="text-gray-600 leading-relaxed">
+                                <p className="text-slate-600 leading-relaxed">
                                     Search across all AI-generated metadata. Find photos by era, location,
                                     architectural style, or any historical element our AI identifies.
                                 </p>
@@ -332,121 +279,15 @@ function LandingPage() {
                 </div>
             </section>
 
-            {/* Social Proof Section */}
-            <section id="social-proof" className="py-20 bg-amber-600">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                            Trusted by History Enthusiasts Worldwide
-                        </h2>
-                        <p className="max-w-2xl mx-auto text-xl text-amber-100">
-                            Join thousands who've already discovered the stories hidden in their photos
-                        </p>
-                    </div>
-
-                    {/* Statistics */}
-                    <div className="grid md:grid-cols-4 gap-8 mb-16">
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">50K+</div>
-                            <div className="text-amber-100">Photos Analyzed</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">95%</div>
-                            <div className="text-amber-100">Accuracy Rate</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">12K+</div>
-                            <div className="text-amber-100">Active Users</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">89%</div>
-                            <div className="text-amber-100">Would Recommend</div>
-                        </div>
-                    </div>
-
-                    {/* Testimonials */}
-                    <div className="grid lg:grid-cols-3 gap-8">
-                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
-                            <CardContent className="p-8">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
-                                        <span className="font-bold text-amber-900">MH</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold">Maria H.</div>
-                                        <div className="text-amber-200 text-sm">Family Historian</div>
-                                    </div>
-                                </div>
-                                <p className="text-amber-100 leading-relaxed">
-                                    "Echoes helped me date my grandmother's photos from the 1940s. The AI identified the exact decade based on clothing and architecture. Amazing!"
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
-                            <CardContent className="p-8">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
-                                        <span className="font-bold text-amber-900">DR</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold">Dr. Robert K.</div>
-                                        <div className="text-amber-200 text-sm">Museum Curator</div>
-                                    </div>
-                                </div>
-                                <p className="text-amber-100 leading-relaxed">
-                                    "As a museum professional, I'm impressed by the accuracy. Echoes identified architectural periods that matched our expert assessments."
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
-                            <CardContent className="p-8">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
-                                        <span className="font-bold text-amber-900">SL</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold">Sarah L.</div>
-                                        <div className="text-amber-200 text-sm">Photography Enthusiast</div>
-                                    </div>
-                                </div>
-                                <p className="text-amber-100 leading-relaxed">
-                                    "I collect vintage photographs, and Echoes has become my go-to tool for understanding their historical context. Game-changer!"
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Trust Badges */}
-                    <div className="text-center mt-16">
-                        <p className="text-amber-200 mb-8">Trusted by professionals at:</p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 opacity-70">
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Museums</span>
-                            </div>
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Universities</span>
-                            </div>
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Archives</span>
-                            </div>
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Genealogists</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Demo/Preview Section */}
-            <section className="py-20 bg-gradient-to-br from-gray-50 to-amber-50">
+            <section id="demo" className="py-20 bg-gradient-to-br from-slate-50 to-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                             See Echoes in Action
                         </h2>
-                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600">
+                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-600">
                             Watch how our AI transforms a mysterious old photo into a rich historical discovery
                         </p>
                     </div>
@@ -470,15 +311,15 @@ function LandingPage() {
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Date:</span>
+                                            <span className="text-slate-600">Date:</span>
                                             <span className="text-red-600">Unknown</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Location:</span>
+                                            <span className="text-slate-600">Location:</span>
                                             <span className="text-red-600">Unknown</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Context:</span>
+                                            <span className="text-slate-600">Context:</span>
                                             <span className="text-red-600">None</span>
                                         </div>
                                     </div>
@@ -495,45 +336,35 @@ function LandingPage() {
                             </div>
                             <Card className="overflow-hidden shadow-xl border-2 border-green-200">
                                 <CardContent className="p-8">
-                                    <div className="aspect-square bg-gradient-to-br from-amber-100 to-orange-100 rounded-lg mb-6 flex items-center justify-center relative">
-                                        <div className="text-center text-gray-700">
-                                            <div className="w-20 h-20 bg-amber-300 rounded mx-auto mb-4 flex items-center justify-center">
-                                                <Brain className="h-10 w-10 text-amber-700" />
+                                    <div className="aspect-square bg-gradient-to-br from-violet-100 to-purple-100 rounded-lg mb-6 flex items-center justify-center relative">
+                                        <div className="text-center text-slate-700">
+                                            <div className="w-20 h-20 bg-violet-300 rounded mx-auto mb-4 flex items-center justify-center">
+                                                <Brain className="h-10 w-10 text-violet-700" />
                                             </div>
                                             <p className="font-medium">AI-Analyzed Photo</p>
                                             <p className="text-sm">Rich historical insights</p>
                                         </div>
-                                        {/* AI Analysis Overlays */}
-                                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                                            1940s Architecture
-                                        </div>
-                                        <div className="absolute top-2 right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
-                                            Victorian Era
-                                        </div>
-                                        <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                                            London, UK
-                                        </div>
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Date:</span>
+                                            <span className="text-slate-600">Date:</span>
                                             <span className="text-green-600 font-medium">1940-1945</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Location:</span>
+                                            <span className="text-slate-600">Location:</span>
                                             <span className="text-green-600 font-medium">London, England</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Architecture:</span>
+                                            <span className="text-slate-600">Architecture:</span>
                                             <span className="text-green-600 font-medium">Victorian</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Confidence:</span>
+                                            <span className="text-slate-600">Confidence:</span>
                                             <span className="text-green-600 font-medium">94%</span>
                                         </div>
                                     </div>
-                                    <div className="mt-6 p-4 bg-amber-50 rounded-lg">
-                                        <p className="text-sm text-gray-700">
+                                    <div className="mt-6 p-4 bg-violet-50 rounded-lg">
+                                        <p className="text-sm text-slate-700">
                                             <span className="font-medium">AI Insight:</span> This photograph appears to be taken during WWII era, showing typical London residential architecture. The style and visual cues suggest wartime period.
                                         </p>
                                     </div>
@@ -544,19 +375,19 @@ function LandingPage() {
 
                     {/* Call-to-Action */}
                     <div className="text-center mt-16">
-                        <div className="inline-flex items-center space-x-4 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+                        <div className="inline-flex items-center space-x-4 p-6 bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl">
                             <div className="text-left">
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">
                                     Ready to discover your photos' stories?
                                 </h3>
-                                <p className="text-gray-600">
+                                <p className="text-slate-600">
                                     Upload your first photo and see the magic happen in seconds
                                 </p>
                             </div>
                             <Button 
                                 size="lg"
                                 onClick={() => navigate('/login')}
-                                className="bg-amber-600 hover:bg-amber-700 text-white whitespace-nowrap"
+                                className="bg-violet-600 hover:bg-violet-700 text-white whitespace-nowrap"
                             >
                                 Try It Free
                                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -567,13 +398,13 @@ function LandingPage() {
             </section>
 
             {/* How It Works Section */}
-            <section id="how-it-works" className="py-20 bg-gradient-to-br from-amber-50 to-orange-50">
+            <section id="how-it-works" className="py-20 bg-gradient-to-br from-slate-100 to-slate-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                             Three Simple Steps
                         </h2>
-                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-gray-600">
+                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-slate-600">
                             From upload to historical discovery in minutes
                         </p>
                     </div>
@@ -581,16 +412,16 @@ function LandingPage() {
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Step 1 */}
                         <div className="text-center">
-                            <div className="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
                                 <Upload className="h-8 w-8" />
                             </div>
-                            <div className="w-8 h-8 bg-amber-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
+                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
                                 1
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">
                                 Upload Your Photo
                             </h3>
-                            <p className="text-gray-600">
+                            <p className="text-slate-600">
                                 Simply drag and drop any historical photo from your collection.
                                 Family photos, vintage finds, or mysterious old images.
                             </p>
@@ -598,16 +429,16 @@ function LandingPage() {
 
                         {/* Step 2 */}
                         <div className="text-center">
-                            <div className="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
                                 <Brain className="h-8 w-8" />
                             </div>
-                            <div className="w-8 h-8 bg-amber-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
+                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
                                 2
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">
                                 AI Analyzes History
                             </h3>
-                            <p className="text-gray-600">
+                            <p className="text-slate-600">
                                 Our advanced AI examines every detail - architecture, clothing, vehicles,
                                 and context clues to determine the historical period and location.
                             </p>
@@ -615,16 +446,16 @@ function LandingPage() {
 
                         {/* Step 3 */}
                         <div className="text-center">
-                            <div className="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
                                 <Users className="h-8 w-8" />
                             </div>
-                            <div className="w-8 h-8 bg-amber-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
+                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
                                 3
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">
+                            <h3 className="text-xl font-bold text-slate-900 mb-4">
                                 Share & Discover
                             </h3>
-                            <p className="text-gray-600">
+                            <p className="text-slate-600">
                                 Share your discoveries with the community and explore others' findings.
                                 Build connections through shared historical interests.
                             </p>
@@ -634,18 +465,18 @@ function LandingPage() {
             </section>
 
             {/* Final CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-amber-600 to-orange-600">
+            <section className="py-20 bg-gradient-to-r from-violet-600 to-purple-600">
                 <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
                         Start Your Historical Journey Today
                     </h2>
-                    <p className="text-xl text-amber-100 mb-8">
-                        Join thousands of history enthusiasts discovering the stories hidden in their photos
+                    <p className="text-xl text-violet-100 mb-8">
+                        Join history enthusiasts discovering the stories hidden in their photos
                     </p>
                     <Button 
                         size="lg"
                         onClick={() => navigate('/login')}
-                        className="bg-white text-amber-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold h-auto"
+                        className="bg-white text-violet-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold h-auto"
                     >
                         Get Started Free
                         <ArrowRight className="ml-2 h-5 w-5" />
@@ -658,13 +489,10 @@ function LandingPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                            <Sparkles className="h-6 w-6 text-amber-400" />
+                            <Sparkles className="h-6 w-6 text-violet-400" />
                             <span className="text-xl font-bold">Echoes</span>
                         </div>
                         <div className="text-center md:text-right">
-                            <p className="text-gray-400">
-                                Discover history through AI-powered photo analysis
-                            </p>
                             <p className="text-gray-500 text-sm mt-2">
                                 © 2025 Echoes. All rights reserved.
                             </p>

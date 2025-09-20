@@ -13,6 +13,7 @@ import Profile from '../components/Profile.jsx';
 import MapPostsView from '../components/MapPostsView.jsx';
 import UploadPost from '../components/UploadPost.jsx';
 import Bookmarks from '../components/Bookmarks.jsx';
+import LandingPage from "@/components/LandingPage.jsx";
 
 function AppRouter() {
   const { isAuthenticated } = useAuthStore();
@@ -22,14 +23,15 @@ function AppRouter() {
       {/* Public Routes */}
       <Route
         path="/"
-        element={isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />}
+        element={isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />}
       />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/home" replace /> : <Login />}
+      />
 
       {/* Protected Routes with Layout wrapper */}
       <Route
-        path="/*"
         element={
           <ProtectedRoute>
             <Layout />
@@ -37,15 +39,15 @@ function AppRouter() {
         }
       >
         {/* Nested routes - these will render inside Layout */}
-        <Route path="home" element={<Home />} />
-        <Route path="explore" element={<Explore />} />
-        <Route path="profile/:userId?" element={<Profile />} />
-        <Route path="map" element={<MapPostsView />} />
-        <Route path="upload" element={<UploadPost />} />
-        <Route path="bookmarks" element={<Bookmarks />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/profile/:userId?" element={<Profile />} />
+        <Route path="/map" element={<MapPostsView />} />
+        <Route path="/upload" element={<UploadPost />} />
+        <Route path="/bookmarks" element={<Bookmarks />} />
 
         {/* Default redirect to home for any unmatched nested routes */}
-        <Route index element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Route>
     </Routes>
   );
