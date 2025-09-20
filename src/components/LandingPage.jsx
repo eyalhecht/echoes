@@ -143,8 +143,8 @@ function LandingPage() {
                         
                         {/* Hero Subtitle */}
                         <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-gray-700 mb-12 leading-relaxed">
-                            Upload any photo and let AI reveal its historical context, date period, and geographical significance. 
-                            Connect with a community passionate about preserving visual history.
+                            Upload any photo and let AI reveal its historical context, date period, and location.
+                            Connect with a community passionate about preserving history.
                         </p>
 
                         {/* Hero CTA */}
@@ -210,7 +210,7 @@ function LandingPage() {
                                         Millions of photos sit forgotten in albums and devices
                                     </h3>
                                     <p className="text-gray-600">
-                                        Family treasures and historical discoveries gathering digital dust because nobody knows their story.
+                                        Family treasures and historical discoveries gathering dust because nobody knows their story.
                                     </p>
                                 </div>
                             </div>
@@ -222,7 +222,7 @@ function LandingPage() {
                                         Traditional photo apps can't tell you when or where history happened
                                     </h3>
                                     <p className="text-gray-600">
-                                        Basic metadata only shows file info—not the rich historical context that makes photos meaningful.
+                                        Basic metadata only shows file info - not the rich historical context that makes photos meaningful.
                                     </p>
                                 </div>
                             </div>
@@ -240,30 +240,31 @@ function LandingPage() {
                             </div>
                         </div>
 
-                        <div className="relative">
-                            <Card className="overflow-hidden shadow-xl border-0 bg-white">
-                                <CardContent className="p-8">
-                                    <div className="space-y-6">
-                                        <div className="flex items-center space-x-3 p-4 bg-gray-100 rounded-lg">
-                                            <div className="w-12 h-12 bg-gray-300 rounded"></div>
-                                            <div className="flex-1">
-                                                <div className="h-3 bg-gray-300 rounded mb-2"></div>
-                                                <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                                            </div>
-                                        </div>
-                                        <div className="text-center text-gray-500 font-medium">
-                                            Traditional Photo Apps
-                                        </div>
-                                        <div className="text-center text-sm text-gray-400">
-                                            "Just another old photo..."
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                            <div className="absolute -bottom-4 -right-4 bg-amber-600 text-white p-3 rounded-full">
-                                <ArrowRight className="h-6 w-6" />
+                        <div className="relative w-64 bg-white shadow-xl rounded-lg overflow-hidden flex flex-col items-center">
+                            {/* Photo */}
+                            <div className="w-full bg-gray-200">
+                                <img
+                                    src="https://images.unsplash.com/photo-1610225526504-3c690a6ca814?q=80&w=694&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                    alt="Historical photo"
+                                    className="w-full h-64 object-cover rounded-t-lg"
+                                />
                             </div>
+
+                            {/* Polaroid bottom area */}
+                            <div className="w-full bg-white p-4 flex flex-col items-center">
+                                {/* AI Insight */}
+                                <div className="text-center text-gray-700 text-sm font-medium mb-2">
+                                    AI Insight:
+                                </div>
+                                <div className="text-center text-gray-500 text-xs">
+                                    Likely taken in Paris around the 1990s. Notice the Eifel tower and cobblestone streets.
+                                </div>
+                            </div>
+
                         </div>
+
+
+
                     </div>
                 </div>
             </section>
@@ -332,115 +333,8 @@ function LandingPage() {
                 </div>
             </section>
 
-            {/* Social Proof Section */}
-            <section id="social-proof" className="py-20 bg-amber-600">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                            Trusted by History Enthusiasts Worldwide
-                        </h2>
-                        <p className="max-w-2xl mx-auto text-xl text-amber-100">
-                            Join thousands who've already discovered the stories hidden in their photos
-                        </p>
-                    </div>
-
-                    {/* Statistics */}
-                    <div className="grid md:grid-cols-4 gap-8 mb-16">
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">50K+</div>
-                            <div className="text-amber-100">Photos Analyzed</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">95%</div>
-                            <div className="text-amber-100">Accuracy Rate</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">12K+</div>
-                            <div className="text-amber-100">Active Users</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="text-4xl md:text-5xl font-bold text-white mb-2">89%</div>
-                            <div className="text-amber-100">Would Recommend</div>
-                        </div>
-                    </div>
-
-                    {/* Testimonials */}
-                    <div className="grid lg:grid-cols-3 gap-8">
-                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
-                            <CardContent className="p-8">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
-                                        <span className="font-bold text-amber-900">MH</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold">Maria H.</div>
-                                        <div className="text-amber-200 text-sm">Family Historian</div>
-                                    </div>
-                                </div>
-                                <p className="text-amber-100 leading-relaxed">
-                                    "Echoes helped me date my grandmother's photos from the 1940s. The AI identified the exact decade based on clothing and architecture. Amazing!"
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
-                            <CardContent className="p-8">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
-                                        <span className="font-bold text-amber-900">DR</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold">Dr. Robert K.</div>
-                                        <div className="text-amber-200 text-sm">Museum Curator</div>
-                                    </div>
-                                </div>
-                                <p className="text-amber-100 leading-relaxed">
-                                    "As a museum professional, I'm impressed by the accuracy. Echoes identified architectural periods that matched our expert assessments."
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-white/10 backdrop-blur-sm border-0 text-white">
-                            <CardContent className="p-8">
-                                <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-amber-400 rounded-full flex items-center justify-center mr-4">
-                                        <span className="font-bold text-amber-900">SL</span>
-                                    </div>
-                                    <div>
-                                        <div className="font-semibold">Sarah L.</div>
-                                        <div className="text-amber-200 text-sm">Photography Enthusiast</div>
-                                    </div>
-                                </div>
-                                <p className="text-amber-100 leading-relaxed">
-                                    "I collect vintage photographs, and Echoes has become my go-to tool for understanding their historical context. Game-changer!"
-                                </p>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Trust Badges */}
-                    <div className="text-center mt-16">
-                        <p className="text-amber-200 mb-8">Trusted by professionals at:</p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 opacity-70">
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Museums</span>
-                            </div>
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Universities</span>
-                            </div>
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Archives</span>
-                            </div>
-                            <div className="bg-white/20 px-6 py-3 rounded-lg">
-                                <span className="text-white font-semibold">Genealogists</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             {/* Demo/Preview Section */}
-            <section className="py-20 bg-gradient-to-br from-gray-50 to-amber-50">
+            <section className="py-20 bg-amber-600">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -640,7 +534,7 @@ function LandingPage() {
                         Start Your Historical Journey Today
                     </h2>
                     <p className="text-xl text-amber-100 mb-8">
-                        Join thousands of history enthusiasts discovering the stories hidden in their photos
+                        Join history enthusiasts discovering the stories hidden in their photos
                     </p>
                     <Button 
                         size="lg"
@@ -662,9 +556,6 @@ function LandingPage() {
                             <span className="text-xl font-bold">Echoes</span>
                         </div>
                         <div className="text-center md:text-right">
-                            <p className="text-gray-400">
-                                Discover history through AI-powered photo analysis
-                            </p>
                             <p className="text-gray-500 text-sm mt-2">
                                 © 2025 Echoes. All rights reserved.
                             </p>
