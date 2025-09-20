@@ -344,16 +344,6 @@ function LandingPage() {
                                             <p className="font-medium">AI-Analyzed Photo</p>
                                             <p className="text-sm">Rich historical insights</p>
                                         </div>
-                                        {/* AI Analysis Overlays */}
-                                        <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                                            1940s Architecture
-                                        </div>
-                                        <div className="absolute top-2 right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
-                                            Victorian Era
-                                        </div>
-                                        <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                                            London, UK
-                                        </div>
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
