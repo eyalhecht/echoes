@@ -149,8 +149,8 @@ export function AppSidebar() {
     return (
         <TooltipProvider>
         <Sidebar collapsible="icon">
-            <SidebarHeader>
-                <div className={open ? "px-2" : "px-3"}>
+            <SidebarHeader className={"cursor-pointer"}>
+                <div onClick={()=> navigate("/home")} className={open ? "px-2" : "px-3"}>
                     <h2 className="text-lg font-semibold">{open ? "ECHOES" : "E"}</h2>
                 </div>
             </SidebarHeader>

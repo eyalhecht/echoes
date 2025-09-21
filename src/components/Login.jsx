@@ -66,7 +66,7 @@ function Login() {
                 </div>
 
                 {/* Main Login Buttons */}
-                <div className="space-y-4 mb-12">
+                <div className="space-y-4 mb-12  animate-fade-in-up">
                     <Button
                         variant="outline"
                         size="lg"
