@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import '../animations.css';
 
 function LandingPage() {
     const navigate = useNavigate();
@@ -136,23 +137,23 @@ function LandingPage() {
                 <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
                         {/* Hero Title */}
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight animate-fade-in-up">
                             Turn Your Photos Into
-                            <span className="block text-violet-600">Historical Discoveries</span>
+                            <span className="block text-violet-600 animate-fade-in-up animation-delay-300">Historical Discoveries</span>
                         </h1>
                         
                         {/* Hero Subtitle */}
-                        <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-700 mb-12 leading-relaxed">
+                        <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-700 mb-12 leading-relaxed animate-fade-in-up animation-delay-500">
                             Upload any photo and let AI reveal its historical context, date period, and location.
                             Connect with a community passionate about preserving history.
                         </p>
 
                         {/* Hero CTA */}
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in-up animation-delay-700">
                             <Button 
                                 size="lg"
                                 onClick={() => navigate('/login')}
-                                className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto"
+                                className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto transform hover:scale-105 transition-all duration-300"
                             >
                                 Start Discovering
                                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -161,7 +162,7 @@ function LandingPage() {
                                 variant="outline"
                                 size="lg"
                                 onClick={() => scrollToSection('how-it-works')}
-                                className="border-2 border-violet-600 text-violet-700 hover:bg-violet-50 px-8 py-4 text-lg font-semibold h-auto"
+                                className="border-2 border-violet-600 text-violet-700 hover:bg-violet-50 px-8 py-4 text-lg font-semibold h-auto transform hover:scale-105 transition-all duration-300"
                             >
                                 See How It Works
                             </Button>

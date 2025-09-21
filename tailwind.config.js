@@ -12,6 +12,102 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+  		animation: {
+  			'fade-in-up': 'fadeInUp 1s ease-out forwards',
+  			'fade-in-down': 'fadeInDown 1s ease-out forwards',
+  			'slide-in-left': 'slideInLeft 1s ease-out forwards',
+  			'slide-in-right': 'slideInRight 1s ease-out forwards',
+  			'bounce-in': 'bounceIn 1s ease-out forwards',
+  			'scale-in': 'scaleIn 0.8s ease-out forwards',
+  			'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+  		},
+  		keyframes: {
+  			fadeInUp: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(30px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
+  			},
+  			fadeInDown: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateY(-30px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
+  			},
+  			slideInLeft: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateX(-50px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				}
+  			},
+  			slideInRight: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'translateX(50px)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'translateX(0)'
+  				}
+  			},
+  			bounceIn: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'scale(0.3)'
+  				},
+  				'50%': {
+  					opacity: '1',
+  					transform: 'scale(1.05)'
+  				},
+  				'70%': {
+  					transform: 'scale(0.9)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'scale(1)'
+  				}
+  			},
+  			scaleIn: {
+  				'0%': {
+  					opacity: '0',
+  					transform: 'scale(0.9)'
+  				},
+  				'100%': {
+  					opacity: '1',
+  					transform: 'scale(1)'
+  				}
+  			},
+  			pulseGlow: {
+  				'0%, 100%': {
+  					opacity: '1',
+  					transform: 'scale(1)'
+  				},
+  				'50%': {
+  					opacity: '0.8',
+  					transform: 'scale(1.02)'
+  				}
+  			}
+  		},
+  		animationDelay: {
+  			'100': '100ms',
+  			'200': '200ms',
+  			'300': '300ms',
+  			'500': '500ms',
+  			'700': '700ms',
+  			'1000': '1000ms'
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
