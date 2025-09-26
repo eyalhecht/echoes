@@ -35,6 +35,8 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
     Home,
     User,
@@ -44,12 +46,16 @@ import {
     LogOut,
     Loader2,
     Settings,
-    Search
+    Search,
+    Trash2,
+    AlertTriangle
 } from "lucide-react"
 import { useNavigate, useLocation } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
 import { useState } from "react"
+import { callApiGateway} from "@/firebaseConfig.js";
+import { useToast } from "@/hooks/use-toast"
 
 export function AppSidebar() {
     const navigate = useNavigate()
@@ -59,6 +65,10 @@ export function AppSidebar() {
     const setExploreQuery = useUiStore((state) => state.setExploreQuery)
     const { open, isMobile, setOpenMobile } = useSidebar()
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [deleteConfirmText, setDeleteConfirmText] = useState('')
+    const [isDeleting, setIsDeleting] = useState(false)
+    const { toast } = useToast()
 
     const handleLogout = async () => {
         try {
@@ -71,6 +81,59 @@ export function AppSidebar() {
 
     const confirmLogout = () => {
         setShowLogoutConfirm(true)
+    }
+
+    const confirmDeleteAccount = () => {
+        setShowDeleteConfirm(true)
+        setDeleteConfirmText('')
+    }
+
+    const handleDeleteAccount = async () => {
+        if (deleteConfirmText !== 'DELETE') {
+            toast({
+                title: "Confirmation Required",
+                description: "Please type DELETE to confirm account deletion",
+                variant: "destructive"
+            })
+            return
+        }
+
+        setIsDeleting(true)
+        try {
+            const response = await callApiGateway({
+                action: 'deleteUserAccount',
+                payload: {}
+            });
+
+            toast({
+                title: "Account Deletion Initiated",
+                description: "You will be logged out shortly.",
+                variant: "default"
+            })
+            
+            // Wait a moment then logout
+            setTimeout(async () => {
+                await useAuthStore.getState().logout()
+                navigate('/login')
+                toast({
+                    title: "Account Deletion Processing",
+                    description: "Account deletion is processing in the background. All your data will be permanently removed.",
+                    variant: "default"
+                })
+            }, 2000)
+            
+        } catch (error) {
+            console.error('Delete account error:', error)
+            toast({
+                title: "Deletion Failed",
+                description: error.message || "Failed to delete account. Please try again.",
+                variant: "destructive"
+            })
+        } finally {
+            setIsDeleting(false)
+            setShowDeleteConfirm(false)
+            setDeleteConfirmText('')
+        }
     }
 
     const getUserInitials = (user) => {
@@ -262,6 +325,18 @@ export function AppSidebar() {
                                     )}
                                     {loading ? 'Logging out...' : 'Log out'}
                                 </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={confirmDeleteAccount}
+                                    disabled={loading || isDeleting}
+                                    className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+                                >
+                                    {isDeleting ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                    )}
+                                    {isDeleting ? 'Deleting...' : 'Delete Account'}
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </SidebarMenuItem>
@@ -269,7 +344,6 @@ export function AppSidebar() {
             </SidebarFooter>
             </Sidebar>
 
-            {/* Logout confirmation dialog - outside sidebar for proper z-index */}
             <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
                 <AlertDialogContent className="z-[9999]">
                     <AlertDialogHeader>
@@ -285,6 +359,76 @@ export function AppSidebar() {
                             className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
                         >
                             Log out
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Delete account confirmation dialog */}
+            <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+                <AlertDialogContent className="z-[9999] max-w-md">
+                    <AlertDialogHeader>
+                        <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-red-600" />
+                            <AlertDialogTitle className="text-red-600">
+                                Delete Account Permanently
+                            </AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription className="space-y-3">
+                            <p className="font-semibold text-foreground">
+                                ⚠️ This action cannot be undone!
+                            </p>
+                            <p>
+                                This will permanently delete your account and all associated data, including:
+                            </p>
+                            <ul className="list-disc list-inside space-y-1 text-sm">
+                                <li>All your posts and uploaded content</li>
+                                <li>All your comments and likes</li>
+                                <li>Your followers and following relationships</li>
+                                <li>Your bookmarks and preferences</li>
+                                <li>Your profile information</li>
+                            </ul>
+                            <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+                                <p className="text-sm text-red-700 dark:text-red-300">
+                                    <strong>Type "DELETE" below to confirm:</strong>
+                                </p>
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="my-4">
+                        <Label htmlFor="delete-confirm" className="text-sm font-medium">
+                            Confirmation
+                        </Label>
+                        <Input
+                            id="delete-confirm"
+                            type="text"
+                            placeholder="Type DELETE here"
+                            value={deleteConfirmText}
+                            onChange={(e) => setDeleteConfirmText(e.target.value)}
+                            className="mt-1"
+                            disabled={isDeleting}
+                        />
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDeleteAccount}
+                            disabled={isDeleting || deleteConfirmText !== 'DELETE'}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-600 disabled:opacity-50"
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting Account...
+                                </>
+                            ) : (
+                                <>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete My Account
+                                </>
+                            )}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
