@@ -125,7 +125,7 @@ function Login() {
                 </div>
 
                 {/* Terms Footer */}
-                <div className="mt-16 text-center">
+                <div className="mt-16 text-center space-y-3">
                     <p className="text-sm text-slate-400 leading-relaxed">
                         By continuing, you agree to our{' '}
                         <button className="text-violet-600 hover:underline font-medium">
@@ -135,6 +135,15 @@ function Login() {
                         <button className="text-violet-600 hover:underline font-medium">
                             Privacy Policy
                         </button>
+                    </p>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                        Need help?{' '}
+                        <a 
+                            href="mailto:eyalhe3@gmail.com"
+                            className="text-violet-600 hover:underline font-medium"
+                        >
+                            Contact Us
+                        </a>
                     </p>
                 </div>
             </div>
