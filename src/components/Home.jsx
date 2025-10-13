@@ -7,6 +7,9 @@ import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
+import { Users } from "lucide-react";
 
 function Home() {
     const [activeTab, setActiveTab] = useState('recent');
@@ -150,11 +153,30 @@ function Home() {
                         )}
 
                         {posts.length === 0 && !postsLoading && (
-                            <div className="text-center py-10 text-muted-foreground/70">
-                                {activeTab === 'following'
-                                    ? "No posts from users you follow yet. Try following some users!"
-                                    : "No posts found"}
-                            </div>
+                            <>
+                                {activeTab === 'following' ? (
+                                    <Empty className="py-10">
+                                        <EmptyHeader>
+                                            <EmptyMedia>
+                                                <Users className="h-12 w-12 text-muted-foreground" />
+                                            </EmptyMedia>
+                                            <EmptyTitle>No posts from people you follow</EmptyTitle>
+                                            <EmptyDescription>
+                                                Start following users to see their posts in your feed.
+                                            </EmptyDescription>
+                                        </EmptyHeader>
+                                        <EmptyContent>
+                                            <Button onClick={() => setActiveTab('recent')}>
+                                                Discover Users
+                                            </Button>
+                                        </EmptyContent>
+                                    </Empty>
+                                ) : (
+                                    <div className="text-center py-10 text-muted-foreground/70">
+                                        No posts found
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 </Tabs>
