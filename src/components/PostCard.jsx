@@ -141,9 +141,9 @@ function PostCard({ post }) {
         if (type === 'photo' || type === 'document' || type === 'item') {
             return (
                 <div className="flex justify-center px-4 sm:px-6">
-                    <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full z-10">
+                    <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full">
                         {formatYear(year) && imageLoaded && (
-                            <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 z-20 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
+                            <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
                                 {formatYear(year)}
                             </div>
                         )}

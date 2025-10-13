@@ -110,7 +110,7 @@ function Home() {
                 <SuggestedUsers />
             </div>
             <div className={cn("max-w-[600px] mx-auto pb-5")}>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-[500px]">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="lg:w-[500px] md:w-full">
                     <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
                         <TabsList className="w-full justify-start rounded-none h-12 bg-transparent p-0">
                             <TabsTrigger
