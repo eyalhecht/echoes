@@ -6,6 +6,7 @@ import SuggestedUsers from "./SuggestedUsers.jsx";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Spinner } from "@/components/ui/spinner";
 
 function Home() {
     const [activeTab, setActiveTab] = useState('recent');
@@ -52,6 +53,8 @@ function Home() {
     // Load initial posts or reload when tab changes
     useEffect(() => {
         const getPosts = async () => {
+            setPosts([]);
+            setLastDocId(null);
             setPostsLoading(true);
             try {
                 const response = await callApiGateway({
@@ -134,8 +137,9 @@ function Home() {
 
                         {/* Show loading for pagination (when loading more posts) */}
                         {postsLoading && posts.length > 0 && (
-                            <div className="text-center py-5 text-muted-foreground">
-                                Loading more posts...
+                            <div className="flex justify-center items-center py-5 gap-2 text-muted-foreground">
+                                <Spinner />
+                                <span>Loading more posts...</span>
                             </div>
                         )}
 
