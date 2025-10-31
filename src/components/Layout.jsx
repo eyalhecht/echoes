@@ -156,7 +156,7 @@ function MainContent() {
 export default function Layout() {
     return (
         <SidebarProvider style={{
-            "--sidebar-width": "12rem"
+            "--sidebar-width": "18rem"
         }}>
             <AppSidebar />
             <MainContent />

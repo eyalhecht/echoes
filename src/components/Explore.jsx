@@ -208,18 +208,30 @@ export function Explore() {
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {posts.map((post) => (
-                                    <div key={post.id} className="rounded-lg border overflow-hidden hover:shadow-md transition-shadow">
+                                    <div
+                                        key={post.id}
+                                        className="rounded-lg border overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                                        onClick={() => {
+                                            window.history.pushState({}, '', `?post=${post.id}`);
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                window.history.pushState({}, '', `?post=${post.id}`);
+                                            }
+                                        }}
+                                        tabIndex={0}
+                                    >
                                         {/* Post Image */}
                                         {post.files?.[0] && (
                                             <div className="aspect-square bg-muted overflow-hidden">
-                                                <img 
-                                                    src={post.files[0]} 
+                                                <img
+                                                    src={post.files[0]}
                                                     alt=""
-                                                    className="h-full w-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                                                    className="h-full w-full object-cover hover:scale-105 transition-transform"
                                                 />
                                             </div>
                                         )}
-                                        
+
                                         {/* Post Content */}
                                         <div className="p-3">
                                             <p className="text-sm font-medium line-clamp-2 mb-2">

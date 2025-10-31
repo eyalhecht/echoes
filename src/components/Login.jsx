@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -24,24 +24,29 @@ function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const { loading, error } = useAuthStore();
+    const [loadingProvider, setLoadingProvider] = useState(null);
 
     const from = location.state?.from || '/home';
 
     const handleGoogleLogin = async () => {
         try {
+            setLoadingProvider('google');
             await useAuthStore.getState().signInWithGoogle();
             navigate(from, { replace: true });
         } catch (err) {
             console.error("Google Login component caught error:", err);
+            setLoadingProvider(null);
         }
     };
 
     const handleGitHubLogin = async () => {
         try {
+            setLoadingProvider('github');
             await useAuthStore.getState().signInWithGitHub();
             navigate(from, { replace: true });
         } catch (err) {
             console.error("GitHub Login component caught error:", err);
+            setLoadingProvider(null);
         }
     };
 
@@ -74,7 +79,7 @@ function Login() {
                         onClick={handleGoogleLogin}
                         disabled={loading}
                     >
-                        {loading ? (
+                        {loadingProvider === 'google' ? (
                             <Loader2 className="mr-4 h-6 w-6 animate-spin" />
                         ) : (
                             <GoogleIcon />
@@ -89,7 +94,7 @@ function Login() {
                         onClick={handleGitHubLogin}
                         disabled={loading}
                     >
-                        {loading ? (
+                        {loadingProvider === 'github' ? (
                             <Loader2 className="mr-4 h-6 w-6 animate-spin" />
                         ) : (
                             <Github className="mr-4 h-6 w-6" />

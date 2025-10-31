@@ -254,7 +254,7 @@ function PostCard({ post }) {
                             {formatFirebaseTimestamp(createdAt)}
                         </p>
                     </div>
-                    <DropdownMenu>
+                    {currentUser?.uid && userId === currentUser.uid && <DropdownMenu>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <DropdownMenuTrigger asChild>
@@ -275,7 +275,7 @@ function PostCard({ post }) {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         )}
-                    </DropdownMenu>
+                    </DropdownMenu>}
                 </CardHeader>
 
                 <div

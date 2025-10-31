@@ -230,7 +230,7 @@ const PostDetailView = ({ post, open, onClose }) => {
                                         {formatFirebaseTimestamp(createdAt)}
                                     </p>
                                 </div>
-                                <DropdownMenu>
+                                {currentUser?.uid && userId === currentUser.uid && <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button className="absolute top-[3px] right-7" variant="ghost" size="icon">
                                             <MoreHorizontal className="h-4 w-4" />
@@ -244,7 +244,7 @@ const PostDetailView = ({ post, open, onClose }) => {
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     )}
-                                </DropdownMenu>
+                                </DropdownMenu>}
                             </div>
 
                             <p className="text-sm mb-4 whitespace-pre-wrap">
