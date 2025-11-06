@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-    Sparkles, 
-    Clock, 
-    MapPin, 
-    Search, 
-    Upload, 
-    Brain, 
+import {
+    Sparkles,
+    Clock,
+    MapPin,
+    Search,
+    Upload,
+    Brain,
     Users,
     ArrowRight,
     Menu,
@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import '../animations.css';
+import landingBackground from '../assets/landing-background.jpg';
 
 function LandingPage() {
     const navigate = useNavigate();
@@ -128,41 +129,42 @@ function LandingPage() {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative overflow-hidden py-20 lg:py-12">
-                {/* Background Pattern */}
-                <div className="absolute inset-0" style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a78bfa' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                }}></div>
-                
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="relative min-h-screen bg-cover bg-center bg-fixed flex items-center"
+                     style={{
+                         backgroundImage: `url(${landingBackground})`
+                     }}>
+                {/* Dark overlay for better text visibility */}
+                <div className="absolute inset-0 bg-black/50"></div>
+
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                     <div className="text-center">
                         {/* Hero Title */}
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 mb-6 leading-tight animate-fade-in-up">
+                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight animate-fade-in-up drop-shadow-lg">
                             Turn Your Photos Into
-                            <span className="block text-violet-600 animate-fade-in-up animation-delay-300">Historical Discoveries</span>
+                            <span className="block text-violet-300 animate-fade-in-up animation-delay-300">Historical Discoveries</span>
                         </h1>
-                        
+
                         {/* Hero Subtitle */}
-                        <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-700 mb-12 leading-relaxed animate-fade-in-up animation-delay-500">
+                        <p className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-white/90 mb-12 leading-relaxed animate-fade-in-up animation-delay-500 drop-shadow-md">
                             Upload any photo and let AI reveal its historical context, date period, and location.
                             Connect with a community passionate about preserving history.
                         </p>
 
                         {/* Hero CTA */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in-up animation-delay-700">
-                            <Button 
+                            <Button
                                 size="lg"
                                 onClick={() => navigate('/login')}
-                                className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto transform hover:scale-105 transition-all duration-300"
+                                className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto transform hover:scale-105 transition-all duration-300 shadow-xl"
                             >
                                 Start Discovering
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
-                            <Button 
+                            <Button
                                 variant="outline"
                                 size="lg"
                                 onClick={() => scrollToSection('how-it-works')}
-                                className="border-2 border-violet-600 text-violet-700 hover:bg-violet-50 px-8 py-4 text-lg font-semibold h-auto transform hover:scale-105 transition-all duration-300"
+                                className="border-2 border-white bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 px-8 py-4 text-lg font-semibold h-auto transform hover:scale-105 transition-all duration-300 shadow-xl"
                             >
                                 See How It Works
                             </Button>
@@ -172,8 +174,13 @@ function LandingPage() {
             </section>
 
             {/* Problem Section */}
-            <section className="py-20 bg-gradient-to-br from-slate-100 to-slate-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="relative py-20 bg-cover bg-center"
+                     style={{
+                         backgroundImage: `url(${landingBackground})`
+                     }}>
+                <div className="absolute inset-0 bg-white/85 backdrop-blur-sm"></div>
+
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-6">
                             Your Photos Have Stories to Tell
@@ -188,8 +195,8 @@ function LandingPage() {
                             {/* Photo */}
                             <div className="w-full bg-gray-200">
                                 <img
-                                    src="https://images.unsplash.com/photo-1610225526504-3c690a6ca814?q=80&w=694&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                                    alt="Historical photo of Paris"
+                                    src={landingBackground}
+                                    alt="Historical photo"
                                     className="w-full h-80 object-cover"
                                 />
                             </div>
@@ -201,7 +208,7 @@ function LandingPage() {
                                     ✨ AI Insight
                                 </div>
                                 <div className="text-center text-slate-700 text-sm leading-relaxed">
-                                    Likely taken in Paris around the 1990s. Notice the Eiffel Tower and cobblestone streets typical of that era.
+                                    Historical school building from the mid-20th century. Notice the distinctive architecture and period details.
                                 </div>
                             </div>
                         </div>
@@ -282,8 +289,13 @@ function LandingPage() {
 
 
             {/* Demo/Preview Section */}
-            <section id="demo" className="py-20 bg-gradient-to-br from-slate-50 to-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section id="demo" className="relative py-20 bg-cover bg-center"
+                     style={{
+                         backgroundImage: `url(${landingBackground})`
+                     }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-slate-50/90 backdrop-blur-sm"></div>
+
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                             See Echoes in Action
@@ -301,14 +313,14 @@ function LandingPage() {
                                     Before: Mystery Photo
                                 </div>
                             </div>
-                            <Card className="overflow-hidden shadow-lg border-2 border-red-200">
+                            <Card className="overflow-hidden shadow-lg border-2 border-red-200 bg-white/95 backdrop-blur">
                                 <CardContent className="p-8">
-                                    <div className="aspect-square bg-gray-100 rounded-lg mb-6 flex items-center justify-center">
-                                        <div className="text-center text-gray-500">
-                                            <div className="w-20 h-20 bg-gray-300 rounded mx-auto mb-4"></div>
-                                            <p className="font-medium">Unknown Photo</p>
-                                            <p className="text-sm">No historical context</p>
-                                        </div>
+                                    <div className="aspect-square bg-gray-100 rounded-lg mb-6 flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src={landingBackground}
+                                            alt="Unknown historical photo"
+                                            className="w-full h-full object-cover grayscale blur-sm opacity-50"
+                                        />
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
@@ -335,38 +347,40 @@ function LandingPage() {
                                     After: Historical Discovery
                                 </div>
                             </div>
-                            <Card className="overflow-hidden shadow-xl border-2 border-green-200">
+                            <Card className="overflow-hidden shadow-xl border-2 border-green-200 bg-white/95 backdrop-blur">
                                 <CardContent className="p-8">
-                                    <div className="aspect-square bg-gradient-to-br from-violet-100 to-purple-100 rounded-lg mb-6 flex items-center justify-center relative">
-                                        <div className="text-center text-slate-700">
-                                            <div className="w-20 h-20 bg-violet-300 rounded mx-auto mb-4 flex items-center justify-center">
-                                                <Brain className="h-10 w-10 text-violet-700" />
-                                            </div>
-                                            <p className="font-medium">AI-Analyzed Photo</p>
-                                            <p className="text-sm">Rich historical insights</p>
+                                    <div className="aspect-square rounded-lg mb-6 overflow-hidden relative">
+                                        <img
+                                            src={landingBackground}
+                                            alt="Analyzed historical photo"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute top-2 right-2 bg-violet-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                            <Brain className="h-3 w-3" />
+                                            AI Analyzed
                                         </div>
                                     </div>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
                                             <span className="text-slate-600">Date:</span>
-                                            <span className="text-green-600 font-medium">1940-1945</span>
+                                            <span className="text-green-600 font-medium">1950s-1960s</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-600">Location:</span>
-                                            <span className="text-green-600 font-medium">London, England</span>
+                                            <span className="text-green-600 font-medium">Brieske, Germany</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-slate-600">Architecture:</span>
-                                            <span className="text-green-600 font-medium">Victorian</span>
+                                            <span className="text-slate-600">Type:</span>
+                                            <span className="text-green-600 font-medium">Educational Building</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-slate-600">Confidence:</span>
-                                            <span className="text-green-600 font-medium">94%</span>
+                                            <span className="text-green-600 font-medium">92%</span>
                                         </div>
                                     </div>
                                     <div className="mt-6 p-4 bg-violet-50 rounded-lg">
                                         <p className="text-sm text-slate-700">
-                                            <span className="font-medium">AI Insight:</span> This photograph appears to be taken during WWII era, showing typical London residential architecture. The style and visual cues suggest wartime period.
+                                            <span className="font-medium">AI Insight:</span> Historical school building showing mid-20th century German architecture. The structure and signage indicate educational use during the post-war period.
                                         </p>
                                     </div>
                                 </CardContent>
@@ -376,7 +390,7 @@ function LandingPage() {
 
                     {/* Call-to-Action */}
                     <div className="text-center mt-16">
-                        <div className="inline-flex items-center space-x-4 p-6 bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl">
+                        <div className="inline-flex flex-col sm:flex-row items-center gap-4 p-6 bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-violet-200">
                             <div className="text-left">
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">
                                     Ready to discover your photos' stories?
@@ -385,10 +399,10 @@ function LandingPage() {
                                     Upload your first photo and see the magic happen in seconds
                                 </p>
                             </div>
-                            <Button 
+                            <Button
                                 size="lg"
                                 onClick={() => navigate('/login')}
-                                className="bg-violet-600 hover:bg-violet-700 text-white whitespace-nowrap"
+                                className="bg-violet-600 hover:bg-violet-700 text-white whitespace-nowrap shadow-lg"
                             >
                                 Try It Free
                                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -399,8 +413,13 @@ function LandingPage() {
             </section>
 
             {/* How It Works Section */}
-            <section id="how-it-works" className="py-20 bg-gradient-to-br from-slate-100 to-slate-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section id="how-it-works" className="relative py-20 bg-cover bg-center"
+                     style={{
+                         backgroundImage: `url(${landingBackground})`
+                     }}>
+                <div className="absolute inset-0 bg-white/85 backdrop-blur-sm"></div>
+
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                             Three Simple Steps
@@ -412,11 +431,11 @@ function LandingPage() {
 
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Step 1 */}
-                        <div className="text-center">
-                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                        <div className="text-center bg-white/60 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-xl">
                                 <Upload className="h-8 w-8" />
                             </div>
-                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
+                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10 shadow-lg">
                                 1
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-4">
@@ -429,11 +448,11 @@ function LandingPage() {
                         </div>
 
                         {/* Step 2 */}
-                        <div className="text-center">
-                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                        <div className="text-center bg-white/60 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-xl">
                                 <Brain className="h-8 w-8" />
                             </div>
-                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
+                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10 shadow-lg">
                                 2
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-4">
@@ -446,11 +465,11 @@ function LandingPage() {
                         </div>
 
                         {/* Step 3 */}
-                        <div className="text-center">
-                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl">
+                        <div className="text-center bg-white/60 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+                            <div className="w-20 h-20 bg-violet-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white font-bold text-2xl shadow-xl">
                                 <Users className="h-8 w-8" />
                             </div>
-                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10">
+                            <div className="w-8 h-8 bg-violet-800 rounded-full flex items-center justify-center mx-auto -mt-12 mb-8 text-white font-bold text-sm relative z-10 shadow-lg">
                                 3
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-4">
@@ -466,18 +485,23 @@ function LandingPage() {
             </section>
 
             {/* Final CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-violet-600 to-purple-600">
-                <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+            <section className="relative py-20 bg-cover bg-center"
+                     style={{
+                         backgroundImage: `url(${landingBackground})`
+                     }}>
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-900/90 to-purple-900/90"></div>
+
+                <div className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 drop-shadow-lg">
                         Start Your Historical Journey Today
                     </h2>
-                    <p className="text-xl text-violet-100 mb-8">
+                    <p className="text-xl text-violet-100 mb-8 drop-shadow-md">
                         Join history enthusiasts discovering the stories hidden in their photos
                     </p>
-                    <Button 
+                    <Button
                         size="lg"
                         onClick={() => navigate('/login')}
-                        className="bg-white text-violet-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold h-auto"
+                        className="bg-white text-violet-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold h-auto shadow-2xl transform hover:scale-105 transition-all duration-300"
                     >
                         Get Started Free
                         <ArrowRight className="ml-2 h-5 w-5" />
