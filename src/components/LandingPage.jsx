@@ -14,13 +14,25 @@ import {
     X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../animations.css';
 import landingBackground from '../assets/landing-background.jpg';
 
 function LandingPage() {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Force light mode for landing page
+    useEffect(() => {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+
+        return () => {
+            // Restore dark mode on unmount
+            document.documentElement.classList.remove('light');
+            document.documentElement.classList.add('dark');
+        };
+    }, []);
 
     const scrollToSection = (sectionId) => {
         document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
