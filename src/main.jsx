@@ -18,7 +18,7 @@ createRoot(document.getElementById('root')).render(
                     googleMapsApiKey={import.meta.env.VITE_MAPS_API_KEY}
                     loadingElement={<MapLoadingState />}
                 >
-                    <ShadcnThemeProvider defaultTheme="light" storageKey="echoes-ui-theme">
+                    <ShadcnThemeProvider defaultTheme="dark" storageKey="echoes-ui-theme">
                     <App />
                     </ShadcnThemeProvider>
                 </LoadScript>
