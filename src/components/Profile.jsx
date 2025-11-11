@@ -205,7 +205,7 @@ const Profile = () => {
         <div className="w-full max-w-2xl mx-auto">
             <Card className="shadow-lg">
                 <CardContent className="p-1">
-                    <div className="flex items-start gap-6">
+                    <div className="flex items-start gap-6 md:m-3">
                         <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
                             <AvatarImage
                                 src={profileData?.profilePictureUrl || '/default-avatar.png'}
