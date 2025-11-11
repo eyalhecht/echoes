@@ -8,7 +8,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 // Google Icon Component
 const GoogleIcon = () => (
@@ -145,17 +145,23 @@ function Login() {
                 <div className="mt-16 text-center space-y-3">
                     <p className="text-sm text-slate-400 leading-relaxed">
                         By continuing, you agree to our{' '}
-                        <button className="text-violet-600 hover:underline font-medium">
+                        <Link
+                            to="/terms"
+                            className="text-violet-600 hover:underline font-medium"
+                        >
                             Terms of Service
-                        </button>
+                        </Link>
                         {' '}and{' '}
-                        <button className="text-violet-600 hover:underline font-medium">
+                        <Link
+                            to="/privacy"
+                            className="text-violet-600 hover:underline font-medium"
+                        >
                             Privacy Policy
-                        </button>
+                        </Link>
                     </p>
                     <p className="text-sm text-slate-400 leading-relaxed">
                         Need help?{' '}
-                        <a 
+                        <a
                             href="mailto:eyalhe3@gmail.com"
                             className="text-violet-600 hover:underline font-medium"
                         >

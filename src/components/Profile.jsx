@@ -202,10 +202,10 @@ const Profile = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-0 pb-5">
-            <Card className="mx-2 shadow-lg">
-                <CardContent className="p-6">
-                    <div className="flex items-start gap-6">
+        <div className="w-full max-w-2xl mx-auto">
+            <Card className="shadow-lg">
+                <CardContent className="p-1">
+                    <div className="flex items-start gap-6 md:m-3">
                         <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
                             <AvatarImage
                                 src={profileData?.profilePictureUrl || '/default-avatar.png'}
@@ -313,7 +313,7 @@ const Profile = () => {
                 </CardContent>
             </Card>
 
-            <div className="p-2 mt-4">
+            <div className="mt-4">
                 {userPostsLoading ? (
                     <div className="text-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
@@ -329,7 +329,7 @@ const Profile = () => {
                         </p>
                     </Card>
                 ) : (
-                    <div className="flex flex-col items-center gap-2.5">
+                    <div className="space-y-4">
                         {userPosts.map((post) => (
                             <PostCard key={post.id} post={post} />
                         ))}

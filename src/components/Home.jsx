@@ -112,8 +112,8 @@ function Home() {
             <div className="hidden lg:block">
                 <SuggestedUsers />
             </div>
-            <div className={cn("max-w-[600px] mx-auto pb-5")}>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="lg:w-[500px] md:w-full">
+            <div className="w-full max-w-2xl mx-auto">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
                         <TabsList className="w-full justify-start rounded-none h-12 bg-transparent p-0">
                             <TabsTrigger
@@ -131,10 +131,10 @@ function Home() {
                         </TabsList>
                     </div>
 
-                    <div className="flex flex-col gap-2 pt-2">
+                    <TabsContent value="recent" className="space-y-4 mt-4">
                         {postsLoading && posts.length === 0 && renderSkeletonCards()}
 
-                        {posts && posts?.map((post) => (
+                        {activeTab === 'recent' && posts && posts?.map((post) => (
                             <PostCard key={post.id} post={post} />
                         ))}
 
@@ -153,32 +153,52 @@ function Home() {
                         )}
 
                         {posts.length === 0 && !postsLoading && (
-                            <>
-                                {activeTab === 'following' ? (
-                                    <Empty className="py-10">
-                                        <EmptyHeader>
-                                            <EmptyMedia>
-                                                <Users className="h-12 w-12 text-muted-foreground" />
-                                            </EmptyMedia>
-                                            <EmptyTitle>No posts from people you follow</EmptyTitle>
-                                            <EmptyDescription>
-                                                Start following users to see their posts in your feed.
-                                            </EmptyDescription>
-                                        </EmptyHeader>
-                                        <EmptyContent>
-                                            <Button onClick={() => setActiveTab('recent')}>
-                                                Discover Users
-                                            </Button>
-                                        </EmptyContent>
-                                    </Empty>
-                                ) : (
-                                    <div className="text-center py-10 text-muted-foreground/70">
-                                        No posts found
-                                    </div>
-                                )}
-                            </>
+                            <div className="text-center py-10 text-muted-foreground/70">
+                                No posts found
+                            </div>
                         )}
-                    </div>
+                    </TabsContent>
+
+                    <TabsContent value="following" className="space-y-4 mt-4">
+                        {postsLoading && posts.length === 0 && renderSkeletonCards()}
+
+                        {activeTab === 'following' && posts && posts?.map((post) => (
+                            <PostCard key={post.id} post={post} />
+                        ))}
+
+                        {/* Show loading for pagination (when loading more posts) */}
+                        {postsLoading && posts.length > 0 && (
+                            <div className="flex justify-center items-center py-5 gap-2 text-muted-foreground">
+                                <Spinner />
+                                <span>Loading more posts...</span>
+                            </div>
+                        )}
+
+                        {!hasMore && posts.length > 0 && (
+                            <div className="text-center py-5 text-muted-foreground">
+                                No more posts to load
+                            </div>
+                        )}
+
+                        {posts.length === 0 && !postsLoading && (
+                            <Empty className="py-10">
+                                <EmptyHeader>
+                                    <EmptyMedia>
+                                        <Users className="h-12 w-12 text-muted-foreground" />
+                                    </EmptyMedia>
+                                    <EmptyTitle>No posts from people you follow</EmptyTitle>
+                                    <EmptyDescription>
+                                        Start following users to see their posts in your feed.
+                                    </EmptyDescription>
+                                </EmptyHeader>
+                                <EmptyContent>
+                                    <Button onClick={() => setActiveTab('recent')}>
+                                        Discover Users
+                                    </Button>
+                                </EmptyContent>
+                            </Empty>
+                        )}
+                    </TabsContent>
                 </Tabs>
             </div>
         </>

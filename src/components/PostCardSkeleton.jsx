@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function PostCardSkeleton() {
     return (
-        <div className="bg-card rounded-lg border p-4 space-y-4 max-w-[500px]">
+        <div className="bg-card rounded-lg border p-4 space-y-4 w-full">
             {/* Header with avatar and user info */}
             <div className="flex items-center space-x-3">
                 <Skeleton className="h-10 w-10 rounded-full" />

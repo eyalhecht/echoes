@@ -116,7 +116,7 @@ const MapPostsView = () => {
                 const radiusKm = Math.max(ne.lat() - sw.lat(), ne.lng() - sw.lng()) * 111 / 2;
 
                 const newCenter = { lat: center.lat(), lng: center.lng() };
-                const newRadius = Math.min(Math.max(radiusKm, 1), 50);
+                const newRadius = Math.min(Math.max(radiusKm, 0.1), 500);
 
                 setMapCenter(newCenter);
                 setRadiusKm(newRadius);
