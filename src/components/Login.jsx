@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -28,18 +28,6 @@ function Login() {
 
     const from = location.state?.from || '/home';
 
-    // Force light mode for login page
-    useEffect(() => {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-
-        return () => {
-            // Restore dark mode on unmount
-            document.documentElement.classList.remove('light');
-            document.documentElement.classList.add('dark');
-        };
-    }, []);
-
     const handleGoogleLogin = async () => {
         try {
             setLoadingProvider('google');
@@ -63,62 +51,61 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-white flex items-center justify-center p-6">
-            <div className="w-full max-w-lg">
+        <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6 relative overflow-hidden">
+            {/* Background gradient mesh */}
+            <div className="absolute top-[-30%] right-[-15%] w-[500px] h-[500px] rounded-full bg-violet-600/15 blur-[128px]" />
+            <div className="absolute bottom-[-30%] left-[-15%] w-[400px] h-[400px] rounded-full bg-purple-600/10 blur-[128px]" />
+
+            <div className="relative w-full max-w-md">
                 {/* Header */}
-                <div className="text-center mb-16">
-                    <div className="relative inline-block mb-12">
-                        <h1 className="text-5xl font-bold text-slate-800">Echoes</h1>
-                        <div className="absolute -top-3 -right-3">
-                            <Sparkles className="h-8 w-8 text-violet-600" />
-                        </div>
+                <div className="text-center mb-12">
+                    <div className="flex items-center justify-center gap-2 mb-8">
+                        <Sparkles className="h-7 w-7 text-violet-400" />
+                        <span className="text-xl font-bold text-zinc-100">Echoes</span>
                     </div>
 
-                    <h2 className="text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-100 mb-3">
                         Choose your sign in method
                     </h2>
-                    <p className="text-slate-500 text-xl">
-                        Continue your historical journey
-                    </p>
                 </div>
 
                 {/* Main Login Buttons */}
-                <div className="space-y-4 mb-12  animate-fade-in-up">
+                <div className="space-y-3 mb-8">
                     <Button
                         variant="outline"
                         size="lg"
-                        className="w-full h-16 text-lg font-semibold border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 rounded-xl transition-all"
+                        className="w-full h-14 text-base font-medium border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:border-zinc-600 rounded-xl transition-colors"
                         onClick={handleGoogleLogin}
                         disabled={loading}
                     >
                         {loadingProvider === 'google' ? (
-                            <Loader2 className="mr-4 h-6 w-6 animate-spin" />
+                            <Loader2 className="mr-3 h-5 w-5 animate-spin text-zinc-400" />
                         ) : (
                             <GoogleIcon />
                         )}
-                        <span className="ml-4 text-slate-700">Continue with Google</span>
+                        <span className="ml-3 text-zinc-200">Continue with Google</span>
                     </Button>
 
                     <Button
                         variant="outline"
                         size="lg"
-                        className="w-full h-16 text-lg font-semibold border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 rounded-xl transition-all"
+                        className="w-full h-14 text-base font-medium border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:border-zinc-600 rounded-xl transition-colors"
                         onClick={handleGitHubLogin}
                         disabled={loading}
                     >
                         {loadingProvider === 'github' ? (
-                            <Loader2 className="mr-4 h-6 w-6 animate-spin" />
+                            <Loader2 className="mr-3 h-5 w-5 animate-spin text-zinc-400" />
                         ) : (
-                            <Github className="mr-4 h-6 w-6" />
+                            <Github className="mr-3 h-5 w-5 text-zinc-300" />
                         )}
-                        <span className="text-slate-700">Continue with GitHub</span>
+                        <span className="text-zinc-200">Continue with GitHub</span>
                     </Button>
                 </div>
 
                 {/* Error Display */}
                 {error && (
-                    <Alert variant="destructive" className="mb-8 rounded-xl">
-                        <AlertDescription className="text-center">
+                    <Alert variant="destructive" className="mb-8 rounded-xl bg-red-500/10 border-red-500/20">
+                        <AlertDescription className="text-center text-red-400">
                             {error}
                         </AlertDescription>
                     </Alert>
@@ -126,15 +113,13 @@ function Login() {
 
                 {/* Bottom Section */}
                 <div className="text-center space-y-6">
-                    <div className="relative">
-                        <Separator className="bg-slate-200" />
-                    </div>
+                    <Separator className="bg-zinc-800" />
 
-                    <p className="text-slate-500 text-lg">
+                    <p className="text-zinc-500 text-sm">
                         Need more info?{' '}
-                        <button 
+                        <button
                             onClick={() => navigate('/')}
-                            className="text-violet-600 hover:text-violet-700 font-semibold hover:underline transition-colors"
+                            className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
                         >
                             Back to homepage
                         </button>
@@ -142,28 +127,28 @@ function Login() {
                 </div>
 
                 {/* Terms Footer */}
-                <div className="mt-16 text-center space-y-3">
-                    <p className="text-sm text-slate-400 leading-relaxed">
+                <div className="mt-12 text-center space-y-2">
+                    <p className="text-xs text-zinc-500 leading-relaxed">
                         By continuing, you agree to our{' '}
                         <Link
                             to="/terms"
-                            className="text-violet-600 hover:underline font-medium"
+                            className="text-violet-400 hover:text-violet-300 font-medium"
                         >
                             Terms of Service
                         </Link>
                         {' '}and{' '}
                         <Link
                             to="/privacy"
-                            className="text-violet-600 hover:underline font-medium"
+                            className="text-violet-400 hover:text-violet-300 font-medium"
                         >
                             Privacy Policy
                         </Link>
                     </p>
-                    <p className="text-sm text-slate-400 leading-relaxed">
+                    <p className="text-xs text-zinc-500 leading-relaxed">
                         Need help?{' '}
                         <a
                             href="mailto:eyalhe3@gmail.com"
-                            className="text-violet-600 hover:underline font-medium"
+                            className="text-violet-400 hover:text-violet-300 font-medium"
                         >
                             Contact Us
                         </a>
