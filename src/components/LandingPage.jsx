@@ -174,7 +174,7 @@ function LandingPage() {
                     </h1>
 
                     <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed mb-12">
-                        That photo in your grandma's drawer? Your dad's first car? The McDonald's
+                        That photo in your grandpa's drawer? Your dad's first car? The McDonald's
                         down the street before it was renovated? These are pure history -
                         and people want to see them.
                     </p>

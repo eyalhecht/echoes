@@ -65,11 +65,8 @@ function Login() {
                     </div>
 
                     <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-100 mb-3">
-                        Welcome back
+                        Choose your sign in method
                     </h2>
-                    <p className="text-zinc-400 text-lg">
-                        Sign in to continue your journey
-                    </p>
                 </div>
 
                 {/* Main Login Buttons */}
