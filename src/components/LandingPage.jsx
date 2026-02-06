@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
     Sparkles,
-    Clock,
     MapPin,
     Search,
     Upload,
@@ -19,29 +16,24 @@ import { useNavigate } from 'react-router-dom';
 
 const features = [
     {
-        icon: Clock,
-        title: 'AI Historical Dating',
-        description: 'Our AI analyzes architectural styles, clothing, vehicles, and visual cues to estimate when your photo was taken.',
-        span: 'lg:col-span-2 lg:row-span-2',
-        showcase: true,
+        icon: Users,
+        title: 'A Living Feed of History',
+        description: 'Scroll through photos you\'ve never seen before — street scenes from the \'60s, vintage storefronts, faded family portraits. Like, comment, and share the moments that move you.',
     },
     {
         icon: MapPin,
-        title: 'Smart Geolocation',
-        description: 'Identifies landmarks, buildings, and geographical features to pinpoint where historical moments happened.',
-        span: 'lg:col-span-2',
+        title: 'History on the Map',
+        description: 'Every photo is tied to a real location on the map. Browse historical moments by location and see what the world looked like decades ago, right where you are.',
     },
     {
         icon: Search,
-        title: 'Intelligent Search',
-        description: 'Search across all AI-generated metadata. Find photos by era, location, architectural style, or any historical element.',
-        span: 'lg:col-span-2',
+        title: 'Explore Any Era or Place',
+        description: 'Search by decade, city, or subject. Looking for 1970s Paris? Cold War Berlin? There\'s always a photo you haven\'t seen yet.',
     },
     {
-        icon: Users,
-        title: 'Community',
-        description: 'Share discoveries with history enthusiasts. Build connections through shared historical interests and collaborative research.',
-        span: 'lg:col-span-4',
+        icon: Brain,
+        title: 'AI That Understands History',
+        description: 'Every photo is automatically enriched — AI detects the time period, location, cultural context, and historical significance, so every post tells its full story.',
         accent: true,
     },
 ];
@@ -50,20 +42,20 @@ const steps = [
     {
         num: '01',
         icon: Upload,
-        title: 'Upload Your Photo',
-        description: 'Simply drag and drop any historical photo from your collection. Family photos, vintage finds, or mysterious old images.',
+        title: 'Share a Moment From the Past',
+        description: 'That photo from grandma\'s drawer, a vintage street scene, a faded family portrait — upload it and give it a second life.',
     },
     {
         num: '02',
         icon: Brain,
-        title: 'AI Analyzes History',
-        description: 'Our advanced AI examines every detail — architecture, clothing, vehicles, and context clues to determine the period and location.',
+        title: 'AI Adds the Story',
+        description: 'Our AI analyzes every detail — architecture, clothing, vehicles, signs — and tells you when, where, and why this photo matters.',
     },
     {
         num: '03',
         icon: Users,
-        title: 'Share & Discover',
-        description: 'Share your discoveries with the community and explore others\' findings. Build connections through shared historical interests.',
+        title: 'The World Sees It Too',
+        description: 'Your photo joins a living feed of history. Others like it, comment on it, and discover moments they\'ve never seen before.',
     },
 ];
 
@@ -99,12 +91,7 @@ function LandingPage() {
                             >
                                 Features
                             </button>
-                            <button
-                                onClick={() => scrollToSection('demo')}
-                                className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
-                            >
-                                Demo
-                            </button>
+
                             <button
                                 onClick={() => scrollToSection('how-it-works')}
                                 className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
@@ -139,12 +126,6 @@ function LandingPage() {
                                     className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 w-full text-left"
                                 >
                                     Features
-                                </button>
-                                <button
-                                    onClick={() => scrollToSection('demo')}
-                                    className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 w-full text-left"
-                                >
-                                    Demo
                                 </button>
                                 <button
                                     onClick={() => scrollToSection('how-it-works')}
@@ -186,15 +167,16 @@ function LandingPage() {
 
                 <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
                     <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.9] mb-8">
-                        Turn Your Photos Into
+                        Your Photos Hold History.
                         <span className="block bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                            Historical Discoveries
+                            People Want to See It.
                         </span>
                     </h1>
 
                     <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed mb-12">
-                        Upload any photo and let AI reveal its historical context, date period, and location.
-                        Connect with a community passionate about preserving history.
+                        That photo in your grandma's drawer? Your dad's first car? The McDonald's
+                        down the street before it was renovated? These are pure history -
+                        and people want to see them.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -203,7 +185,7 @@ function LandingPage() {
                             onClick={() => navigate('/login')}
                             className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto"
                         >
-                            Start Discovering
+                            Start Sharing History
                             <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
                         <Button
@@ -223,148 +205,38 @@ function LandingPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
-                            Powered by AI, Driven by History
+                            Social Media for History Lovers
                         </h2>
                         <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed">
-                            Unlike other photo apps, Echoes reveals the hidden stories in your images
+                            Share, discover, and discuss historical photos — with AI adding the context you never knew was there
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {features.map((feature) => {
                             const Icon = feature.icon;
-
-                            if (feature.accent) {
-                                return (
-                                    <Card
-                                        key={feature.title}
-                                        className={`${feature.span} bg-gradient-to-br from-violet-950 via-violet-900 to-purple-950 border-violet-500/20`}
-                                    >
-                                        <CardHeader className="flex flex-col md:flex-row md:items-center gap-4">
-                                            <div className="rounded-lg bg-violet-500/20 p-3 w-fit">
-                                                <Icon className="h-6 w-6 text-violet-300" />
-                                            </div>
-                                            <div>
-                                                <CardTitle className="text-lg font-semibold text-zinc-100">
-                                                    {feature.title}
-                                                </CardTitle>
-                                                <CardDescription className="text-violet-200/70 mt-1">
-                                                    {feature.description}
-                                                </CardDescription>
-                                            </div>
-                                        </CardHeader>
-                                    </Card>
-                                );
-                            }
-
                             return (
                                 <Card
                                     key={feature.title}
-                                    className={`${feature.span} bg-zinc-900 border-zinc-800`}
+                                    className={feature.accent
+                                        ? "bg-gradient-to-br from-violet-950 via-violet-900 to-purple-950 border-violet-500/20"
+                                        : "bg-zinc-900 border-zinc-800"
+                                    }
                                 >
                                     <CardHeader>
-                                        <div className="rounded-lg bg-violet-500/10 p-3 w-fit mb-2">
-                                            <Icon className="h-6 w-6 text-violet-400" />
+                                        <div className={`rounded-lg p-3 w-fit mb-2 ${feature.accent ? 'bg-violet-500/20' : 'bg-violet-500/10'}`}>
+                                            <Icon className={`h-6 w-6 ${feature.accent ? 'text-violet-300' : 'text-violet-400'}`} />
                                         </div>
                                         <CardTitle className="text-lg font-semibold text-zinc-100">
                                             {feature.title}
                                         </CardTitle>
-                                        <CardDescription className="text-zinc-400">
+                                        <CardDescription className={feature.accent ? "text-violet-200/70" : "text-zinc-400"}>
                                             {feature.description}
                                         </CardDescription>
                                     </CardHeader>
-
-                                    {feature.showcase && (
-                                        <CardContent>
-                                            {/* Decorative inline UI mockup */}
-                                            <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-4 space-y-3">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs text-zinc-500">Estimated Date</span>
-                                                    <Badge className="bg-violet-500/10 text-violet-400 border-violet-500/20 hover:bg-violet-500/10 text-xs">
-                                                        1950s–1960s
-                                                    </Badge>
-                                                </div>
-                                                <Separator className="bg-zinc-800" />
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs text-zinc-500">Confidence</span>
-                                                    <span className="text-xs text-zinc-300 font-medium">92%</span>
-                                                </div>
-                                                <Separator className="bg-zinc-800" />
-                                                <div className="space-y-1.5">
-                                                    <span className="text-xs text-zinc-500">Signals</span>
-                                                    <div className="flex flex-wrap gap-1.5">
-                                                        <Badge variant="outline" className="text-zinc-400 border-zinc-700 text-xs">Architecture</Badge>
-                                                        <Badge variant="outline" className="text-zinc-400 border-zinc-700 text-xs">Signage</Badge>
-                                                        <Badge variant="outline" className="text-zinc-400 border-zinc-700 text-xs">Materials</Badge>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    )}
                                 </Card>
                             );
                         })}
-                    </div>
-                </div>
-            </section>
-
-            {/* Demo / Glassmorphism Showcase */}
-            <section id="demo" className="py-24">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
-                            See Echoes in Action
-                        </h2>
-                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed">
-                            Watch how our AI transforms a mysterious old photo into a rich historical discovery
-                        </p>
-                    </div>
-
-                    <div className="max-w-2xl mx-auto">
-                        <Card className="bg-zinc-900/50 backdrop-blur-xl border-zinc-700/50">
-                            <CardContent className="p-6 md:p-8">
-                                {/* Placeholder gradient for photo */}
-                                <div className="relative aspect-video rounded-lg bg-gradient-to-br from-zinc-800 via-zinc-700 to-zinc-800 mb-6 flex items-center justify-center overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/60 to-transparent" />
-                                    <Brain className="h-12 w-12 text-zinc-600" />
-                                    <Badge className="absolute top-3 right-3 bg-violet-600 text-white border-transparent hover:bg-violet-600">
-                                        AI Analyzed
-                                    </Badge>
-                                </div>
-
-                                {/* Data rows */}
-                                <div className="space-y-0">
-                                    <div className="flex justify-between py-3">
-                                        <span className="text-sm text-zinc-500">Date</span>
-                                        <span className="text-sm text-zinc-200 font-medium">1950s–1960s</span>
-                                    </div>
-                                    <Separator className="bg-zinc-800" />
-                                    <div className="flex justify-between py-3">
-                                        <span className="text-sm text-zinc-500">Location</span>
-                                        <span className="text-sm text-zinc-200 font-medium">Brieske, Germany</span>
-                                    </div>
-                                    <Separator className="bg-zinc-800" />
-                                    <div className="flex justify-between py-3">
-                                        <span className="text-sm text-zinc-500">Type</span>
-                                        <span className="text-sm text-zinc-200 font-medium">Educational Building</span>
-                                    </div>
-                                    <Separator className="bg-zinc-800" />
-                                    <div className="flex justify-between py-3">
-                                        <span className="text-sm text-zinc-500">Confidence</span>
-                                        <span className="text-sm text-zinc-200 font-medium">92%</span>
-                                    </div>
-                                </div>
-
-                                {/* AI Insight */}
-                                <div className="mt-6 p-4 rounded-lg bg-violet-500/10 border border-violet-500/20">
-                                    <p className="text-sm text-zinc-300">
-                                        <span className="font-semibold text-violet-400">AI Insight:</span>{' '}
-                                        Historical school building showing mid-20th century German architecture.
-                                        The structure and signage indicate educational use during the post-war period.
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
                     </div>
                 </div>
             </section>
@@ -373,14 +245,11 @@ function LandingPage() {
             <section id="how-it-works" className="py-24">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <Badge className="mb-4 bg-violet-500/10 text-violet-400 border-violet-500/20 hover:bg-violet-500/10">
-                            How It Works
-                        </Badge>
                         <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
-                            Three Simple Steps
+                            How It Works
                         </h2>
                         <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed">
-                            From upload to historical discovery in minutes
+                            From a dusty photo to a shared piece of history — in three steps
                         </p>
                     </div>
 
@@ -418,10 +287,10 @@ function LandingPage() {
 
                         <CardContent className="relative p-8 md:p-16 text-center">
                             <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-6">
-                                Start Your Historical Journey Today
+                                That Photo Deserves to Be Seen
                             </h2>
                             <p className="text-lg md:text-xl text-violet-200/70 mb-8 max-w-2xl mx-auto">
-                                Join history enthusiasts discovering the stories hidden in their photos
+                                Share it. Let AI tell its story. Let the world discover it.
                             </p>
                             <Button
                                 size="lg"
