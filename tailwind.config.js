@@ -109,6 +109,13 @@ export default {
   			'1000': '1000ms'
   		},
   		colors: {
+  			echoes: {
+  				cream: 'hsl(var(--echoes-cream))',
+  				brown: 'hsl(var(--echoes-brown))',
+  				amber: 'hsl(var(--echoes-amber))',
+  				sage:  'hsl(var(--echoes-sage))',
+  				muted: 'hsl(var(--echoes-muted))',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
