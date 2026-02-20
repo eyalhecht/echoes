@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
-    Sparkles,
     MapPin,
     Search,
     Upload,
@@ -13,28 +10,36 @@ import {
     X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { palette, alpha } from '../styles/theme';
 
 const features = [
     {
         icon: Users,
-        title: 'A Living Feed of History',
-        description: 'Scroll through photos you\'ve never seen before — street scenes from the \'60s, vintage storefronts, faded family portraits. Like, comment, and share the moments that move you.',
+        title: 'A Living Feed',
+        description: "Scroll through photos you've never seen before — street scenes from the '60s, vintage storefronts, faded family portraits.",
+        noteColor: '#FFF9C4',
+        rotate: '-1.5deg',
     },
     {
         icon: MapPin,
         title: 'History on the Map',
-        description: 'Every photo is tied to a real location on the map. Browse historical moments by location and see what the world looked like decades ago, right where you are.',
+        description: 'Every photo is tied to a real location. Browse historical moments by place and see what the world looked like decades ago.',
+        noteColor: '#F8E8D4',
+        rotate: '1deg',
     },
     {
         icon: Search,
-        title: 'Explore Any Era or Place',
-        description: 'Search by decade, city, or subject. Looking for 1970s Paris? Cold War Berlin? There\'s always a photo you haven\'t seen yet.',
+        title: 'Explore Any Era',
+        description: "Search by decade, city, or subject. 1970s Paris? Cold War Berlin? There's always a photo you haven't discovered yet.",
+        noteColor: '#E4EFE5',
+        rotate: '-0.8deg',
     },
     {
         icon: Brain,
-        title: 'AI That Understands History',
-        description: 'Every photo is automatically enriched — AI detects the time period, location, cultural context, and historical significance, so every post tells its full story.',
-        accent: true,
+        title: 'AI Reads the Story',
+        description: 'AI detects the time period, location, cultural context, and historical significance — so every post tells its full story.',
+        noteColor: '#EDE8F8',
+        rotate: '1.8deg',
     },
 ];
 
@@ -43,7 +48,7 @@ const steps = [
         num: '01',
         icon: Upload,
         title: 'Share a Moment From the Past',
-        description: 'That photo from grandma\'s drawer, a vintage street scene, a faded family portrait — upload it and give it a second life.',
+        description: "That photo from grandma's drawer, a vintage street scene, a faded family portrait — upload it and give it a second life.",
     },
     {
         num: '02',
@@ -55,220 +60,357 @@ const steps = [
         num: '03',
         icon: Users,
         title: 'The World Sees It Too',
-        description: 'Your photo joins a living feed of history. Others like it, comment on it, and discover moments they\'ve never seen before.',
+        description: "Your photo joins a living feed of history. Others like it, comment on it, and discover moments they've never seen before.",
     },
 ];
+
+function Polaroid({ rotate, label, tint = '#D4B896', className = '' }) {
+    return (
+        <div
+            className={`absolute hidden lg:block select-none ${className}`}
+            style={{ transform: `rotate(${rotate})` }}
+        >
+            <div
+                className="bg-white p-2 pb-7"
+                style={{
+                    width: 128,
+                    boxShadow: `3px 4px 18px ${alpha('--echoes-brown', 0.18)}, 0 1px 3px ${alpha('--echoes-brown', 0.08)}`,
+                }}
+            >
+                {/* photo placeholder */}
+                <div
+                    className="w-full"
+                    style={{
+                        height: 108,
+                        background: `linear-gradient(135deg, ${tint}cc 0%, ${tint}66 60%, ${tint}99 100%)`,
+                    }}
+                />
+                {/* label */}
+                <p
+                    className="text-center mt-2 text-xs"
+                    style={{ fontFamily: "'Caveat', cursive", color: palette.muted, letterSpacing: '0.02em' }}
+                >
+                    {label}
+                </p>
+            </div>
+        </div>
+    );
+}
+
+function StickyNote({ icon: Icon, title, description, noteColor, rotate }) {
+    return (
+        <div
+            style={{
+                background: noteColor,
+                transform: `rotate(${rotate})`,
+                boxShadow: `3px 5px 20px ${alpha('--echoes-brown', 0.12)}`,
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            }}
+            className="p-6 pt-8 relative hover:scale-[1.02] hover:rotate-0 hover:shadow-xl"
+            onMouseEnter={e => { e.currentTarget.style.transform = 'rotate(0deg) scale(1.02)'; e.currentTarget.style.boxShadow = `6px 8px 28px ${alpha('--echoes-brown', 0.18)}`; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = `rotate(${rotate})`; e.currentTarget.style.boxShadow = `3px 5px 20px ${alpha('--echoes-brown', 0.12)}`; }}
+        >
+            {/* tape strip at top */}
+            <div
+                className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 rounded-sm"
+                style={{ background: alpha('--echoes-amber', 0.25), backdropFilter: 'blur(2px)' }}
+            />
+            <div className="mb-3 inline-flex">
+                <Icon size={20} color={palette.amber} strokeWidth={1.8} />
+            </div>
+            <h3
+                className="text-lg mb-2 font-semibold"
+                style={{ fontFamily: "'Caveat', cursive", color: palette.brown, fontSize: '1.25rem', lineHeight: 1.2 }}
+            >
+                {title}
+            </h3>
+            <p className="text-sm leading-relaxed" style={{ color: palette.muted }}>
+                {description}
+            </p>
+        </div>
+    );
+}
 
 function LandingPage() {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const scrollToSection = (sectionId) => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToSection = (id) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
         setMobileMenuOpen(false);
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100">
-            {/* Navigation */}
-            <nav className="bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/50 sticky top-0 z-50">
+        <div style={{ background: palette.cream, color: palette.brown, fontFamily: "'Lora', Georgia, serif" }}>
+
+            <nav
+                className="sticky top-0 z-50 backdrop-blur-md"
+                style={{
+                    background: alpha('--echoes-cream', 0.88),
+                    borderBottom: `1px solid ${alpha('--echoes-amber', 0.19)}`,
+                }}
+            >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center">
-                            <button
-                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                className="flex items-center space-x-2"
-                            >
-                                <Sparkles className="h-7 w-7 text-violet-400" />
-                                <span className="text-xl font-bold text-zinc-100">Echoes</span>
-                            </button>
-                        </div>
-
-                        <div className="hidden md:flex items-center space-x-8">
+                        <button
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="flex items-center gap-2"
+                        >
+                            <span className="text-lg font-bold" style={{ color: palette.brown, letterSpacing: '-0.02em' }}>
+                                Echoes
+                            </span>
+                        </button>
+                        <div className="hidden md:flex items-center gap-8">
                             <button
                                 onClick={() => scrollToSection('features')}
-                                className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
+                                className="text-sm transition-colors"
+                                style={{ color: palette.muted }}
+                                onMouseEnter={e => e.target.style.color = palette.brown}
+                                onMouseLeave={e => e.target.style.color = palette.muted}
                             >
                                 Features
                             </button>
-
                             <button
                                 onClick={() => scrollToSection('how-it-works')}
-                                className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
+                                className="text-sm transition-colors"
+                                style={{ color: palette.muted }}
+                                onMouseEnter={e => e.target.style.color = palette.brown}
+                                onMouseLeave={e => e.target.style.color = palette.muted}
                             >
                                 How It Works
                             </button>
-                            <Button
+                            <button
                                 onClick={() => navigate('/login')}
-                                className="bg-violet-600 hover:bg-violet-700 text-white text-sm"
+                                className="text-sm px-5 py-2 font-semibold transition-all"
+                                style={{
+                                    background: palette.brown,
+                                    color: palette.cream,
+                                    boxShadow: `3px 3px 0px ${palette.amber}`,
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.brown}`; e.currentTarget.style.background = palette.amber; }}
+                                onMouseLeave={e => { e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; e.currentTarget.style.background = palette.brown; }}
                             >
                                 Get Started
-                            </Button>
+                            </button>
                         </div>
-
-                        <div className="md:hidden">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
-                            >
-                                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                            </Button>
-                        </div>
+                        <button
+                            className="md:hidden p-2"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            style={{ color: palette.brown }}
+                        >
+                            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                        </button>
                     </div>
 
                     {mobileMenuOpen && (
-                        <div className="md:hidden border-t border-zinc-800 bg-zinc-950/95 backdrop-blur-md">
-                            <div className="px-2 pt-2 pb-3 space-y-1">
-                                <button
-                                    onClick={() => scrollToSection('features')}
-                                    className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 w-full text-left"
-                                >
-                                    Features
-                                </button>
-                                <button
-                                    onClick={() => scrollToSection('how-it-works')}
-                                    className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 w-full text-left"
-                                >
-                                    How It Works
-                                </button>
+                        <div
+                            className="md:hidden pb-4 border-t"
+                            style={{ borderColor: alpha('--echoes-amber', 0.19) }}
+                        >
+                            <div className="flex flex-col gap-1 pt-3">
+                                {[
+                                    { label: 'Features', action: () => scrollToSection('features') },
+                                    { label: 'How It Works', action: () => scrollToSection('how-it-works') },
+                                    { label: 'Log In', action: () => navigate('/login') },
+                                ].map(({ label, action }) => (
+                                    <button
+                                        key={label}
+                                        onClick={action}
+                                        className="text-left px-3 py-2 text-sm"
+                                        style={{ color: palette.muted }}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
                                 <button
                                     onClick={() => navigate('/login')}
-                                    className="block px-3 py-2 text-sm text-zinc-400 hover:text-zinc-100 w-full text-left"
+                                    className="mt-2 mx-3 py-2 text-sm font-semibold"
+                                    style={{ background: palette.brown, color: palette.cream }}
                                 >
-                                    Log In
+                                    Get Started Free
                                 </button>
-                                <Button
-                                    onClick={() => navigate('/login')}
-                                    className="w-full mt-2 bg-violet-600 hover:bg-violet-700 text-white"
-                                >
-                                    Get Started
-                                </Button>
                             </div>
                         </div>
                     )}
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center overflow-hidden">
-                {/* Gradient mesh background */}
-                <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-violet-600/20 blur-[128px]" />
-                <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/15 blur-[128px]" />
-                {/* Dot grid overlay */}
+            <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
                 <div
-                    className="absolute inset-0 opacity-[0.03]"
+                    className="absolute inset-0 opacity-40 pointer-events-none"
                     style={{
-                        backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
-                        backgroundSize: '24px 24px',
+                        backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 27px, ${alpha('--echoes-amber', 0.08)} 28px)`,
                     }}
                 />
 
-                <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.9] mb-8">
-                        Your Photos Hold History.
-                        <span className="block bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                            People Want to See It.
+                {/* Scattered polaroids */}
+                <Polaroid rotate="-7deg"  label="Summer '67"      tint="#C9A87A" className="top-[12%] left-[4%]"   />
+                <Polaroid rotate="5deg"   label="Brooklyn, 1952"  tint="#A89070" className="top-[8%]  right-[6%]"  />
+                <Polaroid rotate="-3deg"  label="Grandma & Joe"   tint="#B8927A" className="bottom-[14%] right-[5%]" />
+                <Polaroid rotate="8deg"   label="First car, 1971" tint="#9A8060" className="bottom-[18%] left-[3%]"  />
+
+                {/* Glow blob */}
+                <div
+                    className="absolute pointer-events-none"
+                    style={{
+                        width: 500, height: 500,
+                        borderRadius: '50%',
+                        background: `radial-gradient(circle, ${alpha('--echoes-amber', 0.09)} 0%, transparent 70%)`,
+                        top: '50%', left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                    }}
+                />
+
+                {/* Main copy */}
+                <div className="relative z-10 text-center max-w-3xl">
+                    <h1
+                        className="font-bold leading-tight mb-6"
+                        style={{ fontSize: 'clamp(3rem, 8vw, 5.5rem)', letterSpacing: '-0.03em', color: palette.brown, lineHeight: 1.05 }}
+                    >
+                        History lives in
+                        <span className="block italic relative inline-block w-full">
+                            your drawer.
+                            {/* Hand-drawn SVG underline */}
+                            <svg
+                                viewBox="0 0 420 14"
+                                fill="none"
+                                className="absolute w-full"
+                                style={{ bottom: '-6px', left: 0 }}
+                                preserveAspectRatio="none"
+                            >
+                                <path
+                                    d="M4 9 Q 60 3, 140 8 Q 220 13, 300 7 Q 370 3, 416 9"
+                                    stroke={palette.amber}
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    fill="none"
+                                />
+                            </svg>
                         </span>
                     </h1>
 
-                    <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed mb-12">
-                        That photo in your grandpa's drawer? Your dad's first car? The McDonald's
-                        down the street before it was renovated? These are pure history -
-                        and people want to see them.
+                    <p
+                        className="max-w-xl mx-auto text-lg leading-relaxed mb-10"
+                        style={{ color: palette.muted }}
+                    >
+                        Upload old photos. AI uncovers their story — the era, the place, the moment.
+                        Then share them with people who care.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button
-                            size="lg"
+                        <button
                             onClick={() => navigate('/login')}
-                            className="bg-violet-600 hover:bg-violet-700 text-white px-8 py-4 text-lg font-semibold h-auto"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base transition-all"
+                            style={{
+                                background: palette.brown,
+                                color: palette.cream,
+                                boxShadow: `4px 4px 0px ${palette.amber}`,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = palette.amber; e.currentTarget.style.boxShadow = `4px 4px 0px ${palette.brown}`; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `4px 4px 0px ${palette.amber}`; }}
                         >
-                            Start Sharing History
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="lg"
+                            Open the Shoebox
+                            <ArrowRight size={18} />
+                        </button>
+                        <button
                             onClick={() => scrollToSection('how-it-works')}
-                            className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 px-8 py-4 text-lg font-semibold h-auto"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base transition-all border"
+                            style={{
+                                background: 'transparent',
+                                color: palette.brown,
+                                borderColor: alpha('--echoes-brown', 0.31),
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = palette.amber; e.currentTarget.style.color = palette.amber; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = alpha('--echoes-brown', 0.31); e.currentTarget.style.color = palette.brown; }}
                         >
                             See How It Works
-                        </Button>
+                        </button>
                     </div>
                 </div>
             </section>
 
-            {/* Features Section — Bento Grid */}
-            <section id="features" className="py-24">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
+            <section id="features" className="py-28 px-4">
+                <div className="max-w-6xl mx-auto">
+
+                    <div className="text-center mb-20">
+                        <p
+                            className="text-xl mb-3"
+                            style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}
+                        >
+                            what you get
+                        </p>
+                        <h2
+                            className="font-bold"
+                            style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', letterSpacing: '-0.02em', color: palette.brown }}
+                        >
                             Social Media for History Lovers
                         </h2>
-                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed">
+                        <p className="mt-4 text-lg max-w-2xl mx-auto" style={{ color: palette.muted }}>
                             Share, discover, and discuss historical photos — with AI adding the context you never knew was there
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {features.map((feature) => {
-                            const Icon = feature.icon;
-                            return (
-                                <Card
-                                    key={feature.title}
-                                    className={feature.accent
-                                        ? "bg-gradient-to-br from-violet-950 via-violet-900 to-purple-950 border-violet-500/20"
-                                        : "bg-zinc-900 border-zinc-800"
-                                    }
-                                >
-                                    <CardHeader>
-                                        <div className={`rounded-lg p-3 w-fit mb-2 ${feature.accent ? 'bg-violet-500/20' : 'bg-violet-500/10'}`}>
-                                            <Icon className={`h-6 w-6 ${feature.accent ? 'text-violet-300' : 'text-violet-400'}`} />
-                                        </div>
-                                        <CardTitle className="text-lg font-semibold text-zinc-100">
-                                            {feature.title}
-                                        </CardTitle>
-                                        <CardDescription className={feature.accent ? "text-violet-200/70" : "text-zinc-400"}>
-                                            {feature.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>
-                            );
-                        })}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-6">
+                        {features.map((f) => (
+                            <StickyNote key={f.title} {...f} />
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* How It Works */}
-            <section id="how-it-works" className="py-24">
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-4">
+            <section id="how-it-works" className="py-28 px-4" style={{ background: alpha('--echoes-brown', 0.03) }}>
+                <div className="max-w-5xl mx-auto">
+
+                    <div className="text-center mb-20">
+                        <p
+                            className="text-xl mb-3"
+                            style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}
+                        >
+                            three simple steps
+                        </p>
+                        <h2
+                            className="font-bold"
+                            style={{ fontSize: 'clamp(2rem, 5vw, 3.25rem)', letterSpacing: '-0.02em', color: palette.brown }}
+                        >
                             How It Works
                         </h2>
-                        <p className="max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed">
+                        <p className="mt-4 text-lg max-w-xl mx-auto" style={{ color: palette.muted }}>
                             From a dusty photo to a shared piece of history — in three steps
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-3 gap-12 md:gap-8">
                         {steps.map((step) => {
                             const Icon = step.icon;
                             return (
-                                <div key={step.num} className="relative text-left">
-                                    {/* Watermark step number */}
-                                    <span className="text-8xl font-bold text-zinc-800 leading-none select-none">
+                                <div key={step.num} className="text-left relative">
+                                    {/* Big handwritten step number */}
+                                    <span
+                                        className="block leading-none mb-2"
+                                        style={{
+                                            fontFamily: "'Caveat', cursive",
+                                            fontSize: '5rem',
+                                            color: alpha('--echoes-amber', 0.25),
+                                            lineHeight: 1,
+                                        }}
+                                    >
                                         {step.num}
                                     </span>
-                                    <div className="mt-4 rounded-lg bg-violet-500/10 p-3 w-fit">
-                                        <Icon className="h-5 w-5 text-violet-400" />
+
+                                    <div
+                                        className="inline-flex items-center justify-center w-10 h-10 rounded-full mb-4"
+                                        style={{ background: alpha('--echoes-amber', 0.09) }}
+                                    >
+                                        <Icon size={18} color={palette.amber} strokeWidth={1.8} />
                                     </div>
-                                    <h3 className="text-lg font-semibold text-zinc-100 mt-4">
+
+                                    <h3
+                                        className="font-semibold mb-3 text-lg"
+                                        style={{ color: palette.brown, letterSpacing: '-0.01em' }}
+                                    >
                                         {step.title}
                                     </h3>
-                                    <p className="text-zinc-400 mt-2 leading-relaxed">
+                                    <p className="text-sm leading-relaxed" style={{ color: palette.muted }}>
                                         {step.description}
                                     </p>
                                 </div>
@@ -278,47 +420,86 @@ function LandingPage() {
                 </div>
             </section>
 
-            {/* Final CTA */}
-            <section className="py-24">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Card className="relative overflow-hidden bg-gradient-to-br from-violet-950 via-violet-900 to-purple-950 border-violet-500/20">
-                        {/* Blurred glow */}
-                        <div className="absolute top-[-50%] right-[-20%] w-[400px] h-[400px] rounded-full bg-violet-500/10 blur-[100px]" />
+            <section className="py-28 px-4">
+                <div className="max-w-3xl mx-auto">
+                    <div
+                        className="relative text-center px-8 py-16 md:py-20"
+                        style={{
+                            background: palette.cream,
+                            border: `2px solid ${alpha('--echoes-amber', 0.31)}`,
+                            boxShadow: `8px 8px 0px ${alpha('--echoes-amber', 0.19)}`,
+                        }}
+                    >
+                        {/* Corner decorations */}
+                        {[
+                            'top-3 left-3',
+                            'top-3 right-3',
+                            'bottom-3 left-3',
+                            'bottom-3 right-3',
+                        ].map((pos) => (
+                            <div
+                                key={pos}
+                                className={`absolute ${pos} w-4 h-4`}
+                                style={{
+                                    borderTop: pos.includes('top') ? `2px solid ${palette.amber}` : 'none',
+                                    borderBottom: pos.includes('bottom') ? `2px solid ${palette.amber}` : 'none',
+                                    borderLeft: pos.includes('left') ? `2px solid ${palette.amber}` : 'none',
+                                    borderRight: pos.includes('right') ? `2px solid ${palette.amber}` : 'none',
+                                }}
+                            />
+                        ))}
 
-                        <CardContent className="relative p-8 md:p-16 text-center">
-                            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-100 mb-6">
-                                That Photo Deserves to Be Seen
-                            </h2>
-                            <p className="text-lg md:text-xl text-violet-200/70 mb-8 max-w-2xl mx-auto">
-                                Share it. Let AI tell its story. Let the world discover it.
-                            </p>
-                            <Button
-                                size="lg"
-                                onClick={() => navigate('/login')}
-                                className="bg-white text-violet-900 hover:bg-zinc-100 px-8 py-4 text-lg font-semibold h-auto"
-                            >
-                                Get Started Free
-                                <ArrowRight className="ml-2 h-5 w-5" />
-                            </Button>
-                        </CardContent>
-                    </Card>
+                        <p
+                            className="text-2xl mb-4"
+                            style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}
+                        >
+                            don't let it sit forgotten
+                        </p>
+                        <h2
+                            className="font-bold mb-5"
+                            style={{
+                                fontSize: 'clamp(2rem, 5vw, 3rem)',
+                                letterSpacing: '-0.02em',
+                                color: palette.brown,
+                            }}
+                        >
+                            That Photo Deserves to Be Seen
+                        </h2>
+                        <p className="text-lg mb-10 max-w-lg mx-auto" style={{ color: palette.muted }}>
+                            Share it. Let AI tell its story. Let the world discover it.
+                        </p>
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="inline-flex items-center gap-2 px-10 py-4 font-semibold text-base transition-all"
+                            style={{
+                                background: palette.brown,
+                                color: palette.cream,
+                                boxShadow: `4px 4px 0px ${palette.amber}`,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = palette.amber; e.currentTarget.style.boxShadow = `4px 4px 0px ${palette.brown}`; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `4px 4px 0px ${palette.amber}`; }}
+                        >
+                            Get Started Free
+                            <ArrowRight size={18} />
+                        </button>
+                    </div>
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="border-t border-zinc-800 py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col md:flex-row justify-between items-center">
-                        <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                            <Sparkles className="h-5 w-5 text-violet-400" />
-                            <span className="text-sm font-semibold text-zinc-300">Echoes</span>
-                        </div>
-                        <p className="text-zinc-500 text-xs">
-                            © 2025 Echoes. All rights reserved.
-                        </p>
+            <footer
+                className="py-8 border-t"
+                style={{ borderColor: alpha('--echoes-amber', 0.19) }}
+            >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold" style={{ color: palette.brown }}>Echoes</span>
                     </div>
+                    <p className="text-xs" style={{ color: palette.muted }}>
+                        © 2025 Echoes. All rights reserved.
+                    </p>
                 </div>
             </footer>
+
         </div>
     );
 }
