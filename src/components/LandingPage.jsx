@@ -7,10 +7,14 @@ import {
     Users,
     ArrowRight,
     Menu,
-    X
+    X,
+    Sun,
+    Moon,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from './theme-provider';
 import { palette, alpha } from '../styles/theme';
+import Polaroid from './ui/Polaroid';
 
 const features = [
     {
@@ -64,39 +68,6 @@ const steps = [
     },
 ];
 
-function Polaroid({ rotate, label, tint = '#D4B896', className = '' }) {
-    return (
-        <div
-            className={`absolute hidden lg:block select-none ${className}`}
-            style={{ transform: `rotate(${rotate})` }}
-        >
-            <div
-                className="bg-white p-2 pb-7"
-                style={{
-                    width: 128,
-                    boxShadow: `3px 4px 18px ${alpha('--echoes-brown', 0.18)}, 0 1px 3px ${alpha('--echoes-brown', 0.08)}`,
-                }}
-            >
-                {/* photo placeholder */}
-                <div
-                    className="w-full"
-                    style={{
-                        height: 108,
-                        background: `linear-gradient(135deg, ${tint}cc 0%, ${tint}66 60%, ${tint}99 100%)`,
-                    }}
-                />
-                {/* label */}
-                <p
-                    className="text-center mt-2 text-xs"
-                    style={{ fontFamily: "'Caveat', cursive", color: palette.muted, letterSpacing: '0.02em' }}
-                >
-                    {label}
-                </p>
-            </div>
-        </div>
-    );
-}
-
 function StickyNote({ icon: Icon, title, description, noteColor, rotate }) {
     return (
         <div
@@ -133,6 +104,7 @@ function StickyNote({ icon: Icon, title, description, noteColor, rotate }) {
 
 function LandingPage() {
     const navigate = useNavigate();
+    const { theme, setTheme } = useTheme();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const scrollToSection = (id) => {
@@ -179,6 +151,7 @@ function LandingPage() {
                             >
                                 How It Works
                             </button>
+
                             <button
                                 onClick={() => navigate('/login')}
                                 className="text-sm px-5 py-2 font-semibold transition-all"
@@ -191,6 +164,16 @@ function LandingPage() {
                                 onMouseLeave={e => { e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; e.currentTarget.style.background = palette.brown; }}
                             >
                                 Get Started
+                            </button>
+                            <button
+                                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                className="p-2 transition-colors"
+                                style={{ color: palette.muted }}
+                                onMouseEnter={e => e.currentTarget.style.color = palette.brown}
+                                onMouseLeave={e => e.currentTarget.style.color = palette.muted}
+                                aria-label="Toggle theme"
+                            >
+                                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                             </button>
                         </div>
                         <button
@@ -222,6 +205,14 @@ function LandingPage() {
                                         {label}
                                     </button>
                                 ))}
+                                <button
+                                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                    className="flex items-center gap-2 px-3 py-2 text-sm"
+                                    style={{ color: palette.muted }}
+                                >
+                                    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                                    {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                                </button>
                                 <button
                                     onClick={() => navigate('/login')}
                                     className="mt-2 mx-3 py-2 text-sm font-semibold"

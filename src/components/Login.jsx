@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
-import {
-    Github,
-    Loader2,
-    Sparkles
-} from 'lucide-react';
+import { Github, Loader2, Sun, Moon } from 'lucide-react';
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useTheme } from './theme-provider';
+import { palette, alpha } from '../styles/theme';
+import Polaroid from './ui/Polaroid';
 
-// Google Icon Component
 const GoogleIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24">
+    <svg width="18" height="18" viewBox="0 0 24 24" className="shrink-0">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -24,6 +20,7 @@ function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const { loading, error } = useAuthStore();
+    const { theme, setTheme } = useTheme();
     const [loadingProvider, setLoadingProvider] = useState(null);
 
     const from = location.state?.from || '/home';
@@ -51,105 +48,171 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6 relative overflow-hidden">
-            {/* Background gradient mesh */}
-            <div className="absolute top-[-30%] right-[-15%] w-[500px] h-[500px] rounded-full bg-violet-600/15 blur-[128px]" />
-            <div className="absolute bottom-[-30%] left-[-15%] w-[400px] h-[400px] rounded-full bg-purple-600/10 blur-[128px]" />
+        <div
+            className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden"
+            style={{ background: palette.cream, fontFamily: "'Lora', Georgia, serif" }}
+        >
+            {/* Theme toggle */}
+            <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="absolute top-4 right-4 z-20 p-2 transition-colors"
+                style={{ color: palette.muted }}
+                onMouseEnter={e => e.currentTarget.style.color = palette.brown}
+                onMouseLeave={e => e.currentTarget.style.color = palette.muted}
+                aria-label="Toggle theme"
+            >
+                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
 
-            <div className="relative w-full max-w-md">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <div className="flex items-center justify-center gap-2 mb-8">
-                        <Sparkles className="h-7 w-7 text-violet-400" />
-                        <span className="text-xl font-bold text-zinc-100">Echoes</span>
-                    </div>
+            {/* Paper line texture */}
+            <div
+                className="absolute inset-0 opacity-40 pointer-events-none"
+                style={{
+                    backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 27px, ${alpha('--echoes-amber', 0.08)} 28px)`,
+                }}
+            />
 
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-100 mb-3">
-                        Choose your sign in method
-                    </h2>
-                </div>
+            {/* Glow blob */}
+            <div
+                className="absolute pointer-events-none"
+                style={{
+                    width: 500, height: 500,
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle, ${alpha('--echoes-amber', 0.09)} 0%, transparent 70%)`,
+                    top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
+            />
 
-                {/* Main Login Buttons */}
-                <div className="space-y-3 mb-8">
-                    <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full h-14 text-base font-medium border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:border-zinc-600 rounded-xl transition-colors"
-                        onClick={handleGoogleLogin}
-                        disabled={loading}
-                    >
-                        {loadingProvider === 'google' ? (
-                            <Loader2 className="mr-3 h-5 w-5 animate-spin text-zinc-400" />
-                        ) : (
-                            <GoogleIcon />
-                        )}
-                        <span className="ml-3 text-zinc-200">Continue with Google</span>
-                    </Button>
+            {/* Scattered polaroids */}
+            <Polaroid rotate="-8deg"  label="Paris, 1963"     tint="#C9A87A" size="sm" className="top-[10%] left-[4%]"    />
+            <Polaroid rotate="6deg"   label="Brooklyn, 1952"  tint="#A89070" size="sm" className="top-[8%]  right-[5%]"   />
+            <Polaroid rotate="-4deg"  label="First car, 1971" tint="#9A8060" size="sm" className="bottom-[12%] left-[3%]" />
+            <Polaroid rotate="9deg"   label="Grandma & Joe"   tint="#B8927A" size="sm" className="bottom-[10%] right-[4%]"/>
 
-                    <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full h-14 text-base font-medium border-zinc-700 bg-zinc-900 hover:bg-zinc-800 hover:border-zinc-600 rounded-xl transition-colors"
-                        onClick={handleGitHubLogin}
-                        disabled={loading}
-                    >
-                        {loadingProvider === 'github' ? (
-                            <Loader2 className="mr-3 h-5 w-5 animate-spin text-zinc-400" />
-                        ) : (
-                            <Github className="mr-3 h-5 w-5 text-zinc-300" />
-                        )}
-                        <span className="text-zinc-200">Continue with GitHub</span>
-                    </Button>
-                </div>
+            {/* Card */}
+            <div className="relative w-full max-w-md z-10">
+                <div
+                    className="relative px-8 py-12"
+                    style={{
+                        background: palette.cream,
+                        border: `2px solid ${alpha('--echoes-amber', 0.31)}`,
+                        boxShadow: `8px 8px 0px ${alpha('--echoes-amber', 0.19)}`,
+                    }}
+                >
+                    {/* Corner decorations */}
+                    {['top-3 left-3', 'top-3 right-3', 'bottom-3 left-3', 'bottom-3 right-3'].map((pos) => (
+                        <div
+                            key={pos}
+                            className={`absolute ${pos} w-4 h-4`}
+                            style={{
+                                borderTop:    pos.includes('top')    ? `2px solid ${palette.amber}` : 'none',
+                                borderBottom: pos.includes('bottom') ? `2px solid ${palette.amber}` : 'none',
+                                borderLeft:   pos.includes('left')   ? `2px solid ${palette.amber}` : 'none',
+                                borderRight:  pos.includes('right')  ? `2px solid ${palette.amber}` : 'none',
+                            }}
+                        />
+                    ))}
 
-                {/* Error Display */}
-                {error && (
-                    <Alert variant="destructive" className="mb-8 rounded-xl bg-red-500/10 border-red-500/20">
-                        <AlertDescription className="text-center text-red-400">
-                            {error}
-                        </AlertDescription>
-                    </Alert>
-                )}
-
-                {/* Bottom Section */}
-                <div className="text-center space-y-6">
-                    <Separator className="bg-zinc-800" />
-
-                    <p className="text-zinc-500 text-sm">
-                        Need more info?{' '}
+                    {/* Header */}
+                    <div className="text-center mb-10">
                         <button
                             onClick={() => navigate('/')}
-                            className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
+                            className="text-2xl font-bold mb-5 block w-full"
+                            style={{ color: palette.brown, letterSpacing: '-0.02em' }}
                         >
-                            Back to homepage
+                            Echoes
                         </button>
-                    </p>
+                        <h1
+                            className="font-bold"
+                            style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: palette.brown, letterSpacing: '-0.02em', lineHeight: 1.2 }}
+                        >
+                            Sign in to continue
+                        </h1>
+                        <p className="mt-2 text-sm" style={{ color: palette.muted }}>
+                            Those photos won't share themselves.
+                        </p>
+                    </div>
+
+                    {/* Auth buttons */}
+                    <div className="flex flex-col gap-3 mb-8">
+                        <button
+                            onClick={handleGoogleLogin}
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-3 px-6 py-3.5 font-semibold text-sm transition-all disabled:opacity-60"
+                            style={{
+                                background: palette.brown,
+                                color: palette.cream,
+                                boxShadow: `3px 3px 0px ${palette.amber}`,
+                            }}
+                            onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = palette.amber; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.brown}`; }}}
+                            onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; }}
+                        >
+                            {loadingProvider === 'google'
+                                ? <Loader2 size={18} className="animate-spin" style={{ color: palette.muted }} />
+                                : <GoogleIcon />
+                            }
+                            Continue with Google
+                        </button>
+
+                        <button
+                            onClick={handleGitHubLogin}
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-3 px-6 py-3.5 font-semibold text-sm transition-all disabled:opacity-60"
+                            style={{
+                                background: palette.brown,
+                                color: palette.cream,
+                                boxShadow: `3px 3px 0px ${palette.amber}`,
+                            }}
+                            onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = palette.amber; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.brown}`; }}}
+                            onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; }}
+                        >
+                            {loadingProvider === 'github'
+                                ? <Loader2 size={18} className="animate-spin" />
+                                : <Github size={18} />
+                            }
+                            Continue with GitHub
+                        </button>
+                    </div>
+
+                    {/* Error */}
+                    {error && (
+                        <Alert className="mb-6" style={{ background: alpha('--echoes-amber', 0.08), border: `1px solid ${alpha('--echoes-amber', 0.3)}` }}>
+                            <AlertDescription className="text-center text-sm" style={{ color: palette.brown }}>
+                                {error}
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    {/* Divider + back link */}
+                    <div className="text-center space-y-4">
+                        <div className="h-px w-full" style={{ background: alpha('--echoes-amber', 0.2) }} />
+                        <p className="text-sm" style={{ color: palette.muted }}>
+                            Need more info?{' '}
+                            <button
+                                onClick={() => navigate('/')}
+                                className="font-semibold transition-colors"
+                                style={{ color: palette.amber }}
+                                onMouseEnter={e => e.target.style.color = palette.brown}
+                                onMouseLeave={e => e.target.style.color = palette.amber}
+                            >
+                                Back to homepage
+                            </button>
+                        </p>
+                    </div>
                 </div>
 
-                {/* Terms Footer */}
-                <div className="mt-12 text-center space-y-2">
-                    <p className="text-xs text-zinc-500 leading-relaxed">
+                {/* Terms — outside card */}
+                <div className="mt-5 text-center space-y-1">
+                    <p className="text-xs" style={{ color: palette.muted }}>
                         By continuing, you agree to our{' '}
-                        <Link
-                            to="/terms"
-                            className="text-violet-400 hover:text-violet-300 font-medium"
-                        >
-                            Terms of Service
-                        </Link>
+                        <Link to="/terms" className="font-medium" style={{ color: palette.amber }}>Terms of Service</Link>
                         {' '}and{' '}
-                        <Link
-                            to="/privacy"
-                            className="text-violet-400 hover:text-violet-300 font-medium"
-                        >
-                            Privacy Policy
-                        </Link>
+                        <Link to="/privacy" className="font-medium" style={{ color: palette.amber }}>Privacy Policy</Link>
                     </p>
-                    <p className="text-xs text-zinc-500 leading-relaxed">
+                    <p className="text-xs" style={{ color: palette.muted }}>
                         Need help?{' '}
-                        <a
-                            href="mailto:eyalhe3@gmail.com"
-                            className="text-violet-400 hover:text-violet-300 font-medium"
-                        >
+                        <a href="mailto:eyalhe3@gmail.com" className="font-medium" style={{ color: palette.amber }}>
                             Contact Us
                         </a>
                     </p>
