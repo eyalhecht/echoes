@@ -1,10 +1,10 @@
 import React from 'react';
 import { palette, alpha } from '../../styles/theme';
 
-function Polaroid({ rotate, label, tint = '#D4B896', size = 'md', className = '' }) {
+function Polaroid({ rotate, label, tint = '#D4B896', size = 'md', className = '', imageUrl }) {
     const dimensions = {
         sm: { width: 110, height: 88 },
-        md: { width: 128, height: 108 },
+        md: { width: 288, height: 268 },
     };
     const { width, height } = dimensions[size];
 
@@ -24,7 +24,10 @@ function Polaroid({ rotate, label, tint = '#D4B896', size = 'md', className = ''
                     className="w-full"
                     style={{
                         height,
-                        background: `linear-gradient(135deg, ${tint}cc 0%, ${tint}66 60%, ${tint}99 100%)`,
+                        background: imageUrl ? 'none' : `linear-gradient(135deg, ${tint}cc 0%, ${tint}66 60%, ${tint}99 100%)`,
+                        backgroundImage: imageUrl ? `url(${imageUrl})` : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
                     }}
                 />
                 <p
