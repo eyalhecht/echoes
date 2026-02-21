@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Github, Loader2, Sun, Moon } from 'lucide-react';
+import { Github, Sun, Moon } from 'lucide-react';
+import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useTheme } from './theme-provider';
@@ -149,7 +150,7 @@ function Login() {
                             onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; }}
                         >
                             {loadingProvider === 'google'
-                                ? <Loader2 size={18} className="animate-spin" style={{ color: palette.muted }} />
+                                ? <Spinner size="sm" />
                                 : <GoogleIcon />
                             }
                             Continue with Google
@@ -168,7 +169,7 @@ function Login() {
                             onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; }}
                         >
                             {loadingProvider === 'github'
-                                ? <Loader2 size={18} className="animate-spin" />
+                                ? <Spinner size="sm" />
                                 : <Github size={18} />
                             }
                             Continue with GitHub

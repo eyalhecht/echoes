@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Spinner } from "@/components/ui/spinner";
 import Layout from '../components/Layout.jsx';
 import Login from '../components/Login.jsx';
 import Signup from '../components/Signup.jsx';
@@ -24,9 +25,9 @@ function AppRouter() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+        <div className="text-center space-y-4">
+          <Spinner size="lg" className="mx-auto" />
+          <p className="text-sm text-stone-400" style={{ fontFamily: "'Lora', Georgia, serif" }}>Loading...</p>
         </div>
       </div>
     );

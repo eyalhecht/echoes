@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LogOut, Loader2 } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
@@ -194,7 +195,7 @@ const Profile = () => {
     if (profileLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <Loader2 className="h-8 w-8 animate-spin" />
+                <Spinner size="lg" />
             </div>
         );
     }
@@ -243,7 +244,7 @@ const Profile = () => {
                                             className="min-w-[100px]"
                                         >
                                             {followActionLoading ? (
-                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <Spinner size="sm" />
                                             ) : (
                                                 isFollowing ? 'Unfollow' : 'Follow'
                                             )}
@@ -314,7 +315,7 @@ const Profile = () => {
             <div className="mt-4">
                 {userPostsLoading ? (
                     <div className="text-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                        <Spinner size="lg" className="mx-auto mb-2" />
                         <p className="text-muted-foreground">Loading posts...</p>
                     </div>
                 ) : userPosts.length === 0 ? (

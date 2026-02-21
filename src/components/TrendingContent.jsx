@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingUp, Clock, Flame, RotateCcw } from 'lucide-react';
+import { TrendingUp, Clock, Flame, RotateCcw } from 'lucide-react';
+import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from '../firebaseConfig';
 import MapPostCard from './MapPostCard';
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
@@ -50,7 +51,7 @@ export default function TrendingContent() {
                 <div className="max-w-4xl mx-auto p-4 md:p-6">
                     <div className="flex justify-center py-12">
                         <div className="flex items-center gap-2">
-                            <Loader2 className="h-5 w-5 animate-spin" />
+                            <Spinner size="md" />
                             <span>Loading trending content...</span>
                         </div>
                     </div>

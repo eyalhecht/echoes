@@ -5,7 +5,7 @@ export default function LoadingScreen() {
             <div
                 className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/20 dark:to-black/40"></div>
             <div className="relative z-10 text-center space-y-8">
-                <h1 className="text-6xl md:text-8xl font-sans font-bold text-stone-800 dark:text-stone-200 tracking-wider drop-shadow-lg">
+                <h1 className="text-6xl md:text-8xl font-bold text-stone-800 dark:text-stone-200 drop-shadow-lg" style={{ fontFamily: "'Lora', Georgia, serif", letterSpacing: '-0.02em' }}>
                     Echoes
                 </h1>
             </div>

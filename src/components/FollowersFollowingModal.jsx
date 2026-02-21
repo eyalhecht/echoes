@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 // ScrollArea not available, we'll use a regular scrollable div
-import { Users, UserPlus, Loader2, AlertCircle } from 'lucide-react';
+import { Users, UserPlus, AlertCircle } from 'lucide-react';
+import { Spinner } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { callApiGateway } from "../firebaseConfig.js";
 import { useNavigate } from 'react-router-dom';
@@ -226,7 +227,7 @@ const FollowersFollowingModal = ({
                                         {/* Load more indicator */}
                                         {loadingMore && (
                                             <div className="flex justify-center py-4">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <Spinner size="sm" />
                                             </div>
                                         )}
                                         

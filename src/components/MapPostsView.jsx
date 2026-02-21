@@ -4,7 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
-import { Loader2, MapPin, Navigation } from 'lucide-react';
+import { MapPin, Navigation } from 'lucide-react';
+import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
 import useUiStore from '../stores/useUiStore.js';
@@ -197,7 +198,7 @@ const MapPostsView = () => {
                                 </h2>
                                 {loading && (
                                     <div className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <Spinner size="sm" />
                                         <span className="text-sm text-muted-foreground">
                                             Loading posts...
                                         </span>

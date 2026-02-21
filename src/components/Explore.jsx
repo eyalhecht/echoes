@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from "../firebaseConfig.js";
 import useUiStore from "../stores/useUiStore.js";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
@@ -139,7 +139,7 @@ export function Explore() {
                             <span className="text-sm font-medium text-muted-foreground tracking-wider">
                                 People {!usersLoading && `(${users.length})`}
                             </span>
-                            {usersLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                            {usersLoading && <Spinner size="sm" />}
                         </div>
                         
                         {usersLoading ? (
@@ -189,7 +189,7 @@ export function Explore() {
                         <span className="text-sm font-medium text-muted-foreground tracking-wider">
                             Posts {!postsLoading && posts.length > 0 && `(${posts.length})`}
                         </span>
-                        {postsLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                        {postsLoading && <Spinner size="sm" />}
                     </div>
                     
                     {postsLoading && posts.length === 0 ? (
@@ -271,7 +271,7 @@ export function Explore() {
                                     >
                                         {postsLoading ? (
                                             <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                <Spinner size="sm" className="mr-2" />
                                                 Loading...
                                             </>
                                         ) : (

@@ -1,18 +1,26 @@
-import { Loader2Icon } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 
-function Spinner({
-  className,
-  ...props
-}) {
+const sizeClasses = {
+  sm: "w-4 h-4 border-2",
+  md: "w-5 h-5 border-2",
+  lg: "w-8 h-8 border-[3px]",
+}
+
+function Spinner({ className, size = "sm", ...props }) {
   return (
-    <Loader2Icon
+    <div
       role="status"
       aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
-      {...props} />
-  );
+      className={cn(
+        "rounded-full animate-spin",
+        "border-amber-200 dark:border-amber-800",
+        "border-t-amber-600 dark:border-t-amber-400",
+        sizeClasses[size],
+        className
+      )}
+      {...props}
+    />
+  )
 }
 
 export { Spinner }
