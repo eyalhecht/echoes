@@ -214,7 +214,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon">
             <SidebarHeader className={"cursor-pointer"}>
                 <div onClick={()=> navigate("/home")} className={open ? "px-2" : "px-3"}>
-                    <h2 className="text-lg font-semibold">{open ? "ECHOES" : "E"}</h2>
+                    <h2 className="text-lg font-semibold" style={{ fontFamily: "'Lora', Georgia, serif", letterSpacing: '-0.02em' }}>{open ? "Echoes" : "E"}</h2>
                 </div>
             </SidebarHeader>
             <SidebarContent>
