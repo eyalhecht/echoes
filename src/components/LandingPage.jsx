@@ -235,10 +235,10 @@ function LandingPage() {
                 />
 
                 {/* Scattered polaroids */}
-                <Polaroid rotate="-7deg"  label="Summer '67"      tint="#C9A87A" className="top-[12%] left-[4%]"   />
-                <Polaroid rotate="5deg"   label="Brooklyn, 1952"  tint="#A89070" className="top-[8%]  right-[6%]"  />
-                <Polaroid rotate="-3deg"  label="Grandma & Joe"   tint="#B8927A" className="bottom-[14%] right-[5%]" />
-                <Polaroid rotate="8deg"   label="First car, 1971" tint="#9A8060" className="bottom-[18%] left-[3%]"  />
+                <Polaroid rotate="-7deg"  label="Summer '67"      tint="#C9A87A" className="top-[12%] left-[4%]"    imageUrl="https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762101847784_Scan%202.11.2025%2C%2010.36.jpg?alt=media&token=edb8677e-f7e7-4db8-b27c-5d8983cb0600" />
+                <Polaroid rotate="5deg"   label="Grandma & Joe"  tint="#A89070" className="top-[8%]  right-[6%]"   imageUrl="https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762103986842_Jena_1960er.jpg?alt=media&token=05bd1ea6-a90e-4219-926a-8d1042d4514b" />
+                <Polaroid rotate="-3deg"  label="Brooklyn, 1952"   tint="#B8927A" className="bottom-[14%] right-[5%]" imageUrl="https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762104605109_Goethe_Wohnhaus_Weimar_1966.jpg?alt=media&token=f96fc128-856b-4c94-b72b-5e1a519b581f" />
+                <Polaroid rotate="8deg"   label="First car, 1971" tint="#9A8060" className="bottom-[18%] left-[3%]"  imageUrl="https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762106202384_Ga%CC%88nsema%CC%88nnchenbrunnen_Weimar_1966.jpg?alt=media&token=adee0f45-83b9-43aa-89eb-1c240aef8c51" />
 
                 {/* Glow blob */}
                 <div

@@ -296,7 +296,7 @@ function PostCard({ post }) {
                 <CardContent className="pt-4">
 
                     <div className="flex items-start gap-2 mb-2">
-                        <p className="text-sm flex-1 whitespace-pre-wrap">
+                        <p className="text-sm flex-1 whitespace-pre-wrap" style={{ fontFamily: "'Caveat', cursive", fontSize: '1.2rem' }}>
                             {getDisplayedText()}
                         </p>
 

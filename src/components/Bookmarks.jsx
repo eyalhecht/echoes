@@ -68,7 +68,6 @@ function Bookmarks() {
                 setBookmarks(response.data.posts);
                 setBookmarksLastDocId(response.data.lastDocId);
                 setBookmarksHasMore(response.data.hasMore);
-                console.log("Initial bookmarks loaded:", response.data);
             } catch (error) {
                 console.error('Failed to load bookmarks:', error);
                 setBookmarksError(error.message || 'Failed to load bookmarks');

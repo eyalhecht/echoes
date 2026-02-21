@@ -44,12 +44,12 @@ import {
     Bookmark,
     Upload,
     LogOut,
-    Loader2,
     Settings,
     Search,
     Trash2,
     AlertTriangle
 } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
 import { useNavigate, useLocation } from 'react-router-dom'
 import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
@@ -214,7 +214,7 @@ export function AppSidebar() {
         <Sidebar collapsible="icon">
             <SidebarHeader className={"cursor-pointer"}>
                 <div onClick={()=> navigate("/home")} className={open ? "px-2" : "px-3"}>
-                    <h2 className="text-lg font-semibold">{open ? "ECHOES" : "E"}</h2>
+                    <h2 className="text-lg font-semibold" style={{ fontFamily: "'Lora', Georgia, serif", letterSpacing: '-0.02em' }}>{open ? "Echoes" : "E"}</h2>
                 </div>
             </SidebarHeader>
             <SidebarContent>
@@ -258,7 +258,7 @@ export function AppSidebar() {
                                                 isActive={isActiveRoute(item.path)}
                                             >
                                                 {item.isLoading ? (
-                                                    <Loader2 className="animate-spin" />
+                                                    <Spinner size="sm" />
                                                 ) : (
                                                     <item.icon />
                                                 )}
@@ -319,7 +319,7 @@ export function AppSidebar() {
                                     className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                                 >
                                     {loading ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Spinner size="sm" className="mr-2" />
                                     ) : (
                                         <LogOut className="mr-2 h-4 w-4" />
                                     )}
@@ -331,7 +331,7 @@ export function AppSidebar() {
                                     className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                                 >
                                     {isDeleting ? (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Spinner size="sm" className="mr-2" />
                                     ) : (
                                         <Trash2 className="mr-2 h-4 w-4" />
                                     )}
@@ -420,7 +420,7 @@ export function AppSidebar() {
                         >
                             {isDeleting ? (
                                 <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    <Spinner size="sm" className="mr-2" />
                                     Deleting Account...
                                 </>
                             ) : (

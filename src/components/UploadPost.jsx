@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
+import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,6 @@ import {
     Camera,
     X,
     MapPin,
-    Loader2,
     Upload,
     Image,
     Calendar,
@@ -608,7 +608,7 @@ const UploadPost = () => {
                                     </>
                                 ) : isUploading ? (
                                     <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        <Spinner size="sm" className="mr-2" />
                                         Uploading...
                                     </>
                                 ) : (

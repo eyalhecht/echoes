@@ -45,7 +45,6 @@ function Home() {
             addPosts(response.data.posts); // Append to existing posts
             setLastDocId(response.data.lastDocId);
             setHasMore(response.data.hasMore);
-            console.log("More posts loaded:", response.data);
         } catch (error) {
             console.error('Failed to load more posts:', error);
         } finally {
@@ -71,7 +70,6 @@ function Home() {
                 setPosts(response.data.posts);
                 setLastDocId(response.data.lastDocId);
                 setHasMore(response.data.hasMore);
-                console.log("Posts loaded:", response.data);
             } catch (error) {
                 console.error('Failed to load posts:', error);
             } finally {
