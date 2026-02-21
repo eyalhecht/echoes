@@ -51,8 +51,6 @@ const MapPostsView = () => {
         setError(null);
 
         try {
-            console.log('Fetching posts for:', center, 'radius:', radius);
-
             const response = await callApiGateway({
                 action: 'getPostsByLocation',
                 payload: {
@@ -91,7 +89,6 @@ const MapPostsView = () => {
 
             // Use normalized posts for location display
             setLocationPosts(normalizedPosts);
-            console.log('Got posts:', normalizedPosts.length);
         } catch (err) {
             console.error('Error fetching posts:', err);
         } finally {

@@ -14,7 +14,6 @@ function App() {
 
     // This useEffect sets up the Firebase Auth listener and runs optional connection tests.
     useEffect(() => {
-        console.log("App.jsx: Setting up Firebase Auth listener via Redux...");
         useAuthStore.getState().startListeningForAuthChanges();
     }, []);
 

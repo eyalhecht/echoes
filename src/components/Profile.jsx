@@ -92,8 +92,6 @@ const Profile = () => {
                 }
             });
 
-            console.log("Fetched user posts response:", response);
-
             if (response && response.data.posts) {
                 if (isInitial) {
                     setUserPosts(response.data.posts);
