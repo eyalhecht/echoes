@@ -284,7 +284,7 @@ function LandingPage() {
                         className="max-w-xl mx-auto text-lg leading-relaxed mb-10"
                         style={{ color: palette.muted }}
                     >
-                        Upload old photos. AI uncovers their story — the era, the place, the moment.
+                        Upload old photos. AI will uncover their story - the era, the place, the moment.
                         Then share them with people who care.
                     </p>
 
