@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useState } from 'react';
 import {callApiGateway} from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
-import SuggestedUsers from "./SuggestedUsers.jsx";
+// import SuggestedUsers from "./SuggestedUsers.jsx";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -107,9 +107,9 @@ function Home() {
 
     return (
         <>
-            <div className="hidden lg:block">
+            {/* <div className="hidden lg:block">
                 <SuggestedUsers />
-            </div>
+            </div> */}
             <div className="w-full max-w-2xl mx-auto">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
