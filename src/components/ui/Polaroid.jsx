@@ -4,7 +4,7 @@ import { palette, alpha } from '../../styles/theme';
 function Polaroid({ rotate, label, tint = '#D4B896', size = 'md', className = '', imageUrl }) {
     const dimensions = {
         sm: { width: 110, height: 88 },
-        md: { width: 288, height: 268 },
+        md: { width: 208, height: 188 },
     };
     const { width, height } = dimensions[size];
 
