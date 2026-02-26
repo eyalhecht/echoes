@@ -16,9 +16,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
 
     const {
         liked,
-        likesCount,
         bookmarked,
-        bookmarksCount,
         handleLikeToggle,
         handleBookmarkToggle,
     } = usePostInteractions(post.id);

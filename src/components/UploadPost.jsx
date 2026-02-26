@@ -33,7 +33,6 @@ import { storage, auth, functions } from "../firebaseConfig.js";
 import { httpsCallable } from "firebase/functions";
 import { GeoPoint } from "firebase/firestore";
 import LocationPickerModal from './LocationPickerModal';
-import useUiStore from "@/stores/useUiStore.js";
 import {useNavigate} from "react-router-dom";
 
 const UploadPost = () => {
@@ -257,7 +256,7 @@ const UploadPost = () => {
                 }
             };
 
-            const response = await httpsCallable(functions, 'apiGateway')(payload);
+            await httpsCallable(functions, 'apiGateway')(payload);
 
             uploadingToast.dismiss();
 

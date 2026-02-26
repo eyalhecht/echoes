@@ -31,6 +31,7 @@ export function Explore() {
             setLastPostId(null);
             setHasMorePosts(true);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [exploreQuery]);
 
     const searchContent = async (query, loadMore = false) => {

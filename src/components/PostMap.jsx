@@ -9,7 +9,7 @@ const PostMap = ({
                           width = "100%"
                       }) => {
     const [selectedMarker, setSelectedMarker] = useState(null);
-    const [map, setMap] = useState(null);
+    const [, setMap] = useState(null);
 
     const mapContainerStyle = {
         width: width,

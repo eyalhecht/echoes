@@ -15,7 +15,7 @@ const MapPostsView = () => {
     const [error, setError] = useState(null);
     const [mapCenter, setMapCenter] = useState({ lat: 40.7589, lng: -73.9851 });
     const [radiusKm, setRadiusKm] = useState(45);
-    const [postType, setPostType] = useState('all');
+    const [postType] = useState('all');
     const [selectedPost, setSelectedPost] = useState(null);
     const [hoveredPost, setHoveredPost] = useState(null);
     const [map, setMap] = useState(null);
@@ -178,12 +178,13 @@ const MapPostsView = () => {
                 }
             );
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchPosts, radiusKm, map]);
 
     // Initial load
     useEffect(() => {
         getCurrentLocation();
-    }, []);
+    }, [getCurrentLocation]);
 
     return (
         <div className="h-[90vh] mx-2 flex flex-col">

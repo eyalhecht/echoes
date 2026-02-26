@@ -71,6 +71,7 @@ const Profile = () => {
             }
         };
         loadProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effectiveUserId]);
 
     const loadMorePosts = useCallback(async (isInitial = false) => {
@@ -129,6 +130,7 @@ const Profile = () => {
 
             loadMorePosts(true);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effectiveUserId]);
 
     // Infinite scroll handler

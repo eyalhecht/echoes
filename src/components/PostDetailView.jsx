@@ -28,7 +28,6 @@ import {
     MoreHorizontal,
     Trash2,
 } from 'lucide-react';
-import { format } from 'date-fns'; // Still used for format Firebase Timestamp
 import { usePostInteractions } from '../hooks/usePostInteractions';
 import { callApiGateway } from '../firebaseConfig.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
@@ -64,24 +63,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     const [showMapInModal, setShowMapInModal] = useState(true);
     
     const currentUser = useAuthStore((state) => state.user);
-    const setActiveSidebarItem = useUiStore((state) => state.setActiveSidebarItem);
-    const setActiveProfileView = useUiStore((state) => state.setActiveProfileView);
     const deletePost = useUiStore(state => state.deletePost);
-
-    if (!post) return null;
-
-    const {
-        userDisplayName,
-        userProfilePicUrl,
-        description,
-        type,
-        files,
-        year,
-        location,
-        createdAt,
-        commentsCount,
-        userId,
-    } = post;
 
     const fetchComments = useCallback(async () => {
         setIsCommentsLoading(true);
@@ -90,7 +72,7 @@ const PostDetailView = ({ post, open, onClose }) => {
             const result = await callApiGateway({
                 action: 'getComments',
                 payload: {
-                    postId: post.id
+                    postId: post?.id
                 }
             });
             const processedComments = result.data.comments.map(comment => ({
@@ -109,7 +91,28 @@ const PostDetailView = ({ post, open, onClose }) => {
         } finally {
             setIsCommentsLoading(false);
         }
-    }, [post.id]);
+    }, [post?.id]);
+
+    useEffect(() => {
+        if (open && post && !hasCommentsFetched) {
+            fetchComments();
+        }
+    }, [open, post, hasCommentsFetched, fetchComments]);
+
+    if (!post) return null;
+
+    const {
+        userDisplayName,
+        userProfilePicUrl,
+        description,
+        type,
+        files,
+        year,
+        location,
+        createdAt,
+        commentsCount,
+        userId,
+    } = post;
 
     const handleAddComment = async () => {
         if (!comment.trim() || !currentUser) {
@@ -137,12 +140,6 @@ const PostDetailView = ({ post, open, onClose }) => {
     const handleNameClick = (userId) => {
         navigate(`/profile/${userId}`);
     };
-
-    useEffect(() => {
-        if (open && post && !hasCommentsFetched) {
-            fetchComments();
-        }
-    }, [open, post, hasCommentsFetched, fetchComments]);
 
     const handleCommentSubmit = () => {
         handleAddComment();
@@ -326,7 +323,7 @@ const PostDetailView = ({ post, open, onClose }) => {
                                                                 // Handle object locations
                                                                 return (
                                                                     <div className="flex flex-wrap gap-1">
-                                                                        {Object.entries(location).map(([key, value], i) => (
+                                                                        {Object.entries(location).map(([, value], i) => (
                                                                             <Badge key={i} variant="outline" className="text-xs">
                                                                                 {String(value)}
                                                                             </Badge>

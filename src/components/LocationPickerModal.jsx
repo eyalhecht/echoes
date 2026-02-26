@@ -34,7 +34,7 @@ const LocationPickerModal = ({ open, onClose, onSelectLocation, initialLocation 
                     };
                     setSelectedPosition(newPos);
                 },
-                (error) => {
+                () => {
                     setSelectedPosition({ lat: 40.7128, lng: -74.0060 });
                 },
                 { 

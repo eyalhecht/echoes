@@ -402,7 +402,7 @@ function PostCard({ post }) {
                                                 // Handle object locations
                                                 return (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {Object.entries(location).map(([key, value], i) => (
+                                                        {Object.entries(location).map(([, value], i) => (
                                                             <Badge key={i} variant="outline" className="text-xs">
                                                                 {String(value)}
                                                             </Badge>
