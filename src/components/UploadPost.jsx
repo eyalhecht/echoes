@@ -256,7 +256,7 @@ const UploadPost = () => {
                 }
             };
 
-            await httpsCallable(functions, 'apiGateway')(payload);
+            await httpsCallable(functions, 'api')(payload);
 
             uploadingToast.dismiss();
 

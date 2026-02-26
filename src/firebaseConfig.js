@@ -25,4 +25,4 @@ if (import.meta.env.DEV || window.location.hostname === 'localhost') {
     connectFunctionsEmulator(functions, 'localhost', 5001);
 }
 
-export const callApiGateway = httpsCallable(functions, 'apiGateway');
+export const callApiGateway = httpsCallable(functions, 'api');
