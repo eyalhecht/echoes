@@ -12,7 +12,7 @@ export default function TrendingContent() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [timeframe, setTimeframe] = useState('30d');
+    const [timeframe] = useState('30d');
 
 
     const fetchTrendingPosts = async (selectedTimeframe = timeframe) => {
@@ -39,6 +39,7 @@ export default function TrendingContent() {
 
     useEffect(() => {
         fetchTrendingPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleRetry = () => {

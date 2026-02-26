@@ -40,6 +40,7 @@ const FollowersFollowingModal = ({
             setError(null);
             loadUsers(true);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open, listType, userId]);
 
     const loadUsers = useCallback(async (isInitial = false) => {

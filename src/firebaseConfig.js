@@ -20,9 +20,9 @@ export const functions = getFunctions(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
+if (import.meta.env.DEV || window.location.hostname === 'localhost') {
     console.log('Connecting to Firebase Emulators...');
     connectFunctionsEmulator(functions, 'localhost', 5001);
 }
 
-export const callApiGateway = httpsCallable(functions, 'apiGateway');
+export const callApiGateway = httpsCallable(functions, 'api');

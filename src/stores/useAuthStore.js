@@ -13,7 +13,7 @@ import { httpsCallable } from 'firebase/functions';
 
 const createUserProfileInFirestore = async (displayName, photoURL) => {
     try {
-        const callable = httpsCallable(functions, 'apiGateway');
+        const callable = httpsCallable(functions, 'api');
         await callable({
             action: 'createUserProfile',
             payload: { displayName, photoURL },

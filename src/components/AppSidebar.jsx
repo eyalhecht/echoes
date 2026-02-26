@@ -100,7 +100,7 @@ export function AppSidebar() {
 
         setIsDeleting(true)
         try {
-            const response = await callApiGateway({
+            await callApiGateway({
                 action: 'deleteUserAccount',
                 payload: {}
             });

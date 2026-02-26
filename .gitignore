@@ -23,6 +23,20 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.*
+
+# Firebase
+.firebase/
+.firebaserc
+
+# Build artifacts
+build/
+
+# Claude Code
+.claude/
+
+# Windows artifacts
+nul
 
 # Playwright
 /test-results/

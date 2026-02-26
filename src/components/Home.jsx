@@ -4,7 +4,6 @@ import PostCard from "./PostCard.jsx";
 import useUiStore from "../stores/useUiStore.js";
 // import SuggestedUsers from "./SuggestedUsers.jsx";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton.jsx";
-import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from "@/components/ui/empty";

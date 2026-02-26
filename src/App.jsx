@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import AppRouter from './routes/AppRouter.jsx';
 
 function App() {
-    const { loading: authLoading, isAuthenticated, error: authError } = useAuthStore();
+    const { error: authError } = useAuthStore();
 
     // This useEffect sets up the Firebase Auth listener and runs optional connection tests.
     useEffect(() => {

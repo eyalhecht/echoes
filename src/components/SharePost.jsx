@@ -52,11 +52,6 @@ function SharePost({ postId, className = "" }) {
         window.open(`https://wa.me/?text=${message}`, '_blank');
     };
 
-    const shareToTelegram = () => {
-        const message = encodeURIComponent(`Check out this post: ${postUrl}`);
-        window.open(`https://t.me/share/url?url=${encodeURIComponent(postUrl)}&text=${message}`, '_blank');
-    };
-
     const shareToFacebook = () => {
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`, '_blank');
     };
@@ -64,10 +59,6 @@ function SharePost({ postId, className = "" }) {
     const shareToTwitter = () => {
         const text = encodeURIComponent('Check out this post!');
         window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${text}`, '_blank');
-    };
-
-    const shareToLinkedIn = () => {
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`, '_blank');
     };
 
     const handleNativeShare = async () => {
