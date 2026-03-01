@@ -1,5 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { Spinner } from "@/components/ui/spinner";
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,10 +28,11 @@ import {
     CheckCircle,
 } from 'lucide-react';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage, auth, functions } from "../firebaseConfig.js";
+import { storage, auth, functions, db } from "../firebaseConfig.js";
 import { httpsCallable } from "firebase/functions";
-import { GeoPoint } from "firebase/firestore";
+import { GeoPoint, doc, onSnapshot } from "firebase/firestore";
 import LocationPickerModal from './LocationPickerModal';
+import Professor from './Professor.jsx';
 import {useNavigate} from "react-router-dom";
 
 const UploadPost = () => {
@@ -40,7 +40,6 @@ const UploadPost = () => {
     const { toast } = useToast();
     const [currentStep, setCurrentStep] = useState(1);
     const [justCompletedStep, setJustCompletedStep] = useState(null);
-    const [uploadSuccess, setUploadSuccess] = useState(false);
 
     // Refs for scrolling
     const stepRefs = useRef({});
@@ -53,11 +52,40 @@ const UploadPost = () => {
     const [description, setDescription] = useState('');
     const [location, setLocation] = useState(null);
     const [selectedYear, setSelectedYear] = useState('');
-    const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState(null);
     const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
+    // Upload + analysis state machine
+    // phase: null (form) | 'uploading' | 'processing' | 'analyzing' | 'complete'
+    const [uploadPhase, setUploadPhase] = useState(null);
+    const [uploadMessage, setUploadMessage] = useState('');
+    const [analyzingPostId, setAnalyzingPostId] = useState(null);
+
+    // Derived — keeps all disabled={isUploading} props in the form working
+    const isUploading = !!uploadPhase;
+
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        if (!analyzingPostId) return;
+
+        const unsubscribe = onSnapshot(doc(db, 'posts', analyzingPostId), (snapshot) => {
+            if (!snapshot.exists()) return;
+            const data = snapshot.data();
+
+            if (data.aiStatus) {
+                setUploadMessage(data.aiStatus);
+            }
+
+            if (!data.aiStatus && data.AiMetadata) {
+                setUploadMessage("Fascinating! The Professor has completed his analysis.");
+                setUploadPhase('complete');
+                setTimeout(() => navigate('/home'), 2500);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [analyzingPostId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const postTypes = [
         {
@@ -212,38 +240,27 @@ const UploadPost = () => {
             return;
         }
 
-        setIsUploading(true);
+        // Immediately hand off to the Professor — form disappears right now
         setError(null);
-
-        const uploadingToast = toast({
-            title: "Uploading your post...",
-            description: "Please wait while we process your files and create your post.",
-            duration: Infinity,
-        });
+        setUploadPhase('uploading');
+        setUploadMessage('Preparing your files for the archive...');
 
         try {
             let fileUrls = [];
 
             if (type !== 'youtube' && files.length > 0) {
-                // Update toast with file upload progress
-                uploadingToast.update({
-                    title: "Uploading files...",
-                    description: `Processing ${files.length} file(s)...`,
-                });
-
                 const uploadPromises = files.map(async (file) => {
                     const storageRef = ref(storage, `post_media/${auth.currentUser?.uid || 'anonymous'}/${Date.now()}_${file.name}`);
                     const uploadTaskSnapshot = await uploadBytes(storageRef, file);
                     return await getDownloadURL(uploadTaskSnapshot.ref);
                 });
                 fileUrls = await Promise.all(uploadPromises);
-                uploadingToast.update({
-                    title: "Creating your post...",
-                    description: "Files uploaded successfully, finalizing your post...",
-                });
             } else if (type === 'youtube' && files.length > 0) {
                 fileUrls = files;
             }
+
+            setUploadPhase('processing');
+            setUploadMessage('Registering your echo in the archive...');
 
             const payload = {
                 action: 'createPost',
@@ -256,36 +273,20 @@ const UploadPost = () => {
                 }
             };
 
-            await httpsCallable(functions, 'api')(payload);
+            const result = await httpsCallable(functions, 'api')(payload);
 
-            uploadingToast.dismiss();
-
-            // Show success toast
-            toast({
-                title: "Post uploaded successfully!",
-                description: "Your post has been shared and is now visible to others.",
-                duration: 7000,
-            });
-
-            // Show success state briefly
-            setUploadSuccess(true);
-            
-            // Reset form after a short delay to show success state
-            setTimeout(() => {
-                setType('');
-                setFiles([]);
-                setFilePreviews([]);
-                setDescription('');
-                setLocation(null);
-                setSelectedYear('');
-                setCurrentStep(1);
-                setUploadSuccess(false);
-                navigate('/home');
-            }, 2000);
+            const postId = result?.data?.postId;
+            if (postId) {
+                setAnalyzingPostId(postId);
+                setUploadPhase('analyzing');
+                setUploadMessage('The Professor is examining your image...');
+            } else {
+                // Fallback: backend didn't return a postId, navigate directly
+                setUploadPhase('complete');
+                setUploadMessage('Your echo has been archived!');
+                setTimeout(() => navigate('/home'), 2000);
+            }
         } catch (err) {
-            // Dismiss the uploading toast
-            uploadingToast.dismiss();
-            
             console.error('Error uploading post:', err);
             let errorMessage = 'Failed to upload post. Please try again.';
             if (err.code && err.message) {
@@ -293,21 +294,23 @@ const UploadPost = () => {
             } else if (err.message) {
                 errorMessage = err.message;
             }
+
+            // Return to form with error
+            setUploadPhase(null);
+            setUploadMessage('');
             setError(errorMessage);
-            
-            // Show error toast
+
             toast({
                 title: "Upload failed",
                 description: errorMessage,
                 variant: "destructive",
                 duration: 7000,
             });
-        } finally {
-            setIsUploading(false);
         }
     };
 
     const canProceedToUpload = () => {
+        if (uploadPhase) return false;
         if (type === 'youtube') {
             return files.length > 0 && files[0].trim() && description.trim();
         }
@@ -317,6 +320,40 @@ const UploadPost = () => {
     return (
         <div className="max-w-2xl mx-auto" ref={containerRef}>
             <Card className="shadow-lg bg-sidebar">
+                {uploadPhase ? (
+                    /* ── Professor analysis view ── */
+                    <CardContent className="py-16 flex flex-col items-center justify-center gap-7">
+                        <div className="relative">
+                            <Professor size={96} />
+                            {uploadPhase !== 'complete' && (
+                                <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500" />
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="text-center max-w-sm px-4">
+                            <span className="text-[10px] font-mono tracking-widest text-amber-700 dark:text-amber-500 uppercase block mb-3">
+                                {uploadPhase === 'complete' ? 'Analysis Complete' : 'Archiving Your Echo'}
+                            </span>
+                            <p className="text-sm text-muted-foreground italic leading-relaxed">
+                                {uploadMessage}
+                            </p>
+                        </div>
+
+                        {uploadPhase === 'complete' ? (
+                            <CheckCircle className="h-7 w-7 text-green-500" />
+                        ) : (
+                            <div className="flex gap-1.5">
+                                <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-bounce" style={{ animationDelay: '160ms' }} />
+                                <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-bounce" style={{ animationDelay: '320ms' }} />
+                            </div>
+                        )}
+                    </CardContent>
+                ) : (
+                <>
                 <CardHeader className="text-center pb-6">
                     <h1 className="text-2xl font-bold">Create New Post</h1>
                     <div className="flex justify-center mt-4">
@@ -340,7 +377,6 @@ const UploadPost = () => {
                         </div>
                     </div>
                 </CardHeader>
-
                 <CardContent className="space-y-6">
                     {/* Step 1: Post Type Selection */}
                     {currentStep >= 1 && (
@@ -593,33 +629,17 @@ const UploadPost = () => {
                         <div className="pt-4 animate-in slide-in-from-bottom-4 duration-500">
                             <Button
                                 onClick={handleUploadPost}
-                                disabled={isUploading || !canProceedToUpload() || uploadSuccess}
-                                className={`w-full h-12 text-base font-semibold transition-all duration-300 ${
-                                    uploadSuccess 
-                                        ? 'bg-green-600 hover:bg-green-600 text-white' 
-                                        : ''
-                                }`}
+                                disabled={!canProceedToUpload()}
+                                className="w-full h-12 text-base font-semibold"
                             >
-                                {uploadSuccess ? (
-                                    <>
-                                        <CheckCircle className="h-4 w-4 mr-2" />
-                                        Posted Successfully!
-                                    </>
-                                ) : isUploading ? (
-                                    <>
-                                        <Spinner size="sm" className="mr-2" />
-                                        Uploading...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Upload className="h-4 w-4 mr-2" />
-                                        Create Post
-                                    </>
-                                )}
+                                <Upload className="h-4 w-4 mr-2" />
+                                Create Post
                             </Button>
                         </div>
                     )}
                 </CardContent>
+                </>
+                )}
             </Card>
 
             <LocationPickerModal
