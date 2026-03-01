@@ -33,7 +33,6 @@ import {
     MapPin,
     Trash2,
     Send,
-    Sparkles,
     MoreHorizontal,
 } from 'lucide-react';
 import { format, formatDistanceToNowStrict, isToday, isYesterday } from 'date-fns';
@@ -44,8 +43,8 @@ import useUiStore from "../stores/useUiStore.js";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
-import AiBadge from "@/components/AiBadge.jsx";
 import SharePost from "@/components/SharePost.jsx";
+import Professor from "@/components/Professor.jsx";
 import { useNavigate } from 'react-router-dom';
 
 function PostCard({ post }) {
@@ -74,7 +73,7 @@ function PostCard({ post }) {
     const [commentError, setCommentError] = useState(null);
     const [showComments, setShowComments] = useState(false);
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
-    const [showAiInsights, setShowAiInsights] = useState(false);
+    const [showFullAiDesc, setShowFullAiDesc] = useState(false);
 
     const {
         id: postId,
@@ -295,152 +294,91 @@ function PostCard({ post }) {
 
                 <CardContent className="pt-4">
 
-                    <div className="flex items-start gap-2 mb-2">
-                        <p className="text-sm flex-1 whitespace-pre-wrap" style={{ fontFamily: "'Caveat', cursive", fontSize: '1.2rem' }}>
-                            {getDisplayedText()}
-                        </p>
-
-                        {post.AiMetadata && (
-                            <div className="mb-3">
-                                <AiBadge
-                                    onClick={() => setShowAiInsights(!showAiInsights)}
-                                    className="mb-2"
-                                />
-                            </div>
-                        )}
-                    </div>
+                    <p className="text-sm whitespace-pre-wrap mb-2" style={{ fontFamily: "'Caveat', cursive", fontSize: '1.2rem' }}>
+                        {getDisplayedText()}
+                    </p>
 
                     {shouldTruncate && (
                         <Button
                             variant="link"
                             size="sm"
                             onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                            className="p-0 h-auto text-xs mb-4"
+                            className="p-0 h-auto text-xs mb-2"
                         >
                             {isDescriptionExpanded ? 'Read less' : 'Read more'}
                         </Button>
                     )}
 
-                    {/* AI Insights Panel */}
-                    {post.AiMetadata && (
-                        <div
-                            className={`
-                                mt-4 overflow-hidden
-                                transition-all duration-300 ease-in-out
-                                ${showAiInsights
-                                ? 'max-h-[800px] opacity-100'
-                                : 'max-h-0 opacity-0'
-                            }
-                            `}
-                        >
-                            <div
-                                className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800 transform transition-transform duration-300 ease-out">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-3 opacity-80">
-                                        <Sparkles className="h-3.5 w-3.5 text-blue-600"/>
-                                        <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
-                                    AI Analysis
-                                </span>
-                            </div>
-
-                            {post.AiMetadata.description && (
-                                <div className="mb-4">
-                                    <div className="text-xs text-muted-foreground font-medium mb-2 opacity-80">
-                                        Historical Analysis
-                                    </div>
-                                    <p className="text-sm text-foreground leading-relaxed">
-                                        {post.AiMetadata.description}
-                                    </p>
-                                </div>
-                            )}
-
-                            {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
-                                <div className="mb-3">
-                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                        People Identified
-                                    </p>
-                                    <div className="flex flex-wrap gap-1">
-                                        {post.AiMetadata.people_identified.map((person, index) => (
-                                            <Badge
-                                                key={index}
-                                                variant="outline"
-                                                className="text-xs h-5 border-blue-300 text-blue-600"
-                                            >
-                                                {person}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
-                                <div className="mb-3">
-                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                        AI-Detected Location
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="h-3.5 w-3.5 text-blue-600" />
-                                        {(() => {
-                                            const location = post.AiMetadata.location;
-                                            
-                                            if (typeof location === 'string') {
-                                                // Handle string locations (comma-separated)
-                                                return (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {location
-                                                            .split(',')
-                                                            .map(loc => loc.trim())
-                                                            .filter(Boolean)
-                                                            .map((loc, i) => (
-                                                                <Badge key={i} variant="outline" className="text-xs">
-                                                                    {loc}
-                                                                </Badge>
-                                                            ))}
-                                                    </div>
-                                                );
-                                            } else if (typeof location === 'object' && location !== null) {
-                                                // Handle object locations
-                                                return (
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {Object.entries(location).map(([, value], i) => (
-                                                            <Badge key={i} variant="outline" className="text-xs">
-                                                                {String(value)}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                );
-                                            } else {
-                                                // Handle other types
-                                                return (
-                                                    <Badge variant="outline" className="text-xs">
-                                                        {String(location)}
-                                                    </Badge>
-                                                );
-                                            }
-                                        })()}
-                                    </div>
-                                </div>
-                            )}
-
-                            {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
-                                <div>
-                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                        Estimated Period
-                                    </p>
-                                    <p className="text-xs text-foreground">
-                                        {post.AiMetadata.date_estimate}
-                                        {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
-                                            <span className="text-muted-foreground ml-1">
-                                                ({post.AiMetadata.date_confidence})
-                                            </span>
+                    {/* Professor's historical analysis card — always visible */}
+                    {post.AiMetadata && (() => {
+                        const date = post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period'
+                            ? post.AiMetadata.date_estimate : null;
+                        const loc = post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location'
+                            ? (typeof post.AiMetadata.location === 'string'
+                                ? post.AiMetadata.location
+                                : Object.values(post.AiMetadata.location).filter(Boolean).join(', '))
+                            : null;
+                        const people = post.AiMetadata.people_identified?.length > 0
+                            ? post.AiMetadata.people_identified : null;
+                        if (!post.AiMetadata.description && !date && !loc && !people) return null;
+                        return (
+                            <div className="mb-3 rounded-lg bg-amber-50/70 dark:bg-amber-950/10 border border-amber-200/70 dark:border-amber-800/30 p-2.5">
+                                <div className="flex gap-2.5">
+                                    <Professor size={30} className="flex-shrink-0 mt-0.5" />
+                                    <div className="flex-1 min-w-0">
+                                        <span className="text-[9px] font-mono tracking-widest text-amber-700 dark:text-amber-500 uppercase block mb-1">
+                                            Historical Analysis
+                                        </span>
+                                        {post.AiMetadata.description && (
+                                            <div className="mb-2">
+                                                <p className={`text-xs text-foreground leading-relaxed italic ${showFullAiDesc ? '' : 'line-clamp-3'}`}>
+                                                    {post.AiMetadata.description}
+                                                </p>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setShowFullAiDesc(v => !v); }}
+                                                    className="text-[10px] text-amber-700 dark:text-amber-500 hover:underline mt-0.5"
+                                                >
+                                                    {showFullAiDesc ? 'show less' : 'show more'}
+                                                </button>
+                                            </div>
                                         )}
-                                    </p>
-                                </div>
-                            )}
+                                        {(date || loc) && (
+                                            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mb-1.5">
+                                                {date && (
+                                                    <span className="text-[10px] text-muted-foreground">
+                                                        <span className="font-medium text-foreground">{date}</span>
+                                                    </span>
+                                                )}
+                                                {loc && (
+                                                    <span className="text-[10px] text-muted-foreground truncate">
+                                                        {loc}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                        {people && (
+                                            <div className="flex flex-wrap gap-1">
+                                                {people.slice(0, 3).map((person, i) => (
+                                                    <Badge
+                                                        key={i}
+                                                        variant="outline"
+                                                        className="text-[10px] h-4 px-1.5 border-amber-300 text-amber-800 dark:border-amber-700 dark:text-amber-400"
+                                                    >
+                                                        {typeof person === 'object' ? person.name : person}
+                                                    </Badge>
+                                                ))}
+                                                {people.length > 3 && (
+                                                    <span className="text-[10px] text-muted-foreground self-center">
+                                                        +{people.length - 3}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-4">

@@ -22,7 +22,6 @@ import {
     Bookmark,
     Send,
     X,
-    Sparkles,
     MapPin,
     MessageCircle,
     MoreHorizontal,
@@ -36,8 +35,8 @@ import {formatFirebaseTimestamp} from "./utils.js";
 import PostMap from "./PostMap.jsx";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import SharePost from "./SharePost.jsx";
+import Professor from "@/components/Professor.jsx";
 import {useNavigate} from "react-router-dom";
-import AiBadge from "@/components/AiBadge.jsx";
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -57,7 +56,6 @@ const PostDetailView = ({ post, open, onClose }) => {
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
     const [commentError, setCommentError] = useState(null);
     const [hasCommentsFetched, setHasCommentsFetched] = useState(false);
-    const [showAiInsights, setShowAiInsights] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [locationModal, setLocationModal] = useState(false);
     const [showMapInModal, setShowMapInModal] = useState(true);
@@ -248,118 +246,99 @@ const PostDetailView = ({ post, open, onClose }) => {
                                 {description}
                             </p>
 
-                            {/* AI Insights Panel */}
+                            {/* Historical Analysis — always visible */}
                             {post.AiMetadata && (
-                                <div className="mb-4">
-                                    <AiBadge
-                                        onClick={() => setShowAiInsights(!showAiInsights)}
-                                        className="mb-2"
-                                    />
-
-                                    {showAiInsights && (
-                                        <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
-                                            <div className="flex items-center gap-2 mb-3 opacity-80">
-                                                <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-                                                <span className="text-xs text-blue-600 font-medium uppercase tracking-wider">
-                                                    AI Analysis
-                                                </span>
-                                            </div>
-
+                                <div className="mb-4 pt-3 border-t border-amber-200/70 dark:border-amber-800/40">
+                                    <div className="flex gap-3 mb-3">
+                                        <Professor size={38} className="flex-shrink-0 mt-0.5" />
+                                        <div className="flex-1 min-w-0">
+                                            <span className="text-[10px] font-mono tracking-widest text-amber-700 dark:text-amber-500 uppercase block mb-1.5">
+                                                Historical Analysis
+                                            </span>
                                             {post.AiMetadata.description && (
-                                                <div className="mb-4">
-                                                    <div className="text-xs text-muted-foreground font-medium mb-2 opacity-80">
-                                                        Historical Analysis
-                                                    </div>
-                                                    <p className="text-sm text-foreground leading-relaxed">
-                                                        {post.AiMetadata.description}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
-                                                <div className="mb-3">
-                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                                        People Identified
-                                                    </p>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {post.AiMetadata.people_identified.map((person, index) => (
-                                                            <Badge
-                                                                key={index}
-                                                                variant="outline"
-                                                                className="text-xs h-5 border-blue-300 text-blue-600"
-                                                            >
-                                                                {person}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
-                                                <div className="mb-3">
-                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                                        AI-Detected Location
-                                                    </p>
-                                                    <div className="flex items-center gap-2">
-                                                        {(() => {
-                                                            const location = post.AiMetadata.location;
-                                                            
-                                                            if (typeof location === 'string') {
-                                                                // Handle string locations (comma-separated)
-                                                                return (
-                                                            <div className="flex flex-wrap gap-1">
-                                                                {location
-                                                                    .split(',')
-                                                                    .map(loc => loc.trim())
-                                                                    .filter(Boolean)
-                                                                    .map((loc, i) => (
-                                                                        <Badge key={i} variant="outline" className="text-xs">
-                                                                            {loc}
-                                                                        </Badge>
-                                                                    ))}
-                                                                    </div>
-                                                                );
-                                                            } else if (typeof location === 'object' && location !== null) {
-                                                                // Handle object locations
-                                                                return (
-                                                                    <div className="flex flex-wrap gap-1">
-                                                                        {Object.entries(location).map(([, value], i) => (
-                                                                            <Badge key={i} variant="outline" className="text-xs">
-                                                                                {String(value)}
-                                                                            </Badge>
-                                                                        ))}
-                                                                    </div>
-                                                                );
-                                                            } else {
-                                                                // Handle other types
-                                                                return (
-                                                                    <Badge variant="outline" className="text-xs">
-                                                                        {String(location)}
-                                                                    </Badge>
-                                                                );
-                                                            }
-                                                        })()}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
-                                                <div>
-                                                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                                                        Estimated Period
-                                                    </p>
-                                                    <p className="text-xs text-foreground">
-                                                        {post.AiMetadata.date_estimate}
-                                                        {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
-                                                            <span className="text-muted-foreground ml-1">
-                                                                ({post.AiMetadata.date_confidence})
-                                                            </span>
-                                                        )}
-                                                    </p>
-                                                </div>
+                                                <p className="text-sm text-foreground leading-relaxed italic">
+                                                    {post.AiMetadata.description}
+                                                </p>
                                             )}
                                         </div>
-                                    )}
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        {post.AiMetadata.date_estimate && post.AiMetadata.date_estimate !== 'Unknown period' && (
+                                            <div className="flex items-baseline gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground w-16 flex-shrink-0">Period</span>
+                                                <span className="text-xs text-foreground">
+                                                    {post.AiMetadata.date_estimate}
+                                                    {post.AiMetadata.date_confidence && post.AiMetadata.date_confidence !== 'unknown' && (
+                                                        <span className="text-muted-foreground ml-1.5">· {post.AiMetadata.date_confidence}</span>
+                                                    )}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {post.AiMetadata.location && post.AiMetadata.location !== 'Unknown location' && (
+                                            <div className="flex items-baseline gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground w-16 flex-shrink-0">Location</span>
+                                                <span className="text-xs text-foreground">
+                                                    {typeof post.AiMetadata.location === 'string'
+                                                        ? post.AiMetadata.location
+                                                        : Object.values(post.AiMetadata.location).filter(Boolean).join(', ')}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {post.AiMetadata.people_identified && post.AiMetadata.people_identified.length > 0 && (
+                                            <div className="flex items-start gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground w-16 flex-shrink-0 pt-0.5">People</span>
+                                                <div className="flex flex-col gap-1.5">
+                                                    {post.AiMetadata.people_identified.map((person, index) => {
+                                                        const name = typeof person === 'object' ? person.name : person;
+                                                        const role = typeof person === 'object' ? person.role : null;
+                                                        return (
+                                                            <div key={index}>
+                                                                <Badge
+                                                                    variant="outline"
+                                                                    className="text-xs h-5 border-amber-300 text-amber-800 dark:border-amber-700 dark:text-amber-400"
+                                                                >
+                                                                    {name}
+                                                                </Badge>
+                                                                {role && (
+                                                                    <p className="text-[10px] text-muted-foreground mt-0.5 ml-0.5">{role}</p>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {post.AiMetadata.historical_significance && (
+                                            <div className="flex items-start gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground w-16 flex-shrink-0 pt-0.5">Significance</span>
+                                                <p className="text-xs text-foreground">{post.AiMetadata.historical_significance}</p>
+                                            </div>
+                                        )}
+
+                                        {post.AiMetadata.cultural_context && (
+                                            <div className="flex items-start gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground w-16 flex-shrink-0 pt-0.5">Context</span>
+                                                <p className="text-xs text-foreground">{post.AiMetadata.cultural_context}</p>
+                                            </div>
+                                        )}
+
+                                        {post.AiMetadata.era_indicators && post.AiMetadata.era_indicators.length > 0 && (
+                                            <div className="flex items-start gap-3">
+                                                <span className="text-[10px] uppercase tracking-wider font-medium text-muted-foreground w-16 flex-shrink-0 pt-0.5">Clues</span>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {post.AiMetadata.era_indicators.map((clue, i) => (
+                                                        <Badge key={i} variant="outline" className="text-[10px] h-4 px-1.5 border-border text-muted-foreground">
+                                                            {clue}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
 
