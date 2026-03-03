@@ -1,0 +1,662 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Heart, MessageCircle, Bookmark, Brain,
+    ArrowRight, MapPin, Check, Sparkles, Clock, Camera,
+} from 'lucide-react';
+import { palette, alpha } from '../styles/theme';
+import Professor from './Professor.jsx';
+
+// ── Mock data ─────────────────────────────────────────────────────────────────
+
+const MOCK_POSTS = [
+    {
+        id: 'p1',
+        user: 'Sarah K.',
+        initials: 'SK',
+        avatarColor: '#C9A87A',
+        timeAgo: '2 days ago',
+        caption: "Found this in grandma's attic. She never talked much about her childhood in Germany…",
+        imageUrl: 'https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762103986842_Jena_1960er.jpg?alt=media&token=05bd1ea6-a90e-4219-926a-8d1042d4514b',
+        year: '~1963',
+        likes: 142,
+        comments: 23,
+        bookmarks: 31,
+        ai: {
+            date_estimate: '1960–1965',
+            location: 'Jena, East Germany',
+            description: 'A street scene from Jena, East Germany in the early 1960s. GDR-era architecture lines the background alongside civilians in typical period clothing. The photo captures everyday life during the early Cold War.',
+            tags: ['East Germany', '1960s', 'Cold War', 'Urban life'],
+        },
+    },
+    {
+        id: 'p2',
+        user: 'Marcus H.',
+        initials: 'MH',
+        avatarColor: '#A89070',
+        timeAgo: '5 days ago',
+        caption: "My grandfather's photo from Weimar, 1966. He was studying architecture there.",
+        imageUrl: 'https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762104605109_Goethe_Wohnhaus_Weimar_1966.jpg?alt=media&token=f96fc128-856b-4c94-b72b-5e1a519b581f',
+        year: '1966',
+        likes: 89,
+        comments: 14,
+        bookmarks: 22,
+        ai: {
+            date_estimate: '1966',
+            location: 'Weimar, Germany',
+            description: 'The Goethe Wohnhaus in Weimar, captured in 1966. The residence of Johann Wolfgang von Goethe — now a UNESCO World Heritage Site — is shown in its GDR-era context with characteristic period preservation.',
+            tags: ['Weimar', 'Goethe', 'Architecture', 'UNESCO', 'GDR'],
+        },
+    },
+    {
+        id: 'p3',
+        user: 'Lena V.',
+        initials: 'LV',
+        avatarColor: '#9A8060',
+        timeAgo: '1 week ago',
+        caption: "Summer '67. My mother still remembers this day perfectly.",
+        imageUrl: 'https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762101847784_Scan%202.11.2025%2C%2010.36.jpg?alt=media&token=edb8677e-f7e7-4db8-b27c-5d8983cb0600',
+        year: '~1967',
+        likes: 234,
+        comments: 41,
+        bookmarks: 67,
+        ai: {
+            date_estimate: '1966–1968',
+            location: 'Central Europe',
+            description: 'A candid summer photograph showing civilians in late 1960s attire. Clothing styles, hairstyles, and photographic grain all point to the latter half of the 1960s, likely taken in Central Europe.',
+            tags: ['1960s', 'Summer', 'Everyday life', 'Analog photography'],
+        },
+    },
+];
+
+const UPLOAD_DEMO = {
+    imageUrl: 'https://firebasestorage.googleapis.com/v0/b/echoes-prod-2afe6.firebasestorage.app/o/post_media%2FulTS5Y2Y6ab31Z5v0VNZibJnsRV2%2F1762106202384_Ga%CC%88nsema%CC%88nnchenbrunnen_Weimar_1966.jpg?alt=media&token=adee0f45-83b9-43aa-89eb-1c240aef8c51',
+    ai: {
+        date_estimate: '1966',
+        location: 'Weimar, Thuringia, Germany',
+        description: "The Gänsemännchenbrunnen (Goose Man Fountain) in Weimar's market square, photographed in 1966. This Renaissance bronze fountain, dating to 1555, depicts a man carrying two geese. Captured during the GDR period, the square shows characteristic East German-era preservation.",
+        tags: ['Weimar', 'GDR', 'Fountain', '1960s', 'Renaissance'],
+    },
+};
+
+// ── Typewriter hook ───────────────────────────────────────────────────────────
+
+function useTypewriter(text, speed = 18, enabled = false) {
+    const [displayed, setDisplayed] = useState('');
+    useEffect(() => {
+        if (!enabled) { setDisplayed(''); return; }
+        let i = 0;
+        setDisplayed('');
+        const id = setInterval(() => {
+            i++;
+            setDisplayed(text.slice(0, i));
+            if (i >= text.length) clearInterval(id);
+        }, speed);
+        return () => clearInterval(id);
+    }, [text, speed, enabled]);
+    return displayed;
+}
+
+// ── AI analysis card ──────────────────────────────────────────────────────────
+
+function AiCard({ ai, visible }) {
+    if (!visible) return null;
+    return (
+        <div
+            className="mt-3 rounded-lg p-3 border"
+            style={{
+                background: 'rgba(251,243,219,0.75)',
+                borderColor: 'rgba(210,168,100,0.4)',
+                animation: 'echoesFadeSlideIn 0.3s ease both',
+            }}
+        >
+            <div className="flex gap-2.5">
+                <Professor size={26} className="flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                    <span className="text-[9px] font-mono tracking-widest text-amber-700 uppercase block mb-1.5">
+                        Historical Analysis
+                    </span>
+                    <p className="text-xs leading-relaxed italic text-stone-700 mb-2">
+                        {ai.description}
+                    </p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 mb-2">
+                        {ai.date_estimate && (
+                            <span className="text-[10px] font-medium text-stone-700">{ai.date_estimate}</span>
+                        )}
+                        {ai.location && (
+                            <span className="text-[10px] text-stone-500">{ai.location}</span>
+                        )}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                        {ai.tags.map(tag => (
+                            <span
+                                key={tag}
+                                className="text-[10px] px-1.5 py-0.5 rounded-full border"
+                                style={{ borderColor: 'rgba(210,168,100,0.5)', color: '#92650a' }}
+                            >
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Mock post card ────────────────────────────────────────────────────────────
+
+function MockPostCard({ post }) {
+    const [liked, setLiked] = useState(false);
+    const [bookmarked, setBookmarked] = useState(false);
+    const [localLikes, setLocalLikes] = useState(post.likes);
+    const [showAi, setShowAi] = useState(false);
+
+    return (
+        <div
+            className="rounded-xl overflow-hidden flex flex-col"
+            style={{
+                background: 'white',
+                border: `1px solid ${alpha('--echoes-amber', 0.18)}`,
+                boxShadow: `0 2px 14px ${alpha('--echoes-brown', 0.07)}`,
+            }}
+        >
+            {/* Header */}
+            <div className="flex items-center gap-3 px-4 pt-4 pb-3">
+                <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                    style={{ background: post.avatarColor }}
+                >
+                    {post.initials}
+                </div>
+                <div>
+                    <p className="text-sm font-semibold leading-tight" style={{ color: palette.brown }}>{post.user}</p>
+                    <p className="text-xs" style={{ color: palette.muted }}>{post.timeAgo}</p>
+                </div>
+            </div>
+
+            {/* Polaroid-style image */}
+            <div className="px-4 pb-3">
+                <div className="bg-white p-2 pb-7 shadow-md relative" style={{ border: '1px solid #ede5d8' }}>
+                    <img
+                        src={post.imageUrl}
+                        alt="Historical photo"
+                        className="w-full object-cover"
+                        style={{ maxHeight: 200, filter: 'sepia(12%) contrast(0.96)' }}
+                    />
+                    {post.year && (
+                        <span
+                            className="absolute bottom-2 right-2 text-[10px] italic px-2 py-0.5"
+                            style={{ background: 'rgba(255,255,255,0.88)', color: '#999', border: '1px solid #e0d8cc' }}
+                        >
+                            {post.year}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            {/* Caption */}
+            <div className="px-4 pb-2">
+                <p
+                    className="leading-snug"
+                    style={{ fontFamily: "'Caveat', cursive", color: palette.brown, fontSize: '1.1rem' }}
+                >
+                    {post.caption}
+                </p>
+            </div>
+
+            {/* AI toggle + card */}
+            <div className="px-4 pb-3">
+                <button
+                    onClick={() => setShowAi(v => !v)}
+                    className="flex items-center gap-1.5 text-[11px] font-medium transition-colors"
+                    style={{ color: showAi ? '#92650a' : palette.muted }}
+                >
+                    <Brain size={13} />
+                    {showAi ? 'Hide AI analysis' : 'Show AI analysis'}
+                </button>
+                <AiCard ai={post.ai} visible={showAi} />
+            </div>
+
+            {/* Action bar */}
+            <div
+                className="flex items-center gap-3 px-4 py-3 mt-auto"
+                style={{ borderTop: `1px solid ${alpha('--echoes-amber', 0.12)}` }}
+            >
+                <button
+                    onClick={() => { setLiked(v => !v); setLocalLikes(l => liked ? l - 1 : l + 1); }}
+                    className="flex items-center gap-1.5 text-xs transition-colors"
+                    style={{ color: liked ? '#ef4444' : palette.muted }}
+                >
+                    <Heart size={14} className={liked ? 'fill-current' : ''} />
+                    {localLikes}
+                </button>
+                <button className="flex items-center gap-1.5 text-xs" style={{ color: palette.muted }}>
+                    <MessageCircle size={14} />
+                    {post.comments}
+                </button>
+                <button
+                    onClick={() => setBookmarked(v => !v)}
+                    className="flex items-center gap-1.5 text-xs transition-colors ml-auto"
+                    style={{ color: bookmarked ? '#3b82f6' : palette.muted }}
+                >
+                    <Bookmark size={14} className={bookmarked ? 'fill-current' : ''} />
+                    {post.bookmarks}
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// ── Upload demo ───────────────────────────────────────────────────────────────
+
+function UploadDemo() {
+    const [stage, setStage] = useState('idle'); // idle | uploading | analyzing | done
+    const [progress, setProgress] = useState(0);
+    const [showResult, setShowResult] = useState(false);
+    const aiText = useTypewriter(UPLOAD_DEMO.ai.description, 18, showResult);
+
+    const startDemo = () => {
+        if (stage !== 'idle') return;
+        setStage('uploading');
+        setProgress(0);
+        let p = 0;
+        const tick = setInterval(() => {
+            p = Math.min(p + Math.random() * 14 + 6, 100);
+            setProgress(p);
+            if (p >= 100) {
+                clearInterval(tick);
+                setTimeout(() => setStage('analyzing'), 300);
+                setTimeout(() => {
+                    setStage('done');
+                    setTimeout(() => setShowResult(true), 500);
+                }, 2700);
+            }
+        }, 140);
+    };
+
+    const reset = () => { setStage('idle'); setProgress(0); setShowResult(false); };
+
+    return (
+        <div
+            className="rounded-xl overflow-hidden"
+            style={{
+                background: 'white',
+                border: `1px solid ${alpha('--echoes-amber', 0.22)}`,
+                boxShadow: `0 4px 28px ${alpha('--echoes-brown', 0.1)}`,
+            }}
+        >
+            {/* Image area */}
+            <div className="relative" style={{ height: 260 }}>
+                <img
+                    src={UPLOAD_DEMO.imageUrl}
+                    alt="Historical demo upload"
+                    className="w-full h-full object-cover"
+                    style={{
+                        filter: stage === 'idle'
+                            ? 'sepia(40%) contrast(0.86) brightness(0.9)'
+                            : 'sepia(10%) contrast(0.96)',
+                        transition: 'filter 0.9s ease',
+                    }}
+                />
+
+                {/* Scanning line */}
+                {stage === 'analyzing' && (
+                    <div className="absolute inset-0 overflow-hidden" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                        <div
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                right: 0,
+                                height: 2,
+                                background: `linear-gradient(90deg, transparent, ${palette.amber}, transparent)`,
+                                animation: 'echoesScanLine 1.1s linear infinite',
+                            }}
+                        />
+                    </div>
+                )}
+
+                {/* Idle overlay */}
+                {stage === 'idle' && (
+                    <div
+                        className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                        style={{ background: 'rgba(0,0,0,0.4)' }}
+                        onClick={startDemo}
+                    >
+                        <div className="text-center text-white select-none">
+                            <div
+                                className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
+                                style={{ background: 'rgba(255,255,255,0.14)', border: '2px solid rgba(255,255,255,0.5)' }}
+                            >
+                                <Camera size={24} />
+                            </div>
+                            <p className="text-sm font-semibold">Click to watch the demo</p>
+                            <p className="text-xs opacity-70 mt-1">See AI analyze a historical photo</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Done checkmark badge */}
+                {stage === 'done' && (
+                    <div
+                        className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(34,197,94,0.92)', animation: 'echoesFadeSlideIn 0.3s ease' }}
+                    >
+                        <Check size={14} className="text-white" />
+                    </div>
+                )}
+            </div>
+
+            {/* Status / result panel */}
+            <div className="p-4">
+                {stage === 'idle' && (
+                    <div>
+                        <p className="text-sm font-medium mb-0.5" style={{ color: palette.brown }}>
+                            Gänsemännchenbrunnen, Weimar
+                        </p>
+                        <p className="text-xs" style={{ color: palette.muted }}>
+                            Click the photo to watch AI analyze it in real time
+                        </p>
+                    </div>
+                )}
+
+                {stage === 'uploading' && (
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-medium" style={{ color: palette.brown }}>Uploading photo…</span>
+                            <span className="text-xs" style={{ color: palette.muted }}>{Math.round(progress)}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: alpha('--echoes-amber', 0.15) }}>
+                            <div
+                                className="h-full rounded-full transition-all duration-150"
+                                style={{
+                                    width: `${progress}%`,
+                                    background: `linear-gradient(90deg, ${palette.amber}, ${palette.brown})`,
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+
+                {stage === 'analyzing' && (
+                    <div className="flex items-center gap-3">
+                        <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ background: alpha('--echoes-amber', 0.1) }}
+                        >
+                            <Brain size={15} style={{ color: palette.amber }} />
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-xs font-medium" style={{ color: palette.brown }}>AI is reading the details…</p>
+                            <p className="text-[10px]" style={{ color: palette.muted }}>Detecting era, location, cultural context</p>
+                        </div>
+                        <div className="flex gap-1">
+                            {[0, 1, 2].map(i => (
+                                <div
+                                    key={i}
+                                    className="w-1.5 h-1.5 rounded-full"
+                                    style={{
+                                        background: palette.amber,
+                                        animation: `echoesDot 1.2s ease-in-out ${i * 0.2}s infinite`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {stage === 'done' && (
+                    <div>
+                        <div
+                            className="rounded-lg p-3 mb-3 border"
+                            style={{
+                                background: 'rgba(251,243,219,0.75)',
+                                borderColor: 'rgba(210,168,100,0.4)',
+                                animation: 'echoesFadeSlideIn 0.4s ease',
+                            }}
+                        >
+                            <div className="flex gap-2.5">
+                                <Professor size={26} className="flex-shrink-0 mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                    <span className="text-[9px] font-mono tracking-widest text-amber-700 uppercase block mb-1.5">
+                                        Historical Analysis
+                                    </span>
+                                    <p className="text-xs leading-relaxed italic text-stone-700 mb-2 min-h-[48px]">
+                                        {aiText}
+                                        {showResult && aiText.length < UPLOAD_DEMO.ai.description.length && (
+                                            <span style={{ animation: 'echoesBlink 0.8s step-end infinite' }}>|</span>
+                                        )}
+                                    </p>
+                                    {showResult && aiText === UPLOAD_DEMO.ai.description && (
+                                        <div style={{ animation: 'echoesFadeSlideIn 0.4s ease' }}>
+                                            <div className="flex gap-4 mb-2">
+                                                <span className="text-[10px] font-medium text-stone-700">{UPLOAD_DEMO.ai.date_estimate}</span>
+                                                <span className="text-[10px] text-stone-500">{UPLOAD_DEMO.ai.location}</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
+                                                {UPLOAD_DEMO.ai.tags.map(tag => (
+                                                    <span
+                                                        key={tag}
+                                                        className="text-[10px] px-1.5 py-0.5 rounded-full border"
+                                                        style={{ borderColor: 'rgba(210,168,100,0.5)', color: '#92650a' }}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <button onClick={reset} className="text-xs" style={{ color: palette.muted }}>
+                            ↩ Try again
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
+
+function DemoPage() {
+    const navigate = useNavigate();
+
+    return (
+        <div style={{ background: palette.cream, color: palette.brown, fontFamily: "'Lora', Georgia, serif", minHeight: '100vh' }}>
+
+            {/* Nav */}
+            <nav
+                className="sticky top-0 z-50 backdrop-blur-md"
+                style={{ background: alpha('--echoes-cream', 0.9), borderBottom: `1px solid ${alpha('--echoes-amber', 0.19)}` }}
+            >
+                <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+                    <button
+                        onClick={() => navigate('/')}
+                        className="text-sm font-semibold transition-opacity hover:opacity-70"
+                        style={{ color: palette.brown }}
+                    >
+                        ← Echoes
+                    </button>
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="text-sm px-5 py-2 font-semibold transition-all"
+                        style={{ background: palette.brown, color: palette.cream, boxShadow: `3px 3px 0px ${palette.amber}` }}
+                        onMouseEnter={e => { e.currentTarget.style.background = palette.amber; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.brown}`; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `3px 3px 0px ${palette.amber}`; }}
+                    >
+                        Get Started Free
+                    </button>
+                </div>
+            </nav>
+
+            {/* Hero */}
+            <section className="py-20 px-4 text-center">
+                <p className="text-xl mb-4" style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}>
+                    interactive demo
+                </p>
+                <h1
+                    className="font-bold mb-5"
+                    style={{ fontSize: 'clamp(2.4rem, 6vw, 4.2rem)', letterSpacing: '-0.03em', color: palette.brown, lineHeight: 1.1 }}
+                >
+                    See Echoes in Action
+                </h1>
+                <p className="text-lg max-w-xl mx-auto mb-12" style={{ color: palette.muted }}>
+                    Browse real historical posts, interact with AI analysis, and try the upload flow - no account needed.
+                </p>
+
+                {/* Step trail */}
+                <div className="flex items-center justify-center gap-3 flex-wrap">
+                    {['Browse the feed', 'See AI analysis', 'Try the upload'].map((label, i) => (
+                        <React.Fragment key={label}>
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                                    style={{ background: alpha('--echoes-amber', 0.13), color: palette.amber }}
+                                >
+                                    {i + 1}
+                                </div>
+                                <span className="text-sm" style={{ color: palette.muted }}>{label}</span>
+                            </div>
+                            {i < 2 && <span style={{ color: alpha('--echoes-amber', 0.5) }}>→</span>}
+                        </React.Fragment>
+                    ))}
+                </div>
+            </section>
+
+            {/* Section 1: Feed */}
+            <section className="pb-24 px-4">
+                <div className="max-w-5xl mx-auto">
+                    <div className="mb-8">
+                        <p className="text-base mb-1" style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}>step 01</p>
+                        <h2 className="text-2xl font-bold mb-2" style={{ color: palette.brown, letterSpacing: '-0.02em' }}>
+                            Browse the Feed
+                        </h2>
+                        <p className="text-sm" style={{ color: palette.muted }}>
+                            Real historical photos, shared by users. Click "Show AI analysis" on any card to see what Echoes uncovered.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {MOCK_POSTS.map(post => <MockPostCard key={post.id} post={post} />)}
+                    </div>
+                </div>
+            </section>
+
+            {/* Section 2: Upload demo */}
+            <section className="py-24 px-4" style={{ background: alpha('--echoes-brown', 0.025) }}>
+                <div className="max-w-5xl mx-auto">
+                    <div className="grid md:grid-cols-2 gap-14 items-start">
+                        <div>
+                            <p className="text-base mb-1" style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}>step 02</p>
+                            <h2 className="text-2xl font-bold mb-4" style={{ color: palette.brown, letterSpacing: '-0.02em' }}>
+                                Upload a Memory, Watch AI Uncover It
+                            </h2>
+                            <p className="text-sm leading-relaxed mb-7" style={{ color: palette.muted }}>
+                                Upload any historical photo and Echoes AI reads it immediately — detecting the decade,
+                                identifying the location, and surfacing the cultural context. In seconds, a dusty scan
+                                becomes a documented piece of history.
+                            </p>
+                            {[
+                                { icon: Clock, text: 'Era & decade detection from visual cues' },
+                                { icon: MapPin, text: 'Location identification from landmarks & context' },
+                                { icon: Brain, text: 'Historical events & cultural significance' },
+                                { icon: Sparkles, text: 'Notable figures and people identified' },
+                            ].map(({ icon: Icon, text }) => (
+                                <div key={text} className="flex items-start gap-3 mb-3.5">
+                                    <div
+                                        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                        style={{ background: alpha('--echoes-amber', 0.12) }}
+                                    >
+                                        <Icon size={12} style={{ color: palette.amber }} />
+                                    </div>
+                                    <p className="text-sm" style={{ color: palette.muted }}>{text}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <UploadDemo />
+                    </div>
+                </div>
+            </section>
+
+            {/* CTA */}
+            <section className="py-24 px-4">
+                <div className="max-w-2xl mx-auto text-center">
+                    <div
+                        className="relative px-8 py-16"
+                        style={{
+                            border: `2px solid ${alpha('--echoes-amber', 0.31)}`,
+                            boxShadow: `8px 8px 0px ${alpha('--echoes-amber', 0.19)}`,
+                        }}
+                    >
+                        {/* Corner decorations */}
+                        {['top-3 left-3', 'top-3 right-3', 'bottom-3 left-3', 'bottom-3 right-3'].map(pos => (
+                            <div
+                                key={pos}
+                                className={`absolute ${pos} w-4 h-4`}
+                                style={{
+                                    borderTop: pos.includes('top') ? `2px solid ${palette.amber}` : 'none',
+                                    borderBottom: pos.includes('bottom') ? `2px solid ${palette.amber}` : 'none',
+                                    borderLeft: pos.includes('left') ? `2px solid ${palette.amber}` : 'none',
+                                    borderRight: pos.includes('right') ? `2px solid ${palette.amber}` : 'none',
+                                }}
+                            />
+                        ))}
+                        <p className="text-2xl mb-4" style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}>
+                            Start your journey here
+                        </p>
+                        <h2
+                            className="font-bold mb-5"
+                            style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', letterSpacing: '-0.02em', color: palette.brown }}
+                        >
+                            Ready to share some history?
+                        </h2>
+                        <p className="text-base mb-10" style={{ color: palette.muted }}>
+                            Upload your first historical photo and let AI tell its story - free.
+                        </p>
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="inline-flex items-center gap-2 px-10 py-4 font-semibold text-base transition-all"
+                            style={{ background: palette.brown, color: palette.cream, boxShadow: `4px 4px 0px ${palette.amber}` }}
+                            onMouseEnter={e => { e.currentTarget.style.background = palette.amber; e.currentTarget.style.boxShadow = `4px 4px 0px ${palette.brown}`; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = palette.brown; e.currentTarget.style.boxShadow = `4px 4px 0px ${palette.amber}`; }}
+                        >
+                            Open the Shoebox
+                            <ArrowRight size={18} />
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="py-6 border-t" style={{ borderColor: alpha('--echoes-amber', 0.19) }}>
+                <p className="text-center text-xs" style={{ color: palette.muted }}>
+                    © 2025 Echoes. All rights reserved.
+                </p>
+            </footer>
+
+            {/* CSS keyframes */}
+            <style>{`
+                @keyframes echoesFadeSlideIn {
+                    from { opacity: 0; transform: translateY(-6px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes echoesScanLine {
+                    0%   { top: 0; }
+                    100% { top: 100%; }
+                }
+                @keyframes echoesDot {
+                    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+                    50%      { opacity: 1;   transform: scale(1.2); }
+                }
+                @keyframes echoesBlink {
+                    0%, 100% { opacity: 1; }
+                    50%      { opacity: 0; }
+                }
+            `}</style>
+        </div>
+    );
+}
+
+export default DemoPage;

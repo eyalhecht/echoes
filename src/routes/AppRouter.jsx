@@ -15,6 +15,7 @@ import MapPostsView from '../components/MapPostsView.jsx';
 import UploadPost from '../components/UploadPost.jsx';
 import Bookmarks from '../components/Bookmarks.jsx';
 import LandingPage from "@/components/LandingPage.jsx";
+import DemoPage from "@/components/DemoPage.jsx";
 import PrivacyPolicy from '../components/PrivacyPolicy.jsx';
 import TermsOfService from '../components/TermsOfService.jsx';
 
@@ -44,6 +45,7 @@ function AppRouter() {
         path="/login"
         element={isAuthenticated ? <Navigate to="/home" replace /> : <Login />}
       />
+      <Route path="/demo" element={<DemoPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
 
