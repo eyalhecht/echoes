@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     Heart, MessageCircle, Bookmark, Brain,
     ArrowRight, MapPin, Check, Sparkles, Clock, Camera,
+    Tag, Globe, FileText, Shield, BookOpen,
 } from 'lucide-react';
 import { palette, alpha } from '../styles/theme';
 import Professor from './Professor.jsx';
@@ -95,6 +96,214 @@ function useTypewriter(text, speed = 18, enabled = false) {
         return () => clearInterval(id);
     }, [text, speed, enabled]);
     return displayed;
+}
+
+// ── Agent pipeline data ───────────────────────────────────────────────────────
+
+const PIPELINE = [
+    {
+        phaseKey: 'p1',
+        phaseLabel: 'Phase 1 · Orient',
+        parallel: false,
+        tools: [
+            { key: 'detectLabels', Icon: Tag, name: 'detectLabels', result: 'fountain · cobblestone · 1960s attire · urban square' },
+        ],
+    },
+    {
+        phaseKey: 'p2',
+        phaseLabel: 'Phase 2 · Investigate',
+        parallel: true,
+        tools: [
+            { key: 'detectLandmarks', Icon: MapPin,   name: 'detectLandmarks',                       result: 'Gänsemännchenbrunnen, Weimar — 0.94' },
+            { key: 'searchWeb',       Icon: Globe,    name: 'searchWeb',                             result: 'Weimar · East Germany · 1960s' },
+            { key: 'extractText',     Icon: FileText, name: 'extractText',                           result: 'No text detected' },
+            { key: 'detectLogos',     Icon: Shield,   name: 'detectLogos',                           result: 'No logos detected' },
+            { key: 'searchWikipedia', Icon: BookOpen, name: 'searchWikipedia("Gänsemännchenbrunnen")', result: 'Renaissance fountain, built 1555, Weimar' },
+        ],
+    },
+    {
+        phaseKey: 'p3',
+        phaseLabel: 'GPT-4o · Synthesis',
+        parallel: false,
+        tools: [
+            { key: 'synthesis', Icon: Sparkles, name: 'Structured output', result: 'Historical record generated' },
+        ],
+    },
+];
+
+// ms from when analyzing begins
+const TOOL_TIMERS = {
+    detectLabels:    { start: 0,    end: 2500  },
+    detectLandmarks: { start: 3000, end: 7500  },
+    searchWeb:       { start: 3000, end: 6800  },
+    extractText:     { start: 3100, end: 5200  },
+    detectLogos:     { start: 3000, end: 5600  },
+    searchWikipedia: { start: 3500, end: 8200  },
+    synthesis:       { start: 8800, end: 10800 },
+};
+
+const ALL_IDLE = Object.fromEntries(Object.keys(TOOL_TIMERS).map(k => [k, 'idle']));
+
+// ── Agent pipeline visualization ──────────────────────────────────────────────
+
+function PipelineVisualization({ active }) {
+    const [statuses, setStatuses] = useState(ALL_IDLE);
+
+    useEffect(() => {
+        if (!active) { setStatuses(ALL_IDLE); return; }
+        setStatuses(ALL_IDLE);
+        const timers = [];
+        Object.entries(TOOL_TIMERS).forEach(([key, { start, end }]) => {
+            timers.push(setTimeout(() => setStatuses(s => ({ ...s, [key]: 'running' })), start));
+            timers.push(setTimeout(() => setStatuses(s => ({ ...s, [key]: 'done'    })), end));
+        });
+        return () => timers.forEach(clearTimeout);
+    }, [active]);
+
+    const phaseStatus = (tools) => {
+        const ss = tools.map(t => statuses[t.key]);
+        if (ss.every(s => s === 'done')) return 'done';
+        if (ss.some(s => s === 'running' || s === 'done')) return 'active';
+        return 'idle';
+    };
+
+    return (
+        <div className="space-y-1.5">
+            {PIPELINE.map((phase, pi) => {
+                const ps = phaseStatus(phase.tools);
+                const borderColor = ps === 'active' ? alpha('--echoes-amber', 0.5)
+                    : ps === 'done' ? 'rgba(34,197,94,0.3)' : 'rgba(0,0,0,0.08)';
+                const headerBg = ps === 'active' ? alpha('--echoes-amber', 0.06)
+                    : ps === 'done' ? 'rgba(34,197,94,0.04)' : 'rgba(0,0,0,0.02)';
+                const labelColor = ps === 'active' ? palette.amber
+                    : ps === 'done' ? 'rgb(34,197,94)' : palette.muted;
+
+                return (
+                    <React.Fragment key={phase.phaseKey}>
+                        <div
+                            className="rounded-lg overflow-hidden"
+                            style={{ border: `1px solid ${borderColor}`, transition: 'border-color 0.4s ease' }}
+                        >
+                            {/* Phase header */}
+                            <div
+                                className="px-3 py-1.5 flex items-center justify-between"
+                                style={{ background: headerBg, borderBottom: `1px solid ${borderColor}`, transition: 'background 0.4s ease' }}
+                            >
+                                <span
+                                    className="text-[10px] font-mono tracking-wider uppercase font-medium"
+                                    style={{ color: labelColor, transition: 'color 0.4s ease' }}
+                                >
+                                    {phase.phaseLabel}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    {phase.parallel && ps !== 'idle' && (
+                                        <span
+                                            className="text-[9px] px-1.5 py-0.5 rounded"
+                                            style={{ background: alpha('--echoes-amber', 0.1), color: palette.muted }}
+                                        >
+                                            parallel
+                                        </span>
+                                    )}
+                                    {ps === 'done' && <Check size={10} style={{ color: 'rgb(34,197,94)' }} />}
+                                </div>
+                            </div>
+
+                            {/* Tool rows */}
+                            <div className="px-3 py-2 space-y-2">
+                                {phase.tools.map(({ key, Icon, name, result }) => {
+                                    const status = statuses[key];
+                                    return (
+                                        <div key={key}>
+                                            <div className="flex items-center gap-2">
+                                                {/* Icon bubble */}
+                                                <div
+                                                    className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
+                                                    style={{
+                                                        background: status === 'running' ? alpha('--echoes-amber', 0.12)
+                                                            : status === 'done' ? 'rgba(34,197,94,0.1)' : 'rgba(0,0,0,0.04)',
+                                                        transition: 'background 0.3s ease',
+                                                    }}
+                                                >
+                                                    <Icon
+                                                        size={11}
+                                                        style={{
+                                                            color: status === 'running' ? palette.amber
+                                                                : status === 'done' ? 'rgb(34,197,94)' : 'rgba(0,0,0,0.2)',
+                                                            transition: 'color 0.3s ease',
+                                                        }}
+                                                    />
+                                                </div>
+                                                {/* Tool name */}
+                                                <span
+                                                    className="text-[10px] font-mono flex-1 truncate"
+                                                    style={{
+                                                        color: status === 'idle' ? 'rgba(0,0,0,0.2)' : palette.brown,
+                                                        transition: 'color 0.3s ease',
+                                                    }}
+                                                >
+                                                    {name}
+                                                </span>
+                                                {/* Running dots */}
+                                                {status === 'running' && (
+                                                    <div className="flex gap-0.5 flex-shrink-0">
+                                                        {[0, 1, 2].map(i => (
+                                                            <div
+                                                                key={i}
+                                                                className="w-1 h-1 rounded-full"
+                                                                style={{
+                                                                    background: palette.amber,
+                                                                    animation: `echoesDot 1.2s ease-in-out ${i * 0.2}s infinite`,
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                {/* Done checkmark */}
+                                                {status === 'done' && (
+                                                    <Check size={10} style={{ color: 'rgb(34,197,94)', flexShrink: 0 }} />
+                                                )}
+                                            </div>
+                                            {/* Result snippet */}
+                                            {status === 'done' && (
+                                                <p
+                                                    className="ml-7 text-[10px] leading-relaxed mt-0.5"
+                                                    style={{ color: palette.muted, animation: 'echoesFadeSlideIn 0.3s ease' }}
+                                                >
+                                                    {result}
+                                                </p>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Arrow connector between phases */}
+                        {pi < PIPELINE.length - 1 && (
+                            <div className="flex flex-col items-center py-0.5">
+                                <div
+                                    style={{
+                                        width: 1, height: 12,
+                                        background: ps === 'done' ? alpha('--echoes-amber', 0.45) : 'rgba(0,0,0,0.1)',
+                                        transition: 'background 0.4s ease',
+                                    }}
+                                />
+                                <div
+                                    style={{
+                                        width: 0, height: 0,
+                                        borderLeft: '4px solid transparent',
+                                        borderRight: '4px solid transparent',
+                                        borderTop: `5px solid ${ps === 'done' ? alpha('--echoes-amber', 0.45) : 'rgba(0,0,0,0.1)'}`,
+                                        transition: 'border-top-color 0.4s ease',
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </React.Fragment>
+                );
+            })}
+        </div>
+    );
 }
 
 // ── AI analysis card ──────────────────────────────────────────────────────────
@@ -270,7 +479,7 @@ function UploadDemo() {
                 setTimeout(() => {
                     setStage('done');
                     setTimeout(() => setShowResult(true), 500);
-                }, 2700);
+                }, 13200);
             }
         }, 140);
     };
@@ -379,30 +588,7 @@ function UploadDemo() {
                 )}
 
                 {stage === 'analyzing' && (
-                    <div className="flex items-center gap-3">
-                        <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                            style={{ background: alpha('--echoes-amber', 0.1) }}
-                        >
-                            <Brain size={15} style={{ color: palette.amber }} />
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-xs font-medium" style={{ color: palette.brown }}>AI is reading the details…</p>
-                            <p className="text-[10px]" style={{ color: palette.muted }}>Detecting era, location, cultural context</p>
-                        </div>
-                        <div className="flex gap-1">
-                            {[0, 1, 2].map(i => (
-                                <div
-                                    key={i}
-                                    className="w-1.5 h-1.5 rounded-full"
-                                    style={{
-                                        background: palette.amber,
-                                        animation: `echoesDot 1.2s ease-in-out ${i * 0.2}s infinite`,
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    <PipelineVisualization active={true} />
                 )}
 
                 {stage === 'done' && (
