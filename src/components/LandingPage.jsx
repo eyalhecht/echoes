@@ -1088,33 +1088,31 @@ function LandingPage() {
                             Open the Shoebox
                             <ArrowRight size={18} />
                         </button>
-                        <button
-                            onClick={() => scrollToSection('demo')}
-                            className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base transition-all border"
-                            style={{
-                                background: 'transparent',
-                                color: palette.brown,
-                                borderColor: alpha('--echoes-brown', 0.31),
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = palette.amber; e.currentTarget.style.color = palette.amber; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = alpha('--echoes-brown', 0.31); e.currentTarget.style.color = palette.brown; }}
-                        >
-                            <Play size={15} />
-                            See it live
-                        </button>
                     </div>
 
                     {/* Bouncing scroll prompt */}
-                    <div className="mt-14 flex flex-col items-center gap-1">
-                        <span className="text-xs" style={{ color: alpha('--echoes-brown', 0.35) }}>scroll to demo</span>
-                        <button
-                            onClick={() => scrollToSection('demo')}
-                            className="p-1 transition-opacity hover:opacity-60"
-                            style={{ color: alpha('--echoes-amber', 0.6), animation: 'echoesBounce 1.8s ease-in-out infinite' }}
-                            aria-label="Scroll to demo"
+                    <div className="mt-14 flex justify-center">
+                    <button
+                        onClick={() => scrollToSection('demo')}
+                        className="flex flex-col items-center gap-1 group"
+                        style={{ animation: 'echoesBounce 1.8s ease-in-out infinite', background: 'none', border: 'none', cursor: 'pointer' }}
+                        aria-label="Scroll to demo"
+                    >
+                        <span
+                            className="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200"
+                            style={{
+                                background: alpha('--echoes-amber', 0.12),
+                                color: palette.amber,
+                                border: `1px solid ${alpha('--echoes-amber', 0.35)}`,
+                                boxShadow: `0 0 18px ${alpha('--echoes-amber', 0.15)}`,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = alpha('--echoes-amber', 0.22); e.currentTarget.style.boxShadow = `0 0 28px ${alpha('--echoes-amber', 0.3)}`; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = alpha('--echoes-amber', 0.12); e.currentTarget.style.boxShadow = `0 0 18px ${alpha('--echoes-amber', 0.15)}`; }}
                         >
-                            <ChevronDown size={26} />
-                        </button>
+                            Watch the demo
+                        </span>
+                        <ChevronDown size={22} style={{ color: alpha('--echoes-amber', 0.5) }} />
+                    </button>
                     </div>
                 </div>
             </section>
