@@ -756,18 +756,10 @@ function UploadDemo() {
                 />
 
                 {stage === 'analyzing' && (
-                    <div className="absolute inset-0 overflow-hidden" style={{ background: 'rgba(0,0,0,0.04)' }}>
-                        <div
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                height: 2,
-                                background: `linear-gradient(90deg, transparent, ${palette.amber}, transparent)`,
-                                animation: 'echoesScanLine 1.1s linear infinite',
-                            }}
-                        />
-                    </div>
+                    <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{ animation: 'echoesGlowPulse 2s ease-in-out infinite' }}
+                    />
                 )}
 
                 {stage === 'idle' && (
@@ -1251,9 +1243,9 @@ function LandingPage() {
                     from { opacity: 0; transform: translateY(-6px); }
                     to   { opacity: 1; transform: translateY(0); }
                 }
-                @keyframes echoesScanLine {
-                    0%   { top: 0; }
-                    100% { top: 100%; }
+                @keyframes echoesGlowPulse {
+                    0%, 100% { box-shadow: inset 0 0 0 2px rgba(196,144,60,0.25), inset 0 0 24px rgba(196,144,60,0.08); }
+                    50%      { box-shadow: inset 0 0 0 3px rgba(196,144,60,0.7),  inset 0 0 48px rgba(196,144,60,0.22); }
                 }
                 @keyframes echoesDot {
                     0%, 100% { opacity: 0.3; transform: scale(0.8); }
