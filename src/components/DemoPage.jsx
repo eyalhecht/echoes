@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Heart, MessageCircle, Bookmark, Brain,
-    ArrowRight, MapPin, Check, Sparkles, Clock, Camera,
+    ArrowRight, MapPin, Check, Sparkles, Clock, Play,
     Tag, Globe, FileText, Shield, BookOpen,
 } from 'lucide-react';
 import { palette, alpha } from '../styles/theme';
@@ -457,6 +457,178 @@ function MockPostCard({ post }) {
     );
 }
 
+// ── Tech stack data ───────────────────────────────────────────────────────────
+
+const TECH_CARDS = [
+    {
+        category: 'Orchestration',
+        name: 'LangChain Agent',
+        description: 'A tool-calling agent that drives the two-phase workflow — deciding which Vision tools to invoke based on Phase 1 findings, then synthesizing all evidence into a structured data.',
+        details: [
+            'createAgent() with tool-calling loop',
+            'System prompt encodes historian domain expertise',
+            'responseFormat: SynthesisSchema (Zod)',
+            'Sequential Phase 1 → parallel Phase 2',
+            'Tools run only when evidence warrants it',
+        ],
+    },
+    {
+        category: 'Vision + Reasoning Model',
+        name: 'OpenAI GPT-4o',
+        description: 'Receives the original image alongside all tool outputs, reasons across visual and textual evidence, and produces the final typed output.',
+        details: [
+            'model: gpt-4o, temperature: 0',
+            'Multimodal: image_url, detail: "high"',
+            'Sees both the image and all tool results',
+            'Structured JSON via responseFormat',
+            'ChatOpenAI via @langchain/openai',
+        ],
+    },
+    {
+        category: 'Computer Vision · 5 parallel tools',
+        name: 'Google Cloud Vision',
+        description: 'Five independent Vision API calls run in parallel during Phase 2, each targeting a distinct signal. The agent calls only the tools that Phase 1 makes relevant.',
+        details: [
+            'LABEL_DETECTION — scene & object taxonomy',
+            'LANDMARK_DETECTION — buildings & monuments',
+            'TEXT_DETECTION — OCR, signs, captions',
+            'LOGO_DETECTION — insignia, mastheads, seals',
+            'WEB_DETECTION — reverse image + entities',
+        ],
+    },
+    {
+        category: 'Output Contract',
+        name: 'Zod Structured Schema',
+        description: 'Every response field is typed and validated at runtime. Confidence enums prevent the model from asserting certainty it doesn\'t have.',
+        details: [
+            'date_confidence: definite | probable | possible | unknown',
+            'location_confidence: same four-level enum',
+            'people_identified[]: { name, role, confidence }',
+            'geographic_terms[] — Getty TGN-aligned',
+            'subject_terms[] — Getty AAT-aligned',
+        ],
+    }
+];
+
+// ── Upload section left column (toggled) ─────────────────────────────────────
+
+function UploadSectionLeft() {
+    const [view, setView] = useState('tech');
+    const [visible, setVisible] = useState(true);
+
+    const handleToggle = (next) => {
+        if (next === view) return;
+        setVisible(false);
+        setTimeout(() => { setView(next); setVisible(true); }, 180);
+    };
+
+    return (
+        <div>
+            <p className="text-base mb-1" style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}>step 02</p>
+            <h2 className="text-2xl font-bold mb-4" style={{ color: palette.brown, letterSpacing: '-0.02em' }}>
+                Upload a Memory, Watch AI Uncover It
+            </h2>
+            <p className="text-sm leading-relaxed mb-5" style={{ color: palette.muted }}>
+                Upload any historical photo and Echoes AI reads it immediately — detecting the decade,
+                identifying the location, and surfacing the cultural context. In seconds, a dusty scan
+                becomes a documented piece of history.
+            </p>
+
+            {/* Pill toggle */}
+            <div
+                className="inline-flex rounded-full p-0.5 mb-5"
+                style={{ background: alpha('--echoes-amber', 0.1) }}
+            >
+                {[
+                    { id: 'tech',     label: 'How it\'s built' },
+                    { id: 'features', label: 'What it does'    },
+                ].map(({ id, label }) => (
+                    <button
+                        key={id}
+                        onClick={() => handleToggle(id)}
+                        className="px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200"
+                        style={view === id ? {
+                            background: palette.brown,
+                            color: palette.cream,
+                            boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+                        } : {
+                            background: 'transparent',
+                            color: palette.muted,
+                        }}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Animated content area */}
+            <div
+                style={{
+                    opacity: visible ? 1 : 0,
+                    transform: visible ? 'translateY(0)' : 'translateY(-8px)',
+                    transition: 'opacity 0.18s ease, transform 0.18s ease',
+                }}
+            >
+                {view === 'tech' ? (
+                    <div>
+                        {TECH_CARDS.map((card, i) => (
+                            <div
+                                key={card.name}
+                                className="flex gap-3 py-2.5"
+                                style={{
+                                    borderBottom: i < TECH_CARDS.length - 1
+                                        ? `1px solid ${alpha('--echoes-amber', 0.1)}`
+                                        : 'none',
+                                }}
+                            >
+                                <div
+                                    className="w-0.5 flex-shrink-0 rounded-full self-stretch"
+                                    style={{ background: alpha('--echoes-amber', 0.45) }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-baseline gap-2 mb-0.5">
+                                        <span className="font-mono font-bold text-xs" style={{ color: palette.brown }}>
+                                            {card.name}
+                                        </span>
+                                        <span className="text-[9px] font-mono tracking-wide" style={{ color: palette.muted }}>
+                                            {card.category}
+                                        </span>
+                                    </div>
+                                    <p
+                                        className="text-[11px] leading-snug line-clamp-2"
+                                        style={{ color: palette.muted }}
+                                    >
+                                        {card.description}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div>
+                        {[
+                            { icon: Clock,    text: 'Era & decade detection from visual cues' },
+                            { icon: MapPin,   text: 'Location identification from landmarks & context' },
+                            { icon: Brain,    text: 'Historical events & cultural significance' },
+                            { icon: Sparkles, text: 'Notable figures and people identified' },
+                        ].map(({ icon: Icon, text }) => (
+                            <div key={text} className="flex items-start gap-3 mb-3.5">
+                                <div
+                                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                                    style={{ background: alpha('--echoes-amber', 0.12) }}
+                                >
+                                    <Icon size={12} style={{ color: palette.amber }} />
+                                </div>
+                                <p className="text-sm" style={{ color: palette.muted }}>{text}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 // ── Upload demo ───────────────────────────────────────────────────────────────
 
 function UploadDemo() {
@@ -528,19 +700,28 @@ function UploadDemo() {
                 {/* Idle overlay */}
                 {stage === 'idle' && (
                     <div
-                        className="absolute inset-0 flex items-center justify-center cursor-pointer"
-                        style={{ background: 'rgba(0,0,0,0.4)' }}
+                        className="absolute inset-0 flex items-center justify-center cursor-pointer group"
+                        style={{ background: 'linear-gradient(160deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.6) 100%)' }}
                         onClick={startDemo}
                     >
-                        <div className="text-center text-white select-none">
-                            <div
-                                className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
-                                style={{ background: 'rgba(255,255,255,0.14)', border: '2px solid rgba(255,255,255,0.5)' }}
-                            >
-                                <Camera size={24} />
+                        <div className="text-center select-none">
+                            {/* Ripple rings + play button */}
+                            <div className="relative flex items-center justify-center mx-auto mb-5" style={{ width: 88, height: 88 }}>
+                                <div className="absolute rounded-full" style={{ inset: 0, border: `2px solid ${palette.amber}`, animation: 'echoesRipple 2.4s ease-out infinite' }} />
+                                <div className="absolute rounded-full" style={{ inset: 0, border: `2px solid ${palette.amber}`, animation: 'echoesRipple 2.4s ease-out 0.8s infinite' }} />
+                                <div className="absolute rounded-full" style={{ inset: 0, border: `2px solid ${palette.amber}`, animation: 'echoesRipple 2.4s ease-out 1.6s infinite' }} />
+                                <div
+                                    className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+                                    style={{
+                                        background: palette.amber,
+                                        boxShadow: `0 0 32px ${alpha('--echoes-amber', 0.55)}, 0 0 8px ${alpha('--echoes-amber', 0.4)}`,
+                                    }}
+                                >
+                                    <Play size={24} fill="white" className="text-white ml-1" />
+                                </div>
                             </div>
-                            <p className="text-sm font-semibold">Click to watch the demo</p>
-                            <p className="text-xs opacity-70 mt-1">See AI analyze a historical photo</p>
+                            <p className="text-white font-bold text-base mb-1 drop-shadow">Watch AI analyze this photo</p>
+                            <p className="text-xs drop-shadow" style={{ color: 'rgba(255,255,255,0.6)' }}>See the full agent pipeline in action</p>
                         </div>
                     </div>
                 )}
@@ -734,33 +915,7 @@ function DemoPage() {
             <section className="py-24 px-4" style={{ background: alpha('--echoes-brown', 0.025) }}>
                 <div className="max-w-5xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-14 items-start">
-                        <div>
-                            <p className="text-base mb-1" style={{ fontFamily: "'Caveat', cursive", color: palette.amber }}>step 02</p>
-                            <h2 className="text-2xl font-bold mb-4" style={{ color: palette.brown, letterSpacing: '-0.02em' }}>
-                                Upload a Memory, Watch AI Uncover It
-                            </h2>
-                            <p className="text-sm leading-relaxed mb-7" style={{ color: palette.muted }}>
-                                Upload any historical photo and Echoes AI reads it immediately — detecting the decade,
-                                identifying the location, and surfacing the cultural context. In seconds, a dusty scan
-                                becomes a documented piece of history.
-                            </p>
-                            {[
-                                { icon: Clock, text: 'Era & decade detection from visual cues' },
-                                { icon: MapPin, text: 'Location identification from landmarks & context' },
-                                { icon: Brain, text: 'Historical events & cultural significance' },
-                                { icon: Sparkles, text: 'Notable figures and people identified' },
-                            ].map(({ icon: Icon, text }) => (
-                                <div key={text} className="flex items-start gap-3 mb-3.5">
-                                    <div
-                                        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                                        style={{ background: alpha('--echoes-amber', 0.12) }}
-                                    >
-                                        <Icon size={12} style={{ color: palette.amber }} />
-                                    </div>
-                                    <p className="text-sm" style={{ color: palette.muted }}>{text}</p>
-                                </div>
-                            ))}
-                        </div>
+                        <UploadSectionLeft />
                         <UploadDemo />
                     </div>
                 </div>
@@ -839,6 +994,10 @@ function DemoPage() {
                 @keyframes echoesBlink {
                     0%, 100% { opacity: 1; }
                     50%      { opacity: 0; }
+                }
+                @keyframes echoesRipple {
+                    0%   { transform: scale(1);   opacity: 0.5; }
+                    100% { transform: scale(2.2); opacity: 0; }
                 }
             `}</style>
         </div>
