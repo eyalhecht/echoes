@@ -128,7 +128,7 @@ function Login() {
                             className="font-bold"
                             style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', color: palette.brown, letterSpacing: '-0.02em', lineHeight: 1.2 }}
                         >
-                            Sign in to continue
+                            Sign in or create an account
                         </h1>
                         <p className="mt-2 text-sm" style={{ color: palette.muted }}>
                             Those photos won't share themselves.

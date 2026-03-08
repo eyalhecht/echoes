@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Spinner } from "@/components/ui/spinner";
 import Layout from '../components/Layout.jsx';
 import Login from '../components/Login.jsx';
-import Signup from '../components/Signup.jsx';
 import ProtectedRoute from '../components/ProtectedRoute.jsx';
 import { useAuthStore } from '../stores/useAuthStore.js';
 
