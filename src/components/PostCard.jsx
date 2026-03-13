@@ -166,7 +166,7 @@ function PostCard({ post }) {
                             {description && (
                                 <p
                                     style={{ fontFamily: "'Kalam', cursive", fontSize: '0.95rem' }}
-                                    className="text-gray-600 leading-snug line-clamp-2"
+                                    className={`text-gray-600 leading-snug ${!isDescriptionExpanded ? 'line-clamp-2' : ''}`}
                                 >
                                     {description}
                                 </p>
@@ -316,12 +316,6 @@ function PostCard({ post }) {
                         <p className="text-sm whitespace-pre-wrap mb-2"
                            style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
                             {getDisplayedText()}
-                        </p>
-                    )}
-                    {shouldTruncate && isDescriptionExpanded && files?.length > 0 && (
-                        <p className="text-sm whitespace-pre-wrap mb-1"
-                           style={{ fontFamily: "'Kalam', cursive", fontSize: '1rem' }}>
-                            {'...' + description.substring(MAX_DESCRIPTION_LENGTH)}
                         </p>
                     )}
                     {shouldTruncate && (
