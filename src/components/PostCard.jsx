@@ -294,7 +294,7 @@ function PostCard({ post }) {
 
                 <CardContent className="pt-4">
 
-                    <p className="text-sm whitespace-pre-wrap mb-2" style={{ fontFamily: "'Caveat', cursive", fontSize: '1.2rem' }}>
+                    <p className="text-sm whitespace-pre-wrap mb-2" style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
                         {getDisplayedText()}
                     </p>
 
