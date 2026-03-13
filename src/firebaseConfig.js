@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const functions = getFunctions(app);
-export const db = getFirestore(app);
+const db = getFirestore(app);
 export const storage = getStorage(app);
 
 if (import.meta.env.DEV || window.location.hostname === 'localhost') {
