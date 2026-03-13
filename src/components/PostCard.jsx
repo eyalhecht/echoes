@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
     Card,
     CardHeader,
@@ -61,6 +61,7 @@ function PostCard({ post }) {
     } = usePostInteractions(post.id);
 
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const readMoreRef = useRef(null);
     const [locationModal, setLocationModal] = useState(false); // Controls the unified location modal
     const [imageLoaded, setImageLoaded] = useState(false);
     const [polaroidWidth, setPolaroidWidth] = useState(null);
@@ -318,17 +319,34 @@ function PostCard({ post }) {
                             {getDisplayedText()}
                         </p>
                     )}
-                    {shouldTruncate && isDescriptionExpanded && files?.length > 0 && (
-                        <p className="text-sm whitespace-pre-wrap mb-1"
-                           style={{ fontFamily: "'Kalam', cursive", fontSize: '1rem' }}>
-                            {description}
-                        </p>
+                    {shouldTruncate && files?.length > 0 && (
+                        <div
+                            className="overflow-hidden transition-all duration-300 ease-in-out"
+                            style={{ maxHeight: isDescriptionExpanded ? '600px' : '0px' }}
+                        >
+                            <p className="text-sm whitespace-pre-wrap mb-1 pt-0.5"
+                               style={{ fontFamily: "'Kalam', cursive", fontSize: '1rem' }}>
+                                {description}
+                            </p>
+                        </div>
                     )}
                     {shouldTruncate && (
                         <Button
+                            ref={readMoreRef}
                             variant="link"
                             size="sm"
-                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                            onClick={() => {
+                                if (isDescriptionExpanded) {
+                                    setIsDescriptionExpanded(false);
+                                } else {
+                                    const topBefore = readMoreRef.current.getBoundingClientRect().top;
+                                    setIsDescriptionExpanded(true);
+                                    requestAnimationFrame(() => {
+                                        const topAfter = readMoreRef.current.getBoundingClientRect().top;
+                                        window.scrollBy({ top: topAfter - topBefore, behavior: 'instant' });
+                                    });
+                                }
+                            }}
                             className="p-0 h-auto text-xs mb-2"
                         >
                             {isDescriptionExpanded ? 'Read less' : 'Read more'}
