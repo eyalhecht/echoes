@@ -63,6 +63,7 @@ function PostCard({ post }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [locationModal, setLocationModal] = useState(false); // Controls the unified location modal
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [polaroidWidth, setPolaroidWidth] = useState(null);
     const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
     const deletePost = useUiStore(state => state.deletePost);
     const currentUser = useAuthStore((state) => state.user);
@@ -140,20 +141,37 @@ function PostCard({ post }) {
         if (type === 'photo' || type === 'document' || type === 'item') {
             return (
                 <div className="flex justify-center px-4 sm:px-6">
-                    <div className="relative bg-white p-4 shadow-xl border border-gray-200 max-w-full">
-                        {formatYear(year) && imageLoaded && (
-                            <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
-                                {formatYear(year)}
-                            </div>
-                        )}
-                        <img
-                            src={firstFile}
-                            alt="Post media"
-                            className="w-full max-h-[400px] object-contain"
-                            onLoad={() => setImageLoaded(true)}
-                            onError={() => setImageLoaded(false)}
-                        />
-                        <div className="h-10"></div>
+                    <div
+                        className="text-left relative bg-white p-4 shadow-xl border border-gray-200"
+                        style={polaroidWidth ? { width: polaroidWidth } : { maxWidth: '100%' }}
+                    >
+                        <div className="relative">
+                            {formatYear(year) && imageLoaded && (
+                                <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
+                                    {formatYear(year)}
+                                </div>
+                            )}
+                            <img
+                                src={firstFile}
+                                alt="Post media"
+                                className="block max-h-[400px] max-w-full"
+                                onLoad={(e) => {
+                                    setImageLoaded(true);
+                                    setPolaroidWidth(e.target.offsetWidth + 32); // +32 for p-4 on both sides
+                                }}
+                                onError={() => setImageLoaded(false)}
+                            />
+                        </div>
+                        <div className="pt-2 pb-1 min-h-[40px]">
+                            {description && (
+                                <p
+                                    style={{ fontFamily: "'Kalam', cursive", fontSize: '0.95rem' }}
+                                    className="text-gray-600 leading-snug line-clamp-2"
+                                >
+                                    {description}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             );
@@ -294,10 +312,18 @@ function PostCard({ post }) {
 
                 <CardContent className="pt-4">
 
-                    <p className="text-sm whitespace-pre-wrap mb-2" style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
-                        {getDisplayedText()}
-                    </p>
-
+                    {(!files || files.length === 0) && description && (
+                        <p className="text-sm whitespace-pre-wrap mb-2"
+                           style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
+                            {getDisplayedText()}
+                        </p>
+                    )}
+                    {shouldTruncate && isDescriptionExpanded && files?.length > 0 && (
+                        <p className="text-sm whitespace-pre-wrap mb-1"
+                           style={{ fontFamily: "'Kalam', cursive", fontSize: '1rem' }}>
+                            {description}
+                        </p>
+                    )}
                     {shouldTruncate && (
                         <Button
                             variant="link"
