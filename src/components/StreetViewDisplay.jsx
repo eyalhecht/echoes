@@ -1,26 +1,20 @@
 import React, { useEffect, useRef } from "react";
+
 const StreetViewDisplay = ({ coords, width = "100%", height = "300px" }) => {
     const streetRef = useRef(null);
 
     useEffect(() => {
-    if (!coords || typeof coords._latitude !== "number" || typeof coords._longitude !== "number") return;
+        if (!coords || typeof coords._latitude !== "number" || typeof coords._longitude !== "number") return;
+        if (!window.google?.maps) return;
 
-    const { _latitude, _longitude } = coords;
-    const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_MAPS_API_KEY;
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
-    script.async = true;
-    script.onload = () => {
-    new window.google.maps.StreetViewPanorama(streetRef.current, {
-            position: { lat: _latitude, lng: _longitude },
+        const panorama = new window.google.maps.StreetViewPanorama(streetRef.current, {
+            position: { lat: coords._latitude, lng: coords._longitude },
             pov: { heading: 0, pitch: 0 },
             zoom: 1,
         });
-    };
-    document.body.appendChild(script);
 
-    return () => {
-            document.body.removeChild(script);
+        return () => {
+            if (panorama) panorama.setVisible(false);
         };
     }, [coords]);
 
