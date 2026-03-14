@@ -42,7 +42,7 @@ import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import { useAuthStore } from "../stores/useAuthStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
-import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
+import NowAndThenSlider from "@/components/NowAndThenSlider.jsx";
 import SharePost from "@/components/SharePost.jsx";
 import Professor from "@/components/Professor.jsx";
 import { useNavigate } from 'react-router-dom';
@@ -64,7 +64,7 @@ function PostCard({ post }) {
     const [locationModal, setLocationModal] = useState(false); // Controls the unified location modal
     const [imageLoaded, setImageLoaded] = useState(false);
     const [polaroidWidth, setPolaroidWidth] = useState(null);
-    const [showMapInModal, setShowMapInModal] = useState(true); // Toggles between map and street view inside the modal
+    const [modalTab, setModalTab] = useState('compare'); // 'compare' | 'map'
     const deletePost = useUiStore(state => state.deletePost);
     const currentUser = useAuthStore((state) => state.user);
 
@@ -468,8 +468,8 @@ function PostCard({ post }) {
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => {
-                                            setLocationModal(true); // Open the unified location modal
-                                            setShowMapInModal(true); // Default to showing map
+                                            setLocationModal(true);
+                                            setModalTab('compare');
                                         }}
                                         className="h-8 w-8"
                                     >
@@ -551,35 +551,41 @@ function PostCard({ post }) {
             </Card>
 
             <Dialog open={locationModal} onOpenChange={setLocationModal}>
-                <DialogContent className="max-w-md py-7">
-                    <DialogHeader className="flex flex-row justify-between items-center mb-4">
-                        <DialogTitle>{showMapInModal ? 'Location Map' : 'Street View'}</DialogTitle>
-                        {location && (
-                            <div className="flex gap-2">
-                                <Button
-                                    variant={showMapInModal ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setShowMapInModal(true)}
-                                >
-                                    Map
-                                </Button>
-                                <Button
-                                    variant={!showMapInModal ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setShowMapInModal(false)}
-                                >
-                                    Street View
-                                </Button>
-                            </div>
-                        )}
+                <DialogContent className="max-w-lg py-7">
+                    <DialogHeader className="mb-4">
+                        <div className="flex items-center justify-between">
+                            <DialogTitle>Now &amp; Then</DialogTitle>
+                            {location && files?.length > 0 && (
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant={modalTab === 'compare' ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setModalTab('compare')}
+                                    >
+                                        Now &amp; Then
+                                    </Button>
+                                    <Button
+                                        variant={modalTab === 'map' ? "default" : "outline"}
+                                        size="sm"
+                                        onClick={() => setModalTab('map')}
+                                    >
+                                        Map
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     </DialogHeader>
 
                     {location ? (
                         <>
-                            {showMapInModal ? (
-                                <PostMap center={{ lat: location._latitude, lng: location._longitude }} />
+                            {modalTab === 'compare' && files?.length > 0 ? (
+                                <NowAndThenSlider
+                                    imageUrl={files[0]}
+                                    coords={location}
+                                    height={400}
+                                />
                             ) : (
-                                <StreetViewDisplay coords={post.location}/>
+                                <PostMap center={{ lat: location._latitude, lng: location._longitude }} height="400px" />
                             )}
                         </>
                     ) : (
