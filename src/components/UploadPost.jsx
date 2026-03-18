@@ -20,12 +20,7 @@ import {
     X,
     MapPin,
     Upload,
-    Image,
     Calendar,
-    FileText,
-    Package,
-    Video,
-    Youtube,
     CheckCircle,
 } from 'lucide-react';
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -38,7 +33,7 @@ import {useNavigate} from "react-router-dom";
 const UploadPost = () => {
     const navigate = useNavigate()
     const { toast } = useToast();
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(2);
     const [justCompletedStep, setJustCompletedStep] = useState(null);
     const [uploadSuccess, setUploadSuccess] = useState(false);
 
@@ -47,7 +42,7 @@ const UploadPost = () => {
     const containerRef = useRef(null);
 
     // Form state
-    const [type, setType] = useState('');
+    const type = 'photo';
     const [files, setFiles] = useState([]);
     const [filePreviews, setFilePreviews] = useState([]);
     const [description, setDescription] = useState('');
@@ -59,43 +54,7 @@ const UploadPost = () => {
 
     const fileInputRef = useRef(null);
 
-    const postTypes = [
-        {
-            id: 'photo',
-            label: 'Photo',
-            icon: Image,
-            description: 'Share a photo or image',
-            accept: 'image/*'
-        },
-        // {
-        //     id: 'video',
-        //     label: 'Video',
-        //     icon: Video,
-        //     description: 'Upload a video file',
-        //     accept: 'video/*'
-        // },
-        // {
-        //     id: 'document',
-        //     label: 'Document',
-        //     icon: FileText,
-        //     description: 'Share a document',
-        //     accept: '.pdf,.doc,.docx,.txt'
-        // },
-        // {
-        //     id: 'item',
-        //     label: 'Item',
-        //     icon: Package,
-        //     description: 'Share an item or object',
-        //     accept: 'image/*'
-        // },
-        // {
-        //     id: 'youtube',
-        //     label: 'YouTube',
-        //     icon: Youtube,
-        //     description: 'Share a YouTube video',
-        //     accept: null
-        // }
-    ];
+    const photoAccept = 'image/*';
 
     const yearOptions = useMemo(() => {
         const currentYear = new Date().getFullYear();
@@ -107,8 +66,6 @@ const UploadPost = () => {
         }
         return years;
     }, []);
-
-    const selectedTypeData = postTypes.find(t => t.id === type);
 
     // Smooth scroll to step with highlight effect
     const scrollToStep = (stepNumber) => {
@@ -141,18 +98,6 @@ const UploadPost = () => {
         }, 300);
     };
 
-    const handleTypeSelect = (typeId) => {
-        setType(typeId);
-        setFiles([]);
-        setFilePreviews([]);
-        setError(null);
-        if (typeId) {
-            setCurrentStep(2);
-            scrollToStep(2);
-            focusStepInput(2);
-        }
-    };
-
     const handleFileChange = (event) => {
         const newFiles = Array.from(event.target.files);
         if (newFiles.length > 0) {
@@ -166,16 +111,6 @@ const UploadPost = () => {
         }
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
-        }
-    };
-
-    const handleYouTubeUrlChange = (url) => {
-        setFiles([url]);
-        setError(null);
-        if (url.trim()) {
-            setCurrentStep(3);
-            scrollToStep(3);
-            focusStepInput(3);
         }
     };
 
@@ -199,16 +134,12 @@ const UploadPost = () => {
     };
 
     const handleUploadPost = async () => {
-        if (!description.trim() && files.length === 0 && type !== 'youtube') {
-            setError('Please enter a description or select at least one file to post.');
+        if (files.length === 0) {
+            setError('At least one photo is required.');
             return;
         }
-        if (type === 'youtube' && (files.length === 0 || !files[0].trim())) {
-            setError('Please enter a YouTube video URL.');
-            return;
-        }
-        if (type !== 'youtube' && files.length === 0) {
-            setError('At least one file is required for this post type.');
+        if (!description.trim()) {
+            setError('Please enter a description.');
             return;
         }
 
@@ -222,28 +153,22 @@ const UploadPost = () => {
         });
 
         try {
-            let fileUrls = [];
+            uploadingToast.update({
+                title: "Uploading files...",
+                description: `Processing ${files.length} file(s)...`,
+            });
 
-            if (type !== 'youtube' && files.length > 0) {
-                // Update toast with file upload progress
-                uploadingToast.update({
-                    title: "Uploading files...",
-                    description: `Processing ${files.length} file(s)...`,
-                });
+            const uploadPromises = files.map(async (file) => {
+                const storageRef = ref(storage, `post_media/${auth.currentUser?.uid || 'anonymous'}/${Date.now()}_${file.name}`);
+                const uploadTaskSnapshot = await uploadBytes(storageRef, file);
+                return await getDownloadURL(uploadTaskSnapshot.ref);
+            });
+            const fileUrls = await Promise.all(uploadPromises);
 
-                const uploadPromises = files.map(async (file) => {
-                    const storageRef = ref(storage, `post_media/${auth.currentUser?.uid || 'anonymous'}/${Date.now()}_${file.name}`);
-                    const uploadTaskSnapshot = await uploadBytes(storageRef, file);
-                    return await getDownloadURL(uploadTaskSnapshot.ref);
-                });
-                fileUrls = await Promise.all(uploadPromises);
-                uploadingToast.update({
-                    title: "Creating your post...",
-                    description: "Files uploaded successfully, finalizing your post...",
-                });
-            } else if (type === 'youtube' && files.length > 0) {
-                fileUrls = files;
-            }
+            uploadingToast.update({
+                title: "Creating your post...",
+                description: "Files uploaded successfully, finalizing your post...",
+            });
 
             const payload = {
                 action: 'createPost',
@@ -272,13 +197,12 @@ const UploadPost = () => {
             
             // Reset form after a short delay to show success state
             setTimeout(() => {
-                setType('');
                 setFiles([]);
                 setFilePreviews([]);
                 setDescription('');
                 setLocation(null);
                 setSelectedYear('');
-                setCurrentStep(1);
+                setCurrentStep(2);
                 setUploadSuccess(false);
                 navigate('/home');
             }, 2000);
@@ -307,12 +231,7 @@ const UploadPost = () => {
         }
     };
 
-    const canProceedToUpload = () => {
-        if (type === 'youtube') {
-            return files.length > 0 && files[0].trim() && description.trim();
-        }
-        return files.length > 0 && description.trim();
-    };
+    const canProceedToUpload = () => files.length > 0 && description.trim();
 
     return (
         <div className="max-w-2xl mx-auto" ref={containerRef}>
@@ -321,14 +240,14 @@ const UploadPost = () => {
                     <h1 className="text-2xl font-bold">Create New Post</h1>
                     <div className="flex justify-center mt-4">
                         <div className="flex items-center space-x-2">
-                            {[1, 2, 3, 4].map((step) => (
+                            {[2, 3, 4].map((step) => (
                                 <div key={step} className="flex items-center">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                                         currentStep >= step
                                             ? 'bg-primary text-primary-foreground'
                                             : 'bg-muted text-muted-foreground'
                                     }`}>
-                                        {step}
+                                        {step - 1}
                                     </div>
                                     {step < 4 && (
                                         <div className={`w-8 h-0.5 mx-1 ${
@@ -342,48 +261,8 @@ const UploadPost = () => {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                    {/* Step 1: Post Type Selection */}
-                    {currentStep >= 1 && (
-                        <div
-                            ref={el => stepRefs.current[1] = el}
-                            className={`space-y-4 transition-all duration-500 ${
-                                justCompletedStep === 1 ? 'ring-2 ring-primary/50 rounded-lg p-4 -m-4' : ''
-                            }`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</div>
-                                <Label className="text-lg font-semibold">What are you sharing?</Label>
-                                <Badge variant="secondary">Required</Badge>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {postTypes.map((postType) => (
-                                    <Card
-                                        key={postType.id}
-                                        className={`cursor-pointer transition-all hover:shadow-md ${
-                                            type === postType.id
-                                                ? 'ring-2 ring-primary bg-primary/5'
-                                                : 'hover:bg-accent'
-                                        }`}
-                                        onClick={() => handleTypeSelect(postType.id)}
-                                    >
-                                        <CardContent className="p-4 flex items-center space-x-3">
-                                            <postType.icon className={`h-8 w-8 ${
-                                                type === postType.id ? 'text-primary' : 'text-muted-foreground'
-                                            }`} />
-                                            <div>
-                                                <h3 className="font-medium">{postType.label}</h3>
-                                                <p className="text-sm text-muted-foreground">{postType.description}</p>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Step 2: File Upload */}
-                    {currentStep >= 2 && type && (
+                    {/* Step 1: File Upload */}
+                    {currentStep >= 2 && (
                         <div
                             ref={el => stepRefs.current[2] = el}
                             className={`space-y-4 transition-all duration-500 animate-in slide-in-from-top-4 ${
@@ -391,93 +270,67 @@ const UploadPost = () => {
                             }`}
                         >
                             <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
-                                <Label className="text-lg font-semibold">
-                                    {type === 'youtube' ? 'Enter YouTube URL' : `Upload ${selectedTypeData?.label}`}
-                                </Label>
+                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">1</div>
+                                <Label className="text-lg font-semibold">Upload Photo</Label>
                                 <Badge variant="secondary">Required</Badge>
                             </div>
 
-                            {type === 'youtube' ? (
-                                <div className="space-y-2">
-                                    <Input
-                                        placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                                        value={files[0] || ''}
-                                        onChange={(e) => handleYouTubeUrlChange(e.target.value)}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <input
+                                        accept={photoAccept}
+                                        className="hidden"
+                                        id="file-upload"
+                                        type="file"
+                                        onChange={handleFileChange}
                                         disabled={isUploading}
+                                        ref={fileInputRef}
                                     />
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-4">
-                                        <input
-                                            accept={selectedTypeData?.accept}
-                                            className="hidden"
-                                            id="file-upload"
-                                            type="file"
-                                            onChange={handleFileChange}
-                                            disabled={isUploading}
-                                            ref={fileInputRef}
-                                        />
-                                        <Label htmlFor="file-upload">
-                                            <Button
-                                                variant="outline"
-                                                className="cursor-pointer border-2 border-dashed border-primary bg-primary/5 hover:bg-primary/10"
-                                                asChild
-                                            >
-                                                <span>
-                                                    <Camera className="h-4 w-4 mr-2" />
-                                                    Choose {selectedTypeData?.label}
-                                                </span>
-                                            </Button>
-                                        </Label>
-                                        {files.length > 0 && (
-                                            <span className="text-sm text-muted-foreground">
-                                                {files.length} file(s) selected
+                                    <Label htmlFor="file-upload">
+                                        <Button
+                                            variant="outline"
+                                            className="cursor-pointer border-2 border-dashed border-primary bg-primary/5 hover:bg-primary/10"
+                                            asChild
+                                        >
+                                            <span>
+                                                <Camera className="h-4 w-4 mr-2" />
+                                                Choose Photo
                                             </span>
-                                        )}
-                                    </div>
-
-                                    {/* File Previews */}
-                                    {filePreviews.length > 0 && (
-                                        <div className="flex flex-wrap gap-3 p-4 bg-muted/30 rounded-lg">
-                                            {filePreviews.map((previewUrl, index) => (
-                                                <div key={index} className="relative group">
-                                                    <div className="w-20 h-20 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-shadow">
-                                                        {(type === 'photo' || type === 'item') && (
-                                                            <img
-                                                                src={previewUrl}
-                                                                alt={`Preview ${index}`}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        )}
-                                                        {type === 'video' && (
-                                                            <video
-                                                                src={previewUrl}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        )}
-                                                        {type === 'document' && (
-                                                            <div className="w-full h-full flex items-center justify-center bg-muted text-2xl">
-                                                                📄
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                                                        onClick={() => handleRemoveFile(index)}
-                                                        disabled={isUploading}
-                                                    >
-                                                        <X className="h-3 w-3" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        </Button>
+                                    </Label>
+                                    {files.length > 0 && (
+                                        <span className="text-sm text-muted-foreground">
+                                            {files.length} file(s) selected
+                                        </span>
                                     )}
                                 </div>
-                            )}
+
+                                {/* File Previews */}
+                                {filePreviews.length > 0 && (
+                                    <div className="flex flex-wrap gap-3 p-4 bg-muted/30 rounded-lg">
+                                        {filePreviews.map((previewUrl, index) => (
+                                            <div key={index} className="relative group">
+                                                <div className="w-20 h-20 rounded-lg overflow-hidden shadow-md group-hover:shadow-lg transition-shadow">
+                                                    <img
+                                                        src={previewUrl}
+                                                        alt={`Preview ${index}`}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                                                    onClick={() => handleRemoveFile(index)}
+                                                    disabled={isUploading}
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
 
@@ -490,7 +343,7 @@ const UploadPost = () => {
                             }`}
                         >
                             <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</div>
+                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
                                 <Label htmlFor="description" className="text-lg font-semibold">Tell your story</Label>
                                 <Badge variant="secondary">Required</Badge>
                             </div>
@@ -514,7 +367,7 @@ const UploadPost = () => {
                             }`}
                         >
                             <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">4</div>
+                                <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</div>
                                 <Label className="text-lg font-semibold">Add Context</Label>
                                 <Badge variant="outline">Optional</Badge>
                             </div>
@@ -589,7 +442,7 @@ const UploadPost = () => {
                     )}
 
                     {/* Upload Button */}
-                    {currentStep >= 3 && (
+                    {currentStep >= 3 && files.length > 0 && (
                         <div className="pt-4 animate-in slide-in-from-bottom-4 duration-500">
                             <Button
                                 onClick={handleUploadPost}
