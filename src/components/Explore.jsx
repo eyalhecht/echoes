@@ -1,95 +1,112 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from "../firebaseConfig.js";
-import useUiStore from "../stores/useUiStore.js";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import TrendingContent from "./TrendingContent.jsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function Explore() {
     const navigate = useNavigate();
     const isMobile = useIsMobile();
-    const exploreQuery = useUiStore((state) => state.exploreQuery);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const query = searchParams.get('q') ?? '';
 
     const [users, setUsers] = useState([]);
     const [posts, setPosts] = useState([]);
     const [usersLoading, setUsersLoading] = useState(false);
     const [postsLoading, setPostsLoading] = useState(false);
-    const [hasMorePosts, setHasMorePosts] = useState(true);
+    const [hasMorePosts, setHasMorePosts] = useState(false);
     const [lastPostId, setLastPostId] = useState(null);
 
-    // Perform search when exploreQuery changes
+    const sentinelRef = useRef(null);
+
+    const openPost = (postId) => {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set('post', postId);
+            return next;
+        });
+    };
+
+    // Search when query changes
     useEffect(() => {
-        if (exploreQuery && exploreQuery.trim().length > 0) {
-            searchContent(exploreQuery.trim());
+        if (query && query.trim().length > 0) {
+            searchContent(query.trim());
         } else {
-            // Clear results when no query
             setUsers([]);
             setPosts([]);
             setLastPostId(null);
-            setHasMorePosts(true);
+            setHasMorePosts(false);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [exploreQuery]);
+    }, [query]);
 
-    const searchContent = async (query, loadMore = false) => {
-        if (!query || query.length < 2) return;
+    // Infinite scroll sentinel for load-more
+    useEffect(() => {
+        if (!sentinelRef.current || !hasMorePosts || postsLoading) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    loadMorePosts();
+                }
+            },
+            { rootMargin: '200px' }
+        );
+        observer.observe(sentinelRef.current);
+        return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasMorePosts, postsLoading, lastPostId]);
+
+    const searchContent = async (q, loadMore = false) => {
+        if (!q || q.length < 2) return;
 
         try {
             if (!loadMore) {
                 setUsersLoading(true);
                 setPostsLoading(true);
+                setUsers([]);
+                setPosts([]);
             } else {
                 setPostsLoading(true);
             }
 
-            const searchPromises = [];
+            const promises = [];
 
-            // Search users (only on initial search, not for load more)
             if (!loadMore) {
-                searchPromises.push(
+                promises.push(
                     callApiGateway({
                         action: 'searchUsers',
-                        payload: {
-                            query: query,
-                            limit: isMobile ? 5 : 8
-                        }
+                        payload: { query: q, limit: isMobile ? 5 : 8 }
                     })
                 );
             }
 
-            // Search posts
-            searchPromises.push(
+            promises.push(
                 callApiGateway({
                     action: 'searchPosts',
                     payload: {
-                        query: query,
+                        query: q,
                         limit: isMobile ? 10 : 15,
                         lastPostId: loadMore ? lastPostId : null
                     }
                 })
             );
 
-            const responses = await Promise.all(searchPromises);
-            
-            if (!loadMore) {
-                const usersResponse = responses[0];
-                const postsResponse = responses[1];
-                
-                setUsers(usersResponse.data.users || []);
-                setPosts(postsResponse.data.posts || []);
-                setHasMorePosts(postsResponse.data.hasMore || false);
-                setLastPostId(postsResponse.data.lastDocId || null);
-            } else {
-                const postsResponse = responses[0];
-                
-                setPosts(prev => [...prev, ...(postsResponse.data.posts || [])]);
-                setHasMorePosts(postsResponse.data.hasMore || false);
-                setLastPostId(postsResponse.data.lastDocId || null);
-            }
+            const responses = await Promise.all(promises);
 
+            if (!loadMore) {
+                const [usersRes, postsRes] = responses;
+                setUsers(usersRes.data.users || []);
+                setPosts(postsRes.data.posts || []);
+                setHasMorePosts(postsRes.data.hasMore || false);
+                setLastPostId(postsRes.data.lastDocId || null);
+            } else {
+                const [postsRes] = responses;
+                setPosts(prev => [...prev, ...(postsRes.data.posts || [])]);
+                setHasMorePosts(postsRes.data.hasMore || false);
+                setLastPostId(postsRes.data.lastDocId || null);
+            }
         } catch (error) {
             console.error('Search failed:', error);
         } finally {
@@ -98,13 +115,9 @@ export function Explore() {
         }
     };
 
-    const handleUserClick = (user) => {
-        navigate(`/profile/${user.userId}`);
-    };
-
-    const handleLoadMorePosts = () => {
-        if (exploreQuery && hasMorePosts && !postsLoading) {
-            searchContent(exploreQuery.trim(), true);
+    const loadMorePosts = () => {
+        if (query && hasMorePosts && !postsLoading) {
+            searchContent(query.trim(), true);
         }
     };
 
@@ -118,18 +131,17 @@ export function Explore() {
             .slice(0, 2);
     };
 
-    // Empty state - show trending content
-    if (!exploreQuery || exploreQuery.trim().length === 0) {
+    if (!query || query.trim().length === 0) {
         return <TrendingContent />;
     }
 
     return (
         <div className="flex-1 overflow-auto">
             <div className="max-w-4xl mx-auto p-4 space-y-6">
-                {/* Search Results Header */}
+                {/* Header */}
                 <div className="border-b pb-4">
                     <h1 className="text-xl font-semibold">
-                        Search results for "{exploreQuery}"
+                        Search results for &ldquo;{query}&rdquo;
                     </h1>
                 </div>
 
@@ -142,7 +154,7 @@ export function Explore() {
                             </span>
                             {usersLoading && <Spinner size="sm" />}
                         </div>
-                        
+
                         {usersLoading ? (
                             <div className="space-y-2">
                                 {[1, 2, 3].map((i) => (
@@ -160,19 +172,15 @@ export function Explore() {
                                 {users.map((user) => (
                                     <button
                                         key={user.userId}
-                                        onClick={() => handleUserClick(user)}
+                                        onClick={() => navigate(`/profile/${user.userId}`)}
                                         className="flex items-center gap-3 w-full p-3 rounded-lg border hover:bg-accent hover:text-accent-foreground transition-colors text-left"
                                     >
                                         <Avatar className="h-10 w-10 flex-shrink-0">
                                             <AvatarImage src={user.profilePictureUrl} />
-                                            <AvatarFallback>
-                                                {getUserInitials(user)}
-                                            </AvatarFallback>
+                                            <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium truncate">
-                                                {user.displayName}
-                                            </p>
+                                            <p className="font-medium truncate">{user.displayName}</p>
                                             <p className="text-sm text-muted-foreground">
                                                 {user.followersCount} followers · {user.postsCount} posts
                                             </p>
@@ -192,7 +200,7 @@ export function Explore() {
                         </span>
                         {postsLoading && <Spinner size="sm" />}
                     </div>
-                    
+
                     {postsLoading && posts.length === 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -212,17 +220,12 @@ export function Explore() {
                                     <div
                                         key={post.id}
                                         className="rounded-lg border overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                                        onClick={() => {
-                                            window.history.pushState({}, '', `?post=${post.id}`);
-                                        }}
+                                        onClick={() => openPost(post.id)}
                                         onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ') {
-                                                window.history.pushState({}, '', `?post=${post.id}`);
-                                            }
+                                            if (e.key === 'Enter' || e.key === ' ') openPost(post.id);
                                         }}
                                         tabIndex={0}
                                     >
-                                        {/* Post Image */}
                                         {post.files?.[0] && (
                                             <div className="aspect-square bg-muted overflow-hidden">
                                                 <img
@@ -232,8 +235,6 @@ export function Explore() {
                                                 />
                                             </div>
                                         )}
-
-                                        {/* Post Content */}
                                         <div className="p-3">
                                             <p className="text-sm font-medium line-clamp-2 mb-2">
                                                 {post.description}
@@ -248,45 +249,22 @@ export function Explore() {
                                                 <span className="truncate">{post.userDisplayName}</span>
                                                 <span>·</span>
                                                 <span>{post.likesCount || 0} likes</span>
-                                                {post.relevanceScore && (
-                                                    <>
-                                                        <span>·</span>
-                                                        <span className="text-primary">
-                                                            {Math.round(post.relevanceScore)}% match
-                                                        </span>
-                                                    </>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                            
-                            {/* Load More Button */}
-                            {hasMorePosts && (
-                                <div className="flex justify-center pt-4">
-                                    <Button 
-                                        onClick={handleLoadMorePosts}
-                                        disabled={postsLoading}
-                                        variant="outline"
-                                    >
-                                        {postsLoading ? (
-                                            <>
-                                                <Spinner size="sm" className="mr-2" />
-                                                Loading...
-                                            </>
-                                        ) : (
-                                            'Load More Posts'
-                                        )}
-                                    </Button>
-                                </div>
-                            )}
+
+                            {/* Infinite scroll sentinel */}
+                            <div ref={sentinelRef} className="h-8 flex justify-center items-center">
+                                {postsLoading && <Spinner size="sm" />}
+                            </div>
                         </>
-                    ) : exploreQuery && !postsLoading ? (
+                    ) : query && !postsLoading ? (
                         <div className="text-center py-8">
                             <div className="text-4xl mb-2">📭</div>
                             <p className="text-muted-foreground">
-                                No posts found for "{exploreQuery}"
+                                No posts found for &ldquo;{query}&rdquo;
                             </p>
                         </div>
                     ) : null}

@@ -45,10 +45,11 @@ import { callApiGateway } from "../firebaseConfig.js";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import SharePost from "@/components/SharePost.jsx";
 import Professor from "@/components/Professor.jsx";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function PostCard({ post }) {
     const navigate = useNavigate();
+    const [, setSearchParams] = useSearchParams();
     const {
         liked,
         likesCount,
@@ -308,11 +309,11 @@ function PostCard({ post }) {
                 <div
                     className="cursor-pointer"
                     onClick={() => {
-                        window.history.pushState({}, '', `?post=${postId}`);
+                        setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('post', postId); return next; });
                     }}
                     onKeyDown={(e) => {
                         if (e.key === ' ') {
-                            window.history.pushState({}, '', `?post=${postId}`);
+                            setSearchParams(prev => { const next = new URLSearchParams(prev); next.set('post', postId); return next; });
                         }
                     }}
                     tabIndex={0}

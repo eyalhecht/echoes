@@ -6,32 +6,60 @@ import { Input } from "@/components/ui/input";
 import { callApiGateway } from "../firebaseConfig.js";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
-import useUiStore from "../stores/useUiStore.js";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 export function SearchBar() {
     const navigate = useNavigate();
+    const location = useLocation();
     const isMobile = useIsMobile();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const isOnExplorePage = location.pathname === '/explore';
 
-    const [results, setResults] = useState({ users: [], posts: [] });
+    const [inputValue, setInputValue] = useState(
+        () => isOnExplorePage ? (searchParams.get('q') ?? '') : ''
+    );
+    const [results, setResults] = useState({ users: [] });
     const [isLoading, setIsLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [isExpanded, setIsExpanded] = useState(!isMobile);
     const searchRef = useRef(null);
     const inputRef = useRef(null);
 
-    // Use global state for query
-    const exploreQuery = useUiStore((state) => state.exploreQuery);
-    const setExploreQuery = useUiStore((state) => state.setExploreQuery);
+    // Sync input value when navigating to/from explore
+    useEffect(() => {
+        if (isOnExplorePage) {
+            const urlQuery = searchParams.get('q') ?? '';
+            setInputValue(prev => prev !== urlQuery ? urlQuery : prev);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname]);
 
     useEffect(() => {
         setIsExpanded(!isMobile);
     }, [isMobile]);
 
-    // Debounced search - only users now
+    // Debounced URL update when typing on explore page
     useEffect(() => {
-        if (exploreQuery.length < 2) {
-            setResults({ users: [], posts: [] });
+        if (!isOnExplorePage) return;
+        const timer = setTimeout(() => {
+            setSearchParams(prev => {
+                const currentQ = prev.get('q') ?? '';
+                const newQ = inputValue.trim();
+                if (currentQ === newQ) return prev;
+                const next = new URLSearchParams(prev);
+                if (newQ) next.set('q', newQ);
+                else next.delete('q');
+                return next;
+            }, { replace: true });
+        }, 300);
+        return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inputValue, isOnExplorePage]);
+
+    // Debounced user search for dropdown (any page)
+    useEffect(() => {
+        if (inputValue.length < 2) {
+            setResults({ users: [] });
             setShowDropdown(false);
             return;
         }
@@ -39,22 +67,15 @@ export function SearchBar() {
         const timeoutId = setTimeout(async () => {
             setIsLoading(true);
             try {
-                // Only search users in header dropdown
                 const usersResponse = await callApiGateway({
                     action: 'searchUsers',
-                    payload: {
-                        query: exploreQuery.trim(),
-                        limit: isMobile ? 5 : 8
-                    }
+                    payload: { query: inputValue.trim(), limit: isMobile ? 5 : 8 }
                 });
-
-                const users = usersResponse.data.users || [];
-
-                setResults({ users, posts: [] });
+                setResults({ users: usersResponse.data.users || [] });
                 setShowDropdown(true);
             } catch (error) {
                 console.error('Search failed:', error);
-                setResults({ users: [], posts: [] });
+                setResults({ users: [] });
                 setShowDropdown(false);
             } finally {
                 setIsLoading(false);
@@ -62,67 +83,50 @@ export function SearchBar() {
         }, 300);
 
         return () => clearTimeout(timeoutId);
-    }, [exploreQuery, isMobile]);
+    }, [inputValue, isMobile]);
 
-    // Handle click outside
+    // Close dropdown on outside click
     useEffect(() => {
         function handleClickOutside(event) {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowDropdown(false);
-                if (isMobile && !exploreQuery) {
-                    setIsExpanded(false);
-                }
+                if (isMobile && !inputValue) setIsExpanded(false);
             }
         }
-
         document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [exploreQuery, isMobile]);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [inputValue, isMobile]);
 
-    // Handle keyboard navigation
     const handleKeyDown = (e) => {
         if (e.key === 'Escape') {
             setShowDropdown(false);
-            if (isMobile) {
-                setIsExpanded(false);
-            }
-            setExploreQuery('');
+            if (isMobile) setIsExpanded(false);
+            setInputValue('');
             inputRef.current?.blur();
-        } else if (e.key === 'Enter' && exploreQuery.trim().length > 0) {
-            handleExploreNavigation();
+        } else if (e.key === 'Enter' && inputValue.trim().length > 0) {
+            navigateToExplore();
         }
     };
 
-    // Navigate to Explore with current query
-    const handleExploreNavigation = () => {
-        navigate('/explore');
+    const navigateToExplore = () => {
         setShowDropdown(false);
-        if (isMobile) {
-            setIsExpanded(false);
+        if (isMobile) setIsExpanded(false);
+        if (!isOnExplorePage) {
+            navigate(`/explore?q=${encodeURIComponent(inputValue.trim())}`);
         }
+        // If already on explore, URL is already updated by the debounced effect
     };
 
     const handleUserClick = (user) => {
         navigate(`/profile/${user.userId}`);
         setShowDropdown(false);
-        if (isMobile) {
-            setIsExpanded(false);
-        }
-        setExploreQuery('');
-    };
-
-    const handleSearchIconClick = () => {
-        setIsExpanded(true);
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 100);
+        if (isMobile) setIsExpanded(false);
+        if (!isOnExplorePage) setInputValue('');
     };
 
     const handleClearClick = () => {
-        setExploreQuery('');
-        setResults({ users: [], posts: [] });
+        setInputValue('');
+        setResults({ users: [] });
         setShowDropdown(false);
         inputRef.current?.focus();
     };
@@ -147,7 +151,10 @@ export function SearchBar() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={handleSearchIconClick}
+                        onClick={() => {
+                            setIsExpanded(true);
+                            setTimeout(() => inputRef.current?.focus(), 100);
+                        }}
                         className="h-8 w-8"
                     >
                         <Search className="h-4 w-4" />
@@ -159,13 +166,13 @@ export function SearchBar() {
                             ref={inputRef}
                             type="text"
                             placeholder="Search..."
-                            value={exploreQuery}
-                            onChange={(e) => setExploreQuery(e.target.value)}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyDown}
                             className="pl-10 pr-10 h-9 w-full"
                             autoComplete="off"
                         />
-                        {exploreQuery && (
+                        {inputValue && (
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -187,7 +194,6 @@ export function SearchBar() {
                         </div>
                     ) : results.users?.length > 0 ? (
                         <>
-                            {/* Users Section */}
                             <div className="p-2 border-b">
                                 <span className="text-xs font-medium text-muted-foreground tracking-wider">
                                     People ({results.users.length})
@@ -207,9 +213,7 @@ export function SearchBar() {
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium truncate">
-                                                {user.displayName}
-                                            </p>
+                                            <p className="text-sm font-medium truncate">{user.displayName}</p>
                                             <p className="text-xs text-muted-foreground">
                                                 {user.followersCount} followers · {user.postsCount} posts
                                             </p>
@@ -218,12 +222,11 @@ export function SearchBar() {
                                 ))}
                             </div>
 
-                            {/* Search in Explore Button */}
-                            {exploreQuery.trim().length > 0 && (
+                            {inputValue.trim().length > 0 && (
                                 <>
                                     <div className="border-t" />
                                     <button
-                                        onClick={handleExploreNavigation}
+                                        onClick={navigateToExplore}
                                         className="flex items-center gap-3 w-full px-3 py-3 hover:bg-accent hover:text-accent-foreground transition-colors text-left"
                                     >
                                         <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded">
@@ -231,23 +234,21 @@ export function SearchBar() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium">
-                                                Search posts for "{exploreQuery.trim()}"
+                                                Search posts for &ldquo;{inputValue.trim()}&rdquo;
                                             </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                Find posts, photos, and more
-                                            </p>
+                                            <p className="text-xs text-muted-foreground">Find posts, photos, and more</p>
                                         </div>
                                     </button>
                                 </>
                             )}
                         </>
-                    ) : exploreQuery.length >= 2 ? (
+                    ) : inputValue.length >= 2 ? (
                         <div className="p-4 text-center">
                             <p className="text-sm text-muted-foreground mb-3">
-                                No people found for "{exploreQuery}"
+                                No people found for &ldquo;{inputValue}&rdquo;
                             </p>
                             <button
-                                onClick={handleExploreNavigation}
+                                onClick={navigateToExplore}
                                 className="flex items-center gap-2 mx-auto px-3 py-2 hover:bg-accent hover:text-accent-foreground transition-colors rounded-md"
                             >
                                 <Search className="h-4 w-4" />

@@ -7,7 +7,7 @@ import { Heart, Bookmark } from "lucide-react";
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
 import { usePostInteractions } from "../hooks/usePostInteractions";
 import SharePost from "./SharePost.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function formatDate(firebaseTimestamp) {
     if (!firebaseTimestamp?._seconds) return "";
@@ -23,6 +23,7 @@ function formatDate(firebaseTimestamp) {
 
 export default function MapPostCard({ post, isSelected, onCardClick }) {
     const navigate = useNavigate();
+    const [, setSearchParams] = useSearchParams();
     const [imageHeight, setImageHeight] = useState(280);
     const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -40,7 +41,11 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
     return (
         <Card
             onClick={() => {
-                window.history.pushState({}, '', `?post=${post.id}`);
+                setSearchParams(prev => {
+                    const next = new URLSearchParams(prev);
+                    next.set('post', post.id);
+                    return next;
+                });
                 onCardClick?.(post);
             }}
             className={cn(

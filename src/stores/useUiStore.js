@@ -2,8 +2,6 @@ import { create } from 'zustand';
 import { callApiGateway } from '../firebaseConfig';
 
 const useUiStore = create((set, get) => ({
-    exploreQuery: '',
-    setExploreQuery: (query) => set({ exploreQuery: query }),
     posts: [],
     postsLoading: false,
     postsError: null,
@@ -284,6 +282,15 @@ const useUiStore = create((set, get) => ({
 
     setPostsLoading: (loading) => set({ postsLoading: loading }),
     setPostsError: (error) => set({ postsError: error }),
+
+    // Trending cache (5-minute TTL)
+    trendingPosts: [],
+    trendingFetchedAt: null,
+    setTrending: (posts) => set({ trendingPosts: posts, trendingFetchedAt: Date.now() }),
+    isTrendingFresh: () => {
+        const { trendingFetchedAt } = get();
+        return !!trendingFetchedAt && (Date.now() - trendingFetchedAt) < 5 * 60 * 1000;
+    },
 }));
 
 export default useUiStore;
