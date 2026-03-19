@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,25 +21,19 @@ function formatDate(firebaseTimestamp) {
     return format(date, "MMM dd");
 }
 
-export default function MapPostCard({ post, isSelected, onCardClick }) {
+export default function MapPostCard({ post, isSelected, onCardClick, onCardHover, onCardHoverEnd }) {
     const navigate = useNavigate();
     const [, setSearchParams] = useSearchParams();
-    const [imageHeight, setImageHeight] = useState(280);
-    const [imageLoaded, setImageLoaded] = useState(false);
 
     const { liked, bookmarked, handleLikeToggle, handleBookmarkToggle } =
         usePostInteractions(post.id);
 
     const { userDisplayName, userProfilePicUrl, description, files, userId, createdAt } = post;
 
-    const handleImageLoad = (e) => {
-        const aspect = e.target.naturalHeight / e.target.naturalWidth;
-        setImageHeight(Math.max(200, Math.min(220 * aspect, 350)));
-        setImageLoaded(true);
-    };
-
     return (
         <Card
+            data-testid="post-card"
+            data-selected={isSelected ? "true" : "false"}
             onClick={() => {
                 setSearchParams(prev => {
                     const next = new URLSearchParams(prev);
@@ -48,21 +42,19 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                 });
                 onCardClick?.(post);
             }}
+            onMouseEnter={() => onCardHover?.(post.id)}
+            onMouseLeave={() => onCardHoverEnd?.()}
             className={cn(
                 "overflow-hidden border rounded-xl transition hover:shadow-md cursor-pointer",
                 isSelected && "ring-4 ring-primary"
             )}
         >
-            <div className="relative w-full bg-muted" style={{ height: imageHeight }}>
+            <div className="relative w-full aspect-[4/3] bg-muted">
                 {files?.[0] ? (
                     <img
                         src={files[0]}
                         alt=""
-                        onLoad={handleImageLoad}
-                        className={cn(
-                            "w-full h-full object-cover transition-opacity",
-                            imageLoaded ? "opacity-100" : "opacity-70"
-                        )}
+                        className="w-full h-full object-cover"
                     />
                 ) : (
                     <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -96,7 +88,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                 </div>
             </div>
 
-            <CardContent className="p-3 space-y-3">
+            <CardContent className="p-3 space-y-2">
                 <div className="flex items-center gap-2">
                     <Avatar className="h-7 w-7">
                         <AvatarImage src={userProfilePicUrl} />
@@ -116,7 +108,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                 </div>
 
                 {description && (
-                    <p className="text-sm text-foreground line-clamp-3">{description}</p>
+                    <p className="text-sm text-foreground line-clamp-2">{description}</p>
                 )}
             </CardContent>
         </Card>
