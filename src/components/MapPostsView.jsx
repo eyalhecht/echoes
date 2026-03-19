@@ -6,7 +6,7 @@ import { MapPin, Navigation, X, Search } from 'lucide-react';
 import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
-import MapPhotoMarkerOverlay from './MapPhotoMarker.jsx';
+import { MapPhotoMarkerOverlay, MapClusterMarkerOverlay } from './MapPhotoMarker.jsx';
 import { MAP_STYLE_LIGHT, MAP_STYLE_DARK } from './mapStyle.js';
 import useUiStore from '../stores/useUiStore.js';
 import { useIsMobile } from '../hooks/use-mobile.jsx';
@@ -35,6 +35,47 @@ const ERA_OPTIONS = [
     { label: '2000s+', min: 2001, max: Infinity },
 ];
 
+// Compute geographic clusters from posts at the current zoom level.
+// Uses a simple greedy approach: at low zoom, nearby posts merge into one cluster marker.
+function computeClusters(posts, zoom) {
+    // At zoom 15+, no clustering — show every post individually
+    const threshold = zoom >= 15 ? 0 : 0.005 * Math.pow(2, 14 - zoom);
+    if (threshold === 0) {
+        return posts.map(p => ({
+            posts: [p],
+            lat: p.location._latitude,
+            lng: p.location._longitude,
+            id: p.id,
+        }));
+    }
+
+    const assigned = new Set();
+    const result = [];
+
+    for (let i = 0; i < posts.length; i++) {
+        if (assigned.has(i)) continue;
+        const pi = posts[i];
+        const group = [pi];
+        assigned.add(i);
+
+        for (let j = i + 1; j < posts.length; j++) {
+            if (assigned.has(j)) continue;
+            const pj = posts[j];
+            const dLat = Math.abs(pi.location._latitude - pj.location._latitude);
+            const dLng = Math.abs(pi.location._longitude - pj.location._longitude);
+            if (dLat <= threshold && dLng <= threshold) {
+                group.push(pj);
+                assigned.add(j);
+            }
+        }
+
+        const lat = group.reduce((s, p) => s + p.location._latitude, 0) / group.length;
+        const lng = group.reduce((s, p) => s + p.location._longitude, 0) / group.length;
+        result.push({ posts: group, lat, lng, id: group.length > 1 ? `cluster-${i}` : pi.id });
+    }
+    return result;
+}
+
 const MapPostsView = () => {
     const isMobile = useIsMobile();
     const [loading, setLoading] = useState(false);
@@ -43,6 +84,7 @@ const MapPostsView = () => {
     const [locationPosts, setLocationPosts] = useState([]);
     const [showSearchPill, setShowSearchPill] = useState(false);
     const [eraIndex, setEraIndex] = useState(0); // index into ERA_OPTIONS
+    const [mapZoom, setMapZoom] = useState(12);
     const mapRef = useRef(null);
     const cardRefs = useRef({});
     const initialCenterRef = useRef(DEFAULT_CENTER);
@@ -64,6 +106,9 @@ const MapPostsView = () => {
 
     // Show era filter only if at least one post has year data
     const hasYearData = useMemo(() => locationPosts.some(p => p.year?.[0]), [locationPosts]);
+
+    // Cluster filtered posts based on current zoom level
+    const clusters = useMemo(() => computeClusters(filteredPosts, mapZoom), [filteredPosts, mapZoom]);
 
     const mergeIntoStore = useCallback((posts) => {
         const { posts: existing, setPosts } = useUiStore.getState();
@@ -143,10 +188,26 @@ const MapPostsView = () => {
         );
     }, [fetchPosts]);
 
+    // Called on every pan/zoom — track zoom level and show the pill
     const handleMapMoved = useCallback(() => {
         if (!hasFetchedInitially.current) return;
+        if (mapRef.current) setMapZoom(mapRef.current.getZoom() ?? 12);
         setShowSearchPill(true);
     }, []);
+
+    const handleClusterClick = useCallback((cluster) => {
+        if (cluster.posts.length === 1) {
+            handleMarkerClick(cluster.posts[0]);
+            return;
+        }
+        const map = mapRef.current;
+        if (!map || !window.google?.maps) return;
+        const bounds = new window.google.maps.LatLngBounds();
+        cluster.posts.forEach(p => {
+            bounds.extend({ lat: p.location._latitude, lng: p.location._longitude });
+        });
+        map.fitBounds(bounds, 80);
+    }, [handleMarkerClick]);
 
     const handleSearchThisArea = useCallback(() => {
         const map = mapRef.current;
@@ -290,15 +351,23 @@ const MapPostsView = () => {
                                 onDragEnd={handleMapMoved}
                                 onZoomChanged={handleMapMoved}
                             >
-                                {filteredPosts.map((post) => (
-                                    <MapPhotoMarkerOverlay
-                                        key={post.id}
-                                        post={post}
-                                        isSelected={selectedPost?.id === post.id}
-                                        isHovered={hoveredPostId === post.id}
-                                        onClick={() => handleMarkerClick(post)}
-                                    />
-                                ))}
+                                {clusters.map((cluster) =>
+                                    cluster.posts.length === 1 ? (
+                                        <MapPhotoMarkerOverlay
+                                            key={cluster.id}
+                                            post={cluster.posts[0]}
+                                            isSelected={selectedPost?.id === cluster.posts[0].id}
+                                            isHovered={hoveredPostId === cluster.posts[0].id}
+                                            onClick={() => handleMarkerClick(cluster.posts[0])}
+                                        />
+                                    ) : (
+                                        <MapClusterMarkerOverlay
+                                            key={cluster.id}
+                                            cluster={cluster}
+                                            onClick={() => handleClusterClick(cluster)}
+                                        />
+                                    )
+                                )}
                             </GoogleMap>
 
                             {/* Search this area pill */}
