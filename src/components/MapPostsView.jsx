@@ -1,12 +1,12 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { GoogleMap, Marker } from '@react-google-maps/api';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { GoogleMap } from '@react-google-maps/api';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, X, Search } from 'lucide-react';
 import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
-import { getMarkerIcon } from './mapMarkers.js';
+import MapPhotoMarkerOverlay from './MapPhotoMarker.jsx';
 import useUiStore from '../stores/useUiStore.js';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
@@ -20,12 +20,21 @@ const mapOptions = {
     fullscreenControl: false,
 };
 
+const ERA_OPTIONS = [
+    { label: 'All eras', min: -Infinity, max: Infinity },
+    { label: 'Pre-1900', min: -Infinity, max: 1899 },
+    { label: '1900–1950', min: 1900, max: 1950 },
+    { label: '1950–2000', min: 1951, max: 2000 },
+    { label: '2000s+', min: 2001, max: Infinity },
+];
+
 const MapPostsView = () => {
     const [loading, setLoading] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [hoveredPostId, setHoveredPostId] = useState(null);
     const [locationPosts, setLocationPosts] = useState([]);
     const [showSearchPill, setShowSearchPill] = useState(false);
+    const [eraIndex, setEraIndex] = useState(0); // index into ERA_OPTIONS
     const mapRef = useRef(null);
     const cardRefs = useRef({});
     const initialCenterRef = useRef(DEFAULT_CENTER);
@@ -34,11 +43,25 @@ const MapPostsView = () => {
     const navigate = useNavigate();
     const searchQuery = searchParams.get('q') ?? '';
 
-    const mergeIntoStore = useCallback((normalizedPosts) => {
-        const { posts, setPosts } = useUiStore.getState();
-        const existingIds = new Set(posts.map(p => p.id));
-        const newPosts = normalizedPosts.filter(p => !existingIds.has(p.id));
-        if (newPosts.length > 0) setPosts([...posts, ...newPosts]);
+    // Filter posts by selected era (client-side, no refetch)
+    const filteredPosts = useMemo(() => {
+        const era = ERA_OPTIONS[eraIndex];
+        if (era.min === -Infinity && era.max === Infinity) return locationPosts;
+        return locationPosts.filter(p => {
+            const year = p.year?.[0];
+            if (!year) return true; // no year data → always show
+            return year >= era.min && year <= era.max;
+        });
+    }, [locationPosts, eraIndex]);
+
+    // Show era filter only if at least one post has year data
+    const hasYearData = useMemo(() => locationPosts.some(p => p.year?.[0]), [locationPosts]);
+
+    const mergeIntoStore = useCallback((posts) => {
+        const { posts: existing, setPosts } = useUiStore.getState();
+        const existingIds = new Set(existing.map(p => p.id));
+        const newPosts = posts.filter(p => !existingIds.has(p.id));
+        if (newPosts.length > 0) setPosts([...existing, ...newPosts]);
     }, []);
 
     const normalizePosts = useCallback((raw) => raw.map(post => ({
@@ -112,13 +135,11 @@ const MapPostsView = () => {
         );
     }, [fetchPosts]);
 
-    // Called on every pan/zoom — only shows the pill, never auto-fetches
     const handleMapMoved = useCallback(() => {
         if (!hasFetchedInitially.current) return;
         setShowSearchPill(true);
     }, []);
 
-    // Called when user explicitly clicks "Search this area"
     const handleSearchThisArea = useCallback(() => {
         const map = mapRef.current;
         if (!map) return;
@@ -133,9 +154,7 @@ const MapPostsView = () => {
         const radiusKm = Math.max(ne.lat() - sw.lat(), ne.lng() - sw.lng()) * 111 / 2;
         const clampedRadius = Math.min(Math.max(radiusKm, 0.1), 500);
 
-        // If we were in search mode, clear it
         if (searchQuery) setSearchParams({});
-
         fetchPosts({ lat: center.lat(), lng: center.lng() }, clampedRadius);
     }, [fetchPosts, searchQuery, setSearchParams]);
 
@@ -166,51 +185,77 @@ const MapPostsView = () => {
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                     <ResizablePanel defaultSize={45} minSize={25} maxSize={75}>
                         <div className="h-full flex flex-col">
-                            <div className="p-3 bg-muted/50 border-b flex flex-row gap-2.5 items-center">
-                                <div className="flex-1 min-w-0">
-                                    {searchQuery ? (
-                                        <div>
-                                            <h2 className="text-sm font-semibold truncate">
-                                                &ldquo;{searchQuery}&rdquo;
+                            {/* Panel header */}
+                            <div className="p-3 bg-muted/50 border-b flex flex-col gap-2">
+                                <div className="flex flex-row gap-2.5 items-center">
+                                    <div className="flex-1 min-w-0">
+                                        {searchQuery ? (
+                                            <div>
+                                                <h2 className="text-sm font-semibold truncate">
+                                                    &ldquo;{searchQuery}&rdquo;
+                                                </h2>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} with location
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <h2 className="text-sm font-semibold">
+                                                {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} in area
                                             </h2>
-                                            <p className="text-xs text-muted-foreground">
-                                                {locationPosts.length} post{locationPosts.length !== 1 ? 's' : ''} with location
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <h2 className="text-lg font-semibold">
-                                            {locationPosts.length} Posts in Area
-                                        </h2>
+                                        )}
+                                    </div>
+                                    {loading && <Spinner size="sm" />}
+                                    {searchQuery && !loading && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-7 w-7 flex-shrink-0"
+                                            onClick={() => navigate('/map')}
+                                            title="Clear search"
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </Button>
                                     )}
                                 </div>
-                                {loading && <Spinner size="sm" />}
-                                {searchQuery && !loading && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-7 w-7 flex-shrink-0"
-                                        onClick={() => navigate('/map')}
-                                        title="Clear search, back to map"
-                                    >
-                                        <X className="h-3.5 w-3.5" />
-                                    </Button>
+
+                                {/* Era filter — only shown when posts have year data */}
+                                {hasYearData && (
+                                    <div className="flex gap-1 flex-wrap">
+                                        {ERA_OPTIONS.map((era, i) => (
+                                            <button
+                                                key={era.label}
+                                                onClick={() => setEraIndex(i)}
+                                                className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
+                                                    eraIndex === i
+                                                        ? 'bg-primary text-primary-foreground border-primary'
+                                                        : 'bg-background text-muted-foreground border-border hover:border-foreground/30'
+                                                }`}
+                                            >
+                                                {era.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
 
-                            <div className="flex-1 overflow-y-auto p-4 bg-muted/30">
-                                {!loading && locationPosts.length === 0 ? (
+                            {/* Card list */}
+                            <div className="flex-1 overflow-y-auto p-3 bg-muted/30">
+                                {!loading && filteredPosts.length === 0 ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         <MapPin className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                                        <h3 className="text-base font-medium mb-1">No posts found in this area</h3>
-                                        <p className="text-sm">Pan the map and tap "Search this area"</p>
+                                        <h3 className="text-base font-medium mb-1">No posts found</h3>
+                                        <p className="text-sm">
+                                            {eraIndex !== 0
+                                                ? 'Try a different era filter or pan the map'
+                                                : 'Pan the map and tap "Search this area"'}
+                                        </p>
                                     </div>
                                 ) : (
-                                    <div className="columns-1 sm:columns-2 gap-3 space-y-3">
-                                        {locationPosts.map((post) => (
+                                    <div className="flex flex-col gap-3">
+                                        {filteredPosts.map((post) => (
                                             <div
                                                 key={post.id}
                                                 ref={(el) => { if (el) cardRefs.current[post.id] = el; }}
-                                                className="break-inside-avoid mb-3"
                                             >
                                                 <MapPostCard
                                                     post={post}
@@ -241,19 +286,15 @@ const MapPostsView = () => {
                                 onDragEnd={handleMapMoved}
                                 onZoomChanged={handleMapMoved}
                             >
-                                {locationPosts.map((post) =>
-                                    post.location?._latitude && post.location?._longitude && (
-                                        <Marker
-                                            key={post.id}
-                                            position={{ lat: post.location._latitude, lng: post.location._longitude }}
-                                            onClick={() => handleMarkerClick(post)}
-                                            icon={getMarkerIcon(
-                                                selectedPost?.id === post.id,
-                                                hoveredPostId === post.id
-                                            )}
-                                        />
-                                    )
-                                )}
+                                {filteredPosts.map((post) => (
+                                    <MapPhotoMarkerOverlay
+                                        key={post.id}
+                                        post={post}
+                                        isSelected={selectedPost?.id === post.id}
+                                        isHovered={hoveredPostId === post.id}
+                                        onClick={() => handleMarkerClick(post)}
+                                    />
+                                ))}
                             </GoogleMap>
 
                             {/* Search this area pill */}
