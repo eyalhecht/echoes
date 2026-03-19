@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import useUiStore from '../stores/useUiStore';
 import { useAuthStore } from '../stores/useAuthStore';
 
 export const usePostInteractions = (postId) => {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
     const {
         posts,
         bookmarks,
@@ -13,11 +15,13 @@ export const usePostInteractions = (postId) => {
     const post = posts.find(p => p.id === postId) || bookmarks.find(p => p.id === postId);
 
     const handleLikeToggle = async () => {
-            postId && user?.uid && await togglePostLike(postId, user.uid);
+        if (!user?.uid) { navigate('/login'); return; }
+        postId && await togglePostLike(postId, user.uid);
     };
 
     const handleBookmarkToggle = async () => {
-        postId && user?.uid && await togglePostBookmark(postId, user.uid);
+        if (!user?.uid) { navigate('/login'); return; }
+        postId && await togglePostBookmark(postId, user.uid);
     };
 
     return {

@@ -164,7 +164,7 @@ export function AppSidebar() {
         }
     }
 
-    const items = [
+    const publicItems = [
         {
             name: 'Home',
             icon: Home,
@@ -175,20 +175,21 @@ export function AppSidebar() {
             name: 'Explore',
             icon: Search,
             path: '/explore',
-            callback: () => {
-                setExploreQuery('')
-            }
-        },
-        {
-            name: 'Profile',
-            icon: User,
-            path: `/profile/${currentUser?.uid}`,
-            callback: null
+            callback: () => setExploreQuery('')
         },
         {
             name: 'Map',
             icon: MapPin,
             path: '/map',
+            callback: null
+        },
+    ]
+
+    const authItems = [
+        {
+            name: 'Profile',
+            icon: User,
+            path: `/profile/${currentUser?.uid}`,
             callback: null
         },
         {
@@ -199,7 +200,9 @@ export function AppSidebar() {
         },
     ]
 
-    const actionItems = [
+    const items = currentUser ? [...publicItems, ...authItems] : publicItems
+
+    const actionItems = currentUser ? [
         {
             name: 'Upload',
             icon: Upload,
@@ -207,7 +210,7 @@ export function AppSidebar() {
             callback: null,
             isLoading: false
         },
-    ]
+    ] : []
 
     return (
         <TooltipProvider>
@@ -281,6 +284,7 @@ export function AppSidebar() {
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
+                        {currentUser ? (
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton
@@ -339,6 +343,18 @@ export function AppSidebar() {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+                        ) : (
+                        <div className={`flex gap-2 ${open ? 'flex-col' : 'flex-col items-center'}`}>
+                            <SidebarMenuButton onClick={() => navigate('/login')}>
+                                <LogOut className="rotate-180" />
+                                {open && <span>Sign In</span>}
+                            </SidebarMenuButton>
+                            <SidebarMenuButton onClick={() => navigate('/login')} className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
+                                <User />
+                                {open && <span>Sign Up</span>}
+                            </SidebarMenuButton>
+                        </div>
+                        )}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

@@ -46,6 +46,13 @@ function AppRouter() {
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
 
+      {/* Public routes — inside Layout but no auth required */}
+      <Route element={<Layout />}>
+        <Route path="/home" element={<Home />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/map" element={<MapPostsView />} />
+      </Route>
+
       {/* Protected Routes with Layout wrapper */}
       <Route
         element={
@@ -54,11 +61,7 @@ function AppRouter() {
           </ProtectedRoute>
         }
       >
-        {/* Nested routes - these will render inside Layout */}
-        <Route path="/home" element={<Home />} />
-        <Route path="/explore" element={<Explore />} />
         <Route path="/profile/:userId?" element={<Profile />} />
-        <Route path="/map" element={<MapPostsView />} />
         <Route path="/upload" element={<UploadPost />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
 
