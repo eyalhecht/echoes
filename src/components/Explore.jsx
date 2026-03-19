@@ -7,6 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import TrendingContent from "./TrendingContent.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Map } from "lucide-react";
 
 const SUGGESTED_SEARCHES = [
     'Berlin Wall',
@@ -251,11 +252,22 @@ export function Explore() {
                         Search results for &ldquo;{query}&rdquo;
                     </h1>
                     {!postsLoading && !usersLoading && (posts.length > 0 || users.length > 0) && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                            {posts.length > 0 && `${posts.length} post${posts.length !== 1 ? 's' : ''}`}
-                            {posts.length > 0 && users.length > 0 && ' · '}
-                            {users.length > 0 && `${users.length} ${users.length !== 1 ? 'people' : 'person'}`}
-                        </p>
+                        <div className="flex items-center gap-3 mt-1">
+                            <p className="text-sm text-muted-foreground">
+                                {posts.length > 0 && `${posts.length} post${posts.length !== 1 ? 's' : ''}`}
+                                {posts.length > 0 && users.length > 0 && ' · '}
+                                {users.length > 0 && `${users.length} ${users.length !== 1 ? 'people' : 'person'}`}
+                            </p>
+                            {posts.length > 0 && (
+                                <button
+                                    onClick={() => navigate(`/map?q=${encodeURIComponent(query)}`)}
+                                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                    <Map className="h-3 w-3" />
+                                    View on Map
+                                </button>
+                            )}
+                        </div>
                     )}
                 </div>
 

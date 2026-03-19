@@ -2,12 +2,13 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation } from 'lucide-react';
+import { MapPin, Navigation, X } from 'lucide-react';
 import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
 import { getMarkerIcon } from './mapMarkers.js';
 import useUiStore from '../stores/useUiStore.js';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const DEFAULT_CENTER = { lat: 40.7589, lng: -73.9851 };
 
@@ -29,6 +30,9 @@ const MapPostsView = () => {
     const debounceTimer = useRef(null);
     const cardRefs = useRef({});
     const initialCenterRef = useRef(DEFAULT_CENTER);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const searchQuery = searchParams.get('q') ?? '';
 
     const fetchPosts = useCallback(async (center, radius) => {
         setLoading(true);
@@ -111,9 +115,57 @@ const MapPostsView = () => {
         );
     }, [fetchPosts]);
 
+    // Fetch posts from search query (when coming from Explore "View on Map")
+    const fetchPostsByQuery = useCallback(async (q) => {
+        setLoading(true);
+        try {
+            const response = await callApiGateway({
+                action: 'searchPosts',
+                payload: { query: q, limit: 50 }
+            });
+            const allPosts = response.data.posts || [];
+            // Only keep posts with location data
+            const withLocation = allPosts.filter(p => p.location?._latitude && p.location?._longitude);
+            const normalizedPosts = withLocation.map(post => ({
+                ...post,
+                likedByCurrentUser: post.likedByCurrentUser || false,
+                likesCount: post.likesCount || 0,
+                bookmarkedByCurrentUser: post.bookmarkedByCurrentUser || false,
+                bookmarksCount: post.bookmarksCount || 0,
+            }));
+
+            // Merge into global store
+            const { posts, setPosts } = useUiStore.getState();
+            const existingIds = new Set(posts.map(p => p.id));
+            const newPosts = normalizedPosts.filter(p => !existingIds.has(p.id));
+            if (newPosts.length > 0) setPosts([...posts, ...newPosts]);
+
+            setLocationPosts(normalizedPosts);
+
+            // Pan to first result
+            if (normalizedPosts[0]) {
+                const first = normalizedPosts[0];
+                initialCenterRef.current = { lat: first.location._latitude, lng: first.location._longitude };
+                if (mapRef.current) {
+                    mapRef.current.panTo(initialCenterRef.current);
+                    mapRef.current.setZoom(5);
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching posts by query:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        getCurrentLocation();
-    }, [getCurrentLocation]);
+        if (searchQuery) {
+            fetchPostsByQuery(searchQuery);
+        } else {
+            getCurrentLocation();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="h-[90vh] mx-2 flex flex-col">
@@ -121,15 +173,34 @@ const MapPostsView = () => {
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                     <ResizablePanel defaultSize={45} minSize={25} maxSize={75}>
                         <div className="h-full flex flex-col">
-                            <div className="p-3 bg-muted/50 border-b flex flex-row gap-2.5">
-                                <h2 className="text-lg font-semibold">
-                                    {locationPosts.length} Posts in Area
-                                </h2>
-                                {loading && (
-                                    <div className="flex items-center gap-2">
-                                        <Spinner size="sm" />
-                                        <span className="text-sm text-muted-foreground">Loading posts...</span>
-                                    </div>
+                            <div className="p-3 bg-muted/50 border-b flex flex-row gap-2.5 items-center">
+                                <div className="flex-1 min-w-0">
+                                    {searchQuery ? (
+                                        <div>
+                                            <h2 className="text-sm font-semibold truncate">
+                                                &ldquo;{searchQuery}&rdquo;
+                                            </h2>
+                                            <p className="text-xs text-muted-foreground">
+                                                {locationPosts.length} post{locationPosts.length !== 1 ? 's' : ''} with location
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <h2 className="text-lg font-semibold">
+                                            {locationPosts.length} Posts in Area
+                                        </h2>
+                                    )}
+                                </div>
+                                {loading && <Spinner size="sm" />}
+                                {searchQuery && !loading && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 flex-shrink-0"
+                                        onClick={() => navigate('/map')}
+                                        title="Clear search, back to map"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </Button>
                                 )}
                             </div>
 
@@ -172,8 +243,8 @@ const MapPostsView = () => {
                                 options={mapOptions}
                                 onLoad={(m) => { mapRef.current = m; }}
                                 onUnmount={() => { mapRef.current = null; }}
-                                onDragEnd={handleMapChange}
-                                onZoomChanged={handleMapChange}
+                                onDragEnd={searchQuery ? undefined : handleMapChange}
+                                onZoomChanged={searchQuery ? undefined : handleMapChange}
                             >
                                 {locationPosts.map((post) =>
                                     post.location?._latitude && post.location?._longitude && (
