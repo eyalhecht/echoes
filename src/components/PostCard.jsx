@@ -350,59 +350,62 @@ function PostCard({ post }) {
                             ? post.AiMetadata.people_identified : null;
                         if (!post.AiMetadata.description && !date && !loc && !people) return null;
                         return (
-                            <div className="mb-3 rounded-lg bg-amber-50/70 dark:bg-amber-950/10 border border-amber-200/70 dark:border-amber-800/30 p-2.5">
-                                <div className="flex gap-2.5">
-                                    <Professor size={30} className="flex-shrink-0 mt-0.5" />
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-[9px] font-mono tracking-widest text-amber-700 dark:text-amber-500 uppercase block mb-1">
-                                            Historical Analysis
-                                        </span>
-                                        {post.AiMetadata.description && (
-                                            <div className="mb-2">
-                                                <p className={`text-xs text-foreground leading-relaxed italic ${showFullAiDesc ? '' : 'line-clamp-3'}`}>
-                                                    {post.AiMetadata.description}
-                                                </p>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); setShowFullAiDesc(v => !v); }}
-                                                    className="text-[10px] text-amber-700 dark:text-amber-500 hover:underline mt-0.5"
+                            <div className="mb-3 rounded-lg overflow-hidden border border-echoes-brown/20 dark:border-echoes-brown/30">
+                                {/* Header bar — dark panel */}
+                                <div className="flex items-center gap-2 px-3 py-2 bg-echoes-brown dark:bg-echoes-brown/90">
+                                    <Professor size={22} className="flex-shrink-0 opacity-90" />
+                                    <span className="text-[10px] font-bold tracking-[0.14em] text-echoes-amber uppercase">
+                                        Historical Analysis
+                                    </span>
+                                </div>
+                                {/* Content area — slightly off-background */}
+                                <div className="px-3 py-2.5 bg-echoes-brown/[0.04] dark:bg-echoes-brown/20">
+                                    {post.AiMetadata.description && (
+                                        <div className="mb-2">
+                                            <p className={`text-xs leading-relaxed italic text-foreground/80 ${showFullAiDesc ? '' : 'line-clamp-3'}`}
+                                               style={{ fontFamily: "'Lora', Georgia, serif" }}>
+                                                {post.AiMetadata.description}
+                                            </p>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); setShowFullAiDesc(v => !v); }}
+                                                className="text-[10px] text-echoes-amber hover:underline mt-0.5"
+                                            >
+                                                {showFullAiDesc ? 'show less' : 'show more'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {(date || loc) && (
+                                        <div className="flex flex-wrap gap-1.5 mb-1.5">
+                                            {date && (
+                                                <span className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-tight bg-echoes-teal/15 text-echoes-teal dark:bg-echoes-teal/20 dark:text-echoes-teal border border-echoes-teal/25">
+                                                    {date}
+                                                </span>
+                                            )}
+                                            {loc && (
+                                                <span className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-tight bg-echoes-teal/15 text-echoes-teal dark:bg-echoes-teal/20 dark:text-echoes-teal border border-echoes-teal/25 truncate max-w-[180px]">
+                                                    {loc}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                    {people && (
+                                        <div className="flex flex-wrap gap-1">
+                                            {people.slice(0, 3).map((person, i) => (
+                                                <Badge
+                                                    key={i}
+                                                    variant="outline"
+                                                    className="text-[10px] h-4 px-1.5 border-echoes-amber/40 text-echoes-amber"
                                                 >
-                                                    {showFullAiDesc ? 'show less' : 'show more'}
-                                                </button>
-                                            </div>
-                                        )}
-                                        {(date || loc) && (
-                                            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mb-1.5">
-                                                {date && (
-                                                    <span className="text-[10px] text-muted-foreground">
-                                                        <span className="font-medium text-foreground">{date}</span>
-                                                    </span>
-                                                )}
-                                                {loc && (
-                                                    <span className="text-[10px] text-muted-foreground truncate">
-                                                        {loc}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-                                        {people && (
-                                            <div className="flex flex-wrap gap-1">
-                                                {people.slice(0, 3).map((person, i) => (
-                                                    <Badge
-                                                        key={i}
-                                                        variant="outline"
-                                                        className="text-[10px] h-4 px-1.5 border-amber-300 text-amber-800 dark:border-amber-700 dark:text-amber-400"
-                                                    >
-                                                        {typeof person === 'object' ? person.name : person}
-                                                    </Badge>
-                                                ))}
-                                                {people.length > 3 && (
-                                                    <span className="text-[10px] text-muted-foreground self-center">
-                                                        +{people.length - 3}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
+                                                    {typeof person === 'object' ? person.name : person}
+                                                </Badge>
+                                            ))}
+                                            {people.length > 3 && (
+                                                <span className="text-[10px] text-muted-foreground self-center">
+                                                    +{people.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );
