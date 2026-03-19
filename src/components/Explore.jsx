@@ -1,10 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from "../firebaseConfig.js";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import TrendingContent from "./TrendingContent.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
+const SUGGESTED_SEARCHES = [
+    'Berlin Wall',
+    'World War II',
+    'Moon landing 1969',
+    'Great Depression',
+    'Civil Rights Movement',
+    'Cold War',
+    'Victorian era',
+    'Space race',
+];
 
 export function Explore() {
     const navigate = useNavigate();
@@ -158,11 +170,11 @@ export function Explore() {
                         {usersLoading ? (
                             <div className="space-y-2">
                                 {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg border animate-pulse">
-                                        <div className="h-10 w-10 bg-muted rounded-full" />
-                                        <div className="flex-1 space-y-1">
-                                            <div className="h-4 bg-muted rounded w-1/3" />
-                                            <div className="h-3 bg-muted rounded w-1/2" />
+                                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg border">
+                                        <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+                                        <div className="flex-1 space-y-1.5">
+                                            <Skeleton className="h-4 w-1/3" />
+                                            <Skeleton className="h-3 w-1/2" />
                                         </div>
                                     </div>
                                 ))}
@@ -203,12 +215,12 @@ export function Explore() {
 
                     {postsLoading && posts.length === 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {[1, 2, 3, 4, 5, 6].map((i) => (
-                                <div key={i} className="rounded-lg border p-4 animate-pulse">
-                                    <div className="h-48 bg-muted rounded mb-3" />
-                                    <div className="space-y-2">
-                                        <div className="h-4 bg-muted rounded w-3/4" />
-                                        <div className="h-3 bg-muted rounded w-1/2" />
+                            {[180, 220, 160, 240, 190, 210].map((h, i) => (
+                                <div key={i} className="rounded-lg border overflow-hidden">
+                                    <Skeleton className="w-full" style={{ height: h }} />
+                                    <div className="p-3 space-y-2">
+                                        <Skeleton className="h-4 w-3/4" />
+                                        <Skeleton className="h-3 w-1/2" />
                                     </div>
                                 </div>
                             ))}
@@ -261,11 +273,30 @@ export function Explore() {
                             </div>
                         </>
                     ) : query && !postsLoading ? (
-                        <div className="text-center py-8">
-                            <div className="text-4xl mb-2">📭</div>
-                            <p className="text-muted-foreground">
-                                No posts found for &ldquo;{query}&rdquo;
-                            </p>
+                        <div className="py-10 space-y-6">
+                            <div className="text-center">
+                                <p className="text-lg font-semibold mb-1">
+                                    Nothing found for &ldquo;{query}&rdquo;
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    Try a different term, or explore one of these:
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                {SUGGESTED_SEARCHES.map(suggestion => (
+                                    <button
+                                        key={suggestion}
+                                        onClick={() => setSearchParams(prev => {
+                                            const next = new URLSearchParams(prev);
+                                            next.set('q', suggestion);
+                                            return next;
+                                        })}
+                                        className="px-3 py-1.5 rounded-full border text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                                    >
+                                        {suggestion}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     ) : null}
                 </div>
