@@ -344,16 +344,13 @@ export function AppSidebar() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                         ) : (
-                        <div className={`flex gap-2 ${open ? 'flex-col' : 'flex-col items-center'}`}>
-                            <SidebarMenuButton onClick={() => navigate('/login')}>
-                                <LogOut className="rotate-180" />
-                                {open && <span>Sign In</span>}
-                            </SidebarMenuButton>
-                            <SidebarMenuButton onClick={() => navigate('/login')} className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
-                                <User />
-                                {open && <span>Sign Up</span>}
-                            </SidebarMenuButton>
-                        </div>
+                        <SidebarMenuButton
+                            onClick={() => navigate('/login')}
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                        >
+                            <LogOut className="rotate-180" />
+                            {open && <span>Join Echoes</span>}
+                        </SidebarMenuButton>
                         )}
                     </SidebarMenuItem>
                 </SidebarMenu>
