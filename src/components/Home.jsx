@@ -31,7 +31,6 @@ function Home() {
                 payload: {
                     limit: 10,
                     lastPostId: lastDocId,
-                    feedType: 'recent'
                 }
             });
 
@@ -57,7 +56,6 @@ function Home() {
                     payload: {
                         limit: 10,
                         lastPostId: null,
-                        feedType: 'recent'
                     }
                 });
                 setPosts(response.data.posts);

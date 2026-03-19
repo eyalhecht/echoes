@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/tooltip";
 import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
+import GuestBanner from "./GuestBanner.jsx";
+import WelcomeModal from "./WelcomeModal.jsx";
 
 // Custom hook to listen for URL changes including pushState/replaceState
 function useURLSearchParams() {
@@ -136,16 +138,20 @@ function MainContent() {
                 </div>
             </header>
 
+            <GuestBanner />
+
             <div className="flex flex-1 flex-col">
                 <div className="min-h-[calc(100vh-3rem)] p-5">
                     <Outlet />
                 </div>
             </div>
-            
+
+            <WelcomeModal />
+
             {modalPostId && modalPost && !isLoadingModalPost && (
-                <PostDetailView 
-                    post={modalPost} 
-                    open={true} 
+                <PostDetailView
+                    post={modalPost}
+                    open={true}
                     onClose={handleCloseModal}
                 />
             )}

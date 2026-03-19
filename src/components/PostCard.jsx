@@ -222,8 +222,9 @@ function PostCard({ post }) {
     }, [postId]);
 
     const handleAddComment = async () => {
-        if (!newCommentText.trim() || !currentUser) {
-            setCommentError("Comment cannot be empty and you must be logged in.");
+        if (!currentUser) { navigate('/login'); return; }
+        if (!newCommentText.trim()) {
+            setCommentError("Comment cannot be empty.");
             return;
         }
 

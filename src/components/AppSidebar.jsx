@@ -47,7 +47,8 @@ import {
     Settings,
     Search,
     Trash2,
-    AlertTriangle
+    AlertTriangle,
+    Info
 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -164,7 +165,7 @@ export function AppSidebar() {
         }
     }
 
-    const items = [
+    const publicItems = [
         {
             name: 'Home',
             icon: Home,
@@ -175,20 +176,27 @@ export function AppSidebar() {
             name: 'Explore',
             icon: Search,
             path: '/explore',
-            callback: () => {
-                setExploreQuery('')
-            }
-        },
-        {
-            name: 'Profile',
-            icon: User,
-            path: `/profile/${currentUser?.uid}`,
-            callback: null
+            callback: () => setExploreQuery('')
         },
         {
             name: 'Map',
             icon: MapPin,
             path: '/map',
+            callback: null
+        },
+        ...(!currentUser ? [{
+            name: 'About',
+            icon: Info,
+            path: '/about',
+            callback: null
+        }] : []),
+    ]
+
+    const authItems = [
+        {
+            name: 'Profile',
+            icon: User,
+            path: `/profile/${currentUser?.uid}`,
             callback: null
         },
         {
@@ -199,7 +207,9 @@ export function AppSidebar() {
         },
     ]
 
-    const actionItems = [
+    const items = currentUser ? [...publicItems, ...authItems] : publicItems
+
+    const actionItems = currentUser ? [
         {
             name: 'Upload',
             icon: Upload,
@@ -207,7 +217,7 @@ export function AppSidebar() {
             callback: null,
             isLoading: false
         },
-    ]
+    ] : []
 
     return (
         <TooltipProvider>
@@ -281,6 +291,7 @@ export function AppSidebar() {
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
+                        {currentUser ? (
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                                 <SidebarMenuButton
@@ -339,6 +350,15 @@ export function AppSidebar() {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+                        ) : (
+                        <SidebarMenuButton
+                            onClick={() => navigate('/login')}
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                        >
+                            <LogOut className="rotate-180" />
+                            {open && <span>Join Echoes</span>}
+                        </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

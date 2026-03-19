@@ -118,7 +118,7 @@ function Login() {
                     {/* Header */}
                     <div className="text-center mb-10">
                         <button
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/about')}
                             className="text-2xl font-bold mb-5 block w-full"
                             style={{ color: palette.brown, letterSpacing: '-0.02em' }}
                         >
@@ -191,7 +191,7 @@ function Login() {
                         <p className="text-sm" style={{ color: palette.muted }}>
                             Need more info?{' '}
                             <button
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate('/about')}
                                 className="font-semibold transition-colors"
                                 style={{ color: palette.amber }}
                                 onMouseEnter={e => e.target.style.color = palette.brown}
