@@ -194,6 +194,22 @@ export function SearchBar() {
                         </div>
                     ) : results.users?.length > 0 ? (
                         <>
+                            {/* Search posts — primary action at top */}
+                            <button
+                                onClick={navigateToExplore}
+                                className="flex items-center gap-3 w-full px-3 py-2.5 hover:bg-accent hover:text-accent-foreground transition-colors text-left border-b"
+                            >
+                                <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded">
+                                    <Search className="h-4 w-4 text-primary" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium">
+                                        Search posts for &ldquo;{inputValue.trim()}&rdquo;
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">Photos, stories, and more</p>
+                                </div>
+                            </button>
+
                             <div className="p-2 border-b">
                                 <span className="text-xs font-medium text-muted-foreground tracking-wider">
                                     People ({results.users.length})
@@ -221,26 +237,6 @@ export function SearchBar() {
                                     </button>
                                 ))}
                             </div>
-
-                            {inputValue.trim().length > 0 && (
-                                <>
-                                    <div className="border-t" />
-                                    <button
-                                        onClick={navigateToExplore}
-                                        className="flex items-center gap-3 w-full px-3 py-3 hover:bg-accent hover:text-accent-foreground transition-colors text-left"
-                                    >
-                                        <div className="h-8 w-8 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded">
-                                            <Search className="h-4 w-4 text-primary" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium">
-                                                Search posts for &ldquo;{inputValue.trim()}&rdquo;
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">Find posts, photos, and more</p>
-                                        </div>
-                                    </button>
-                                </>
-                            )}
                         </>
                     ) : inputValue.length >= 2 ? (
                         <div className="p-4 text-center">

@@ -6,6 +6,7 @@ import { callApiGateway } from "../firebaseConfig.js";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import TrendingContent from "./TrendingContent.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const SUGGESTED_SEARCHES = [
     'Berlin Wall',
@@ -17,6 +18,84 @@ const SUGGESTED_SEARCHES = [
     'Victorian era',
     'Space race',
 ];
+
+const ERA_DEFINITIONS = [
+    { label: 'Pre-1900', test: (y) => y < 1900 },
+    { label: '1900s',   test: (y) => y >= 1900 && y < 1920 },
+    { label: '1920s',   test: (y) => y >= 1920 && y < 1930 },
+    { label: '1930s',   test: (y) => y >= 1930 && y < 1940 },
+    { label: '1940s',   test: (y) => y >= 1940 && y < 1950 },
+    { label: '1950s',   test: (y) => y >= 1950 && y < 1960 },
+    { label: '1960s',   test: (y) => y >= 1960 && y < 1970 },
+    { label: '1970s',   test: (y) => y >= 1970 && y < 1980 },
+    { label: '1980s',   test: (y) => y >= 1980 && y < 1990 },
+    { label: '1990s',   test: (y) => y >= 1990 && y < 2000 },
+    { label: '2000s',   test: (y) => y >= 2000 && y < 2010 },
+    { label: '2010s+',  test: (y) => y >= 2010 },
+];
+
+function getAvailableEras(posts) {
+    const present = new Set();
+    for (const post of posts) {
+        for (const y of (post.year || [])) {
+            for (const era of ERA_DEFINITIONS) {
+                if (era.test(y)) { present.add(era.label); break; }
+            }
+        }
+    }
+    return ERA_DEFINITIONS.filter(era => present.has(era.label));
+}
+
+function getAvailableTopics(posts, query) {
+    const queryWords = (query || '').toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const counts = new Map();
+    for (const post of posts) {
+        const tags = [
+            ...(post.AiMetadata?.tags || []),
+            ...(post.AiMetadata?.subject_terms || []),
+        ];
+        for (const tag of tags) {
+            const lower = tag.toLowerCase();
+            if (queryWords.some(w => lower.includes(w) || w.includes(lower))) continue;
+            counts.set(tag, (counts.get(tag) || 0) + 1);
+        }
+    }
+    return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 7)
+        .map(([tag]) => tag);
+}
+
+function filterPosts(posts, eraLabel, topic) {
+    let filtered = posts;
+    if (eraLabel) {
+        const era = ERA_DEFINITIONS.find(e => e.label === eraLabel);
+        if (era) filtered = filtered.filter(p => (p.year || []).some(y => era.test(y)));
+    }
+    if (topic) {
+        const topicLower = topic.toLowerCase();
+        filtered = filtered.filter(p => {
+            const tags = [...(p.AiMetadata?.tags || []), ...(p.AiMetadata?.subject_terms || [])];
+            return tags.some(t => t.toLowerCase() === topicLower);
+        });
+    }
+    return filtered;
+}
+
+// Highlight query terms in text — returns array of strings/elements
+function highlightText(text, query) {
+    if (!text || !query?.trim()) return text;
+    const words = query.trim().split(/\s+/).filter(w => w.length > 2);
+    if (words.length === 0) return text;
+    const escaped = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const pattern = new RegExp(`(${escaped.join('|')})`, 'gi');
+    const parts = text.split(pattern);
+    return parts.map((part, i) =>
+        pattern.test(part)
+            ? <mark key={i} className="bg-yellow-100 dark:bg-yellow-900/40 text-foreground not-italic rounded-sm px-0.5 font-medium">{part}</mark>
+            : part
+    );
+}
 
 export function Explore() {
     const navigate = useNavigate();
@@ -31,6 +110,9 @@ export function Explore() {
     const [hasMorePosts, setHasMorePosts] = useState(false);
     const [lastPostId, setLastPostId] = useState(null);
 
+    const [selectedEra, setSelectedEra] = useState(null);
+    const [selectedTopic, setSelectedTopic] = useState(null);
+
     const sentinelRef = useRef(null);
 
     const openPost = (postId) => {
@@ -40,6 +122,12 @@ export function Explore() {
             return next;
         });
     };
+
+    // Reset filters when query changes
+    useEffect(() => {
+        setSelectedEra(null);
+        setSelectedTopic(null);
+    }, [query]);
 
     // Search when query changes
     useEffect(() => {
@@ -147,15 +235,95 @@ export function Explore() {
         return <TrendingContent />;
     }
 
+    // Derived filter data
+    const availableEras = getAvailableEras(posts);
+    const availableTopics = getAvailableTopics(posts, query);
+    const filteredPosts = filterPosts(posts, selectedEra, selectedTopic);
+    const hasActiveFilter = selectedEra || selectedTopic;
+    const showFilters = !postsLoading && posts.length > 0 && (availableEras.length > 1 || availableTopics.length > 0);
+
     return (
         <div className="flex-1 overflow-auto">
-            <div className="max-w-4xl mx-auto p-4 space-y-6">
+            <div className="max-w-4xl mx-auto p-4 space-y-5">
                 {/* Header */}
                 <div className="border-b pb-4">
                     <h1 className="text-xl font-semibold">
                         Search results for &ldquo;{query}&rdquo;
                     </h1>
+                    {!postsLoading && !usersLoading && (posts.length > 0 || users.length > 0) && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                            {posts.length > 0 && `${posts.length} post${posts.length !== 1 ? 's' : ''}`}
+                            {posts.length > 0 && users.length > 0 && ' · '}
+                            {users.length > 0 && `${users.length} ${users.length !== 1 ? 'people' : 'person'}`}
+                        </p>
+                    )}
                 </div>
+
+                {/* Dynamic filter chips */}
+                {showFilters && (
+                    <div className="space-y-2">
+                        {/* Era chips */}
+                        {availableEras.length > 1 && (
+                            <div className="flex flex-wrap gap-1.5">
+                                <span className="text-[10px] font-semibold text-muted-foreground tracking-widest uppercase self-center mr-1">
+                                    Era
+                                </span>
+                                {availableEras.map(era => (
+                                    <button
+                                        key={era.label}
+                                        onClick={() => setSelectedEra(prev => prev === era.label ? null : era.label)}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
+                                            selectedEra === era.label
+                                                ? "bg-foreground text-background border-foreground"
+                                                : "bg-background text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {era.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Topic chips */}
+                        {availableTopics.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                                <span className="text-[10px] font-semibold text-muted-foreground tracking-widest uppercase self-center mr-1">
+                                    Topic
+                                </span>
+                                {availableTopics.map(topic => (
+                                    <button
+                                        key={topic}
+                                        onClick={() => setSelectedTopic(prev => prev === topic ? null : topic)}
+                                        className={cn(
+                                            "px-2.5 py-1 rounded-full text-xs border transition-colors",
+                                            selectedTopic === topic
+                                                ? "bg-foreground text-background border-foreground font-medium"
+                                                : "bg-background text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+                                        )}
+                                    >
+                                        {topic}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Active filter summary + clear */}
+                        {hasActiveFilter && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span>
+                                    Showing {filteredPosts.length} of {posts.length} posts
+                                </span>
+                                <button
+                                    onClick={() => { setSelectedEra(null); setSelectedTopic(null); }}
+                                    className="text-primary hover:underline"
+                                >
+                                    Clear filters
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Users Section */}
                 {(users.length > 0 || usersLoading) && (
@@ -208,7 +376,7 @@ export function Explore() {
                 <div className="space-y-3">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-muted-foreground tracking-wider">
-                            Posts {!postsLoading && posts.length > 0 && `(${posts.length})`}
+                            Posts {!postsLoading && filteredPosts.length > 0 && `(${filteredPosts.length})`}
                         </span>
                         {postsLoading && <Spinner size="sm" />}
                     </div>
@@ -221,14 +389,15 @@ export function Explore() {
                                     <div className="p-3 space-y-2">
                                         <Skeleton className="h-4 w-3/4" />
                                         <Skeleton className="h-3 w-1/2" />
+                                        <Skeleton className="h-3 w-1/3" />
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    ) : posts.length > 0 ? (
+                    ) : filteredPosts.length > 0 ? (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {posts.map((post) => (
+                                {filteredPosts.map((post) => (
                                     <div
                                         key={post.id}
                                         className="rounded-lg border overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
@@ -247,10 +416,27 @@ export function Explore() {
                                                 />
                                             </div>
                                         )}
-                                        <div className="p-3">
-                                            <p className="text-sm font-medium line-clamp-2 mb-2">
-                                                {post.description}
+                                        <div className="p-3 space-y-2">
+                                            <p className="text-sm font-medium line-clamp-2">
+                                                {highlightText(post.description, query)}
                                             </p>
+
+                                            {/* Year + historical period badges */}
+                                            {(post.year?.[0] || post.AiMetadata?.historical_period) && (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {post.year?.[0] && (
+                                                        <span className="text-[10px] font-mono font-semibold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 px-1.5 py-0.5 rounded">
+                                                            {post.year[0]}
+                                                        </span>
+                                                    )}
+                                                    {post.AiMetadata?.historical_period && (
+                                                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded truncate max-w-[140px]">
+                                                            {post.AiMetadata.historical_period}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <Avatar className="h-4 w-4">
                                                     <AvatarImage src={post.userProfilePicUrl} />
@@ -272,6 +458,19 @@ export function Explore() {
                                 {postsLoading && <Spinner size="sm" />}
                             </div>
                         </>
+                    ) : posts.length > 0 && hasActiveFilter ? (
+                        // Has posts but filters exclude all
+                        <div className="py-8 text-center">
+                            <p className="text-sm text-muted-foreground mb-3">
+                                No posts match the selected filters.
+                            </p>
+                            <button
+                                onClick={() => { setSelectedEra(null); setSelectedTopic(null); }}
+                                className="text-sm text-primary hover:underline"
+                            >
+                                Clear filters
+                            </button>
+                        </div>
                     ) : query && !postsLoading ? (
                         <div className="py-10 space-y-6">
                             <div className="text-center">
