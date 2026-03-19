@@ -47,7 +47,8 @@ import {
     Settings,
     Search,
     Trash2,
-    AlertTriangle
+    AlertTriangle,
+    Info
 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -183,6 +184,12 @@ export function AppSidebar() {
             path: '/map',
             callback: null
         },
+        ...(!currentUser ? [{
+            name: 'About',
+            icon: Info,
+            path: '/about',
+            callback: null
+        }] : []),
     ]
 
     const authItems = [
