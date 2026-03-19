@@ -424,7 +424,7 @@ export function Explore() {
                                                 <img
                                                     src={post.files[0]}
                                                     alt=""
-                                                    className="h-full w-full object-cover hover:scale-105 transition-transform"
+                                                    className="h-full w-full object-cover"
                                                 />
                                             </div>
                                         )}

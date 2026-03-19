@@ -75,7 +75,7 @@ function HeroCard({ post }) {
                     alt=""
                     onLoad={() => setImgLoaded(true)}
                     className={cn(
-                        "absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105",
+                        "absolute inset-0 w-full h-full object-cover",
                         imgLoaded ? "opacity-100" : "opacity-0"
                     )}
                 />
