@@ -78,3 +78,17 @@
     font-family: 'DM Sans', system-ui, sans-serif;
   }
 }
+
+@layer components {
+  /* Sidebar active state: gold left accent border */
+  [data-sidebar="menu-button"][data-active="true"] {
+    background: hsl(var(--echoes-amber) / 0.10) !important;
+    color: hsl(var(--echoes-brown)) !important;
+    box-shadow: inset 3px 0 0 hsl(var(--echoes-amber));
+  }
+  .dark [data-sidebar="menu-button"][data-active="true"] {
+    background: hsl(var(--echoes-amber) / 0.12) !important;
+    color: hsl(var(--echoes-brown)) !important;
+    box-shadow: inset 3px 0 0 hsl(var(--echoes-amber));
+  }
+}

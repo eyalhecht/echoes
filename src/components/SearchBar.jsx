@@ -165,11 +165,11 @@ export function SearchBar() {
                         <Input
                             ref={inputRef}
                             type="text"
-                            placeholder="Search..."
+                            placeholder="Search moments, places, eras..."
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            className="pl-10 pr-10 h-9 w-full"
+                            className="pl-10 pr-10 h-9 w-full shadow-paper focus:shadow-none"
                             autoComplete="off"
                         />
                         {inputValue && (
@@ -187,7 +187,7 @@ export function SearchBar() {
             </div>
 
             {showDropdown && isExpanded && (
-                <div className="absolute top-11 left-0 right-0 bg-background border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
+                <div className="absolute top-11 left-0 right-0 bg-card border rounded-lg shadow-lifted z-50 max-h-80 overflow-y-auto">
                     {isLoading ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
                             Searching...
