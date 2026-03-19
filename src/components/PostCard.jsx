@@ -171,6 +171,15 @@ function PostCard({ post }) {
                                     {description}
                                 </p>
                             )}
+                            {shouldTruncate && (
+                                <button
+                                    onClick={e => { e.stopPropagation(); setIsDescriptionExpanded(v => !v); }}
+                                    className="text-xs text-gray-400 hover:text-gray-600 transition-colors mt-1"
+                                    style={{ fontFamily: "'Kalam', cursive" }}
+                                >
+                                    {isDescriptionExpanded ? 'Read less' : 'Read more'}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -314,20 +323,22 @@ function PostCard({ post }) {
                 <CardContent className="pt-4">
 
                     {(!files || files.length === 0) && description && (
-                        <p className="text-sm whitespace-pre-wrap mb-2"
-                           style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
-                            {getDisplayedText()}
-                        </p>
-                    )}
-                    {shouldTruncate && (
-                        <Button
-                            variant="link"
-                            size="sm"
-                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                            className="p-0 h-auto text-xs mb-2"
-                        >
-                            {isDescriptionExpanded ? 'Read less' : 'Read more'}
-                        </Button>
+                        <>
+                            <p className="text-sm whitespace-pre-wrap mb-1"
+                               style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
+                                {getDisplayedText()}
+                            </p>
+                            {shouldTruncate && (
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                    className="p-0 h-auto text-xs mb-2"
+                                >
+                                    {isDescriptionExpanded ? 'Read less' : 'Read more'}
+                                </Button>
+                            )}
+                        </>
                     )}
 
                     {/* Professor's historical analysis card — always visible */}
