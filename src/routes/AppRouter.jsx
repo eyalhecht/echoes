@@ -35,10 +35,8 @@ function AppRouter() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route
-        path="/"
-        element={isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />}
-      />
+      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="/about" element={<LandingPage />} />
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/home" replace /> : <Login />}
