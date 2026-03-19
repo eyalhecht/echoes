@@ -143,7 +143,7 @@ function PostCard({ post }) {
             return (
                 <div className="flex justify-center px-4 sm:px-6">
                     <div
-                        className="text-left relative bg-white p-4 shadow-xl border border-gray-200"
+                        className="text-left relative bg-card p-4 shadow-paper border border-border"
                         style={polaroidWidth ? { width: polaroidWidth } : { maxWidth: '100%' }}
                     >
                         <div className="relative">
@@ -165,18 +165,14 @@ function PostCard({ post }) {
                         </div>
                         <div className="pt-2 pb-1 min-h-[40px]">
                             {description && (
-                                <p
-                                    style={{ fontFamily: "'Kalam', cursive", fontSize: '0.95rem' }}
-                                    className={`text-gray-600 leading-snug ${!isDescriptionExpanded ? 'line-clamp-2' : ''}`}
-                                >
+                                <p className={`text-sm text-muted-foreground leading-snug ${!isDescriptionExpanded ? 'line-clamp-2' : ''}`}>
                                     {description}
                                 </p>
                             )}
                             {shouldTruncate && (
                                 <button
                                     onClick={e => { e.stopPropagation(); setIsDescriptionExpanded(v => !v); }}
-                                    className="text-xs text-gray-400 hover:text-gray-600 transition-colors mt-1"
-                                    style={{ fontFamily: "'Kalam', cursive" }}
+                                    className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-1"
                                 >
                                     {isDescriptionExpanded ? 'Read less' : 'Read more'}
                                 </button>
@@ -265,7 +261,7 @@ function PostCard({ post }) {
     return (
         <>
             <TooltipProvider>
-            <Card className="w-full rounded-lg shadow-lg bg-sidebar">
+            <Card className="w-full rounded-lg shadow-lifted bg-card">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={userProfilePicUrl || ''} />
@@ -325,8 +321,7 @@ function PostCard({ post }) {
 
                     {(!files || files.length === 0) && description && (
                         <>
-                            <p className="text-sm whitespace-pre-wrap mb-1"
-                               style={{ fontFamily: "'Kalam', cursive", fontSize: '1.1rem' }}>
+                            <p className="text-sm whitespace-pre-wrap mb-1">
                                 {getDisplayedText()}
                             </p>
                             {shouldTruncate && (
@@ -334,7 +329,7 @@ function PostCard({ post }) {
                                     variant="link"
                                     size="sm"
                                     onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                                    className="p-0 h-auto text-xs mb-2"
+                                    className="p-0 h-auto text-xs mb-2 text-muted-foreground"
                                 >
                                     {isDescriptionExpanded ? 'Read less' : 'Read more'}
                                 </Button>
