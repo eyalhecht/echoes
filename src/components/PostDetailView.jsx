@@ -36,7 +36,79 @@ import PostMap from "./PostMap.jsx";
 import StreetViewDisplay from "@/components/StreetViewDisplay.jsx";
 import SharePost from "./SharePost.jsx";
 import Professor from "@/components/Professor.jsx";
-import {useNavigate} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+function RelatedPostsShelf({ post }) {
+    const [, setSearchParams] = useSearchParams();
+    const [related, setRelated] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const query = post?.AiMetadata?.historical_period
+            || (post?.year?.[0] ? String(post.year[0]) : null)
+            || post?.AiMetadata?.tags?.[0]
+            || null;
+
+        if (!query) return;
+
+        let cancelled = false;
+        setLoading(true);
+        callApiGateway({ action: 'searchPosts', payload: { query, limit: 8 } })
+            .then(res => {
+                if (cancelled) return;
+                const others = (res.data.posts || []).filter(p => p.id !== post.id);
+                setRelated(others.slice(0, 6));
+            })
+            .catch(() => {})
+            .finally(() => { if (!cancelled) setLoading(false); });
+
+        return () => { cancelled = true; };
+    }, [post?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (!loading && related.length === 0) return null;
+
+    const openPost = (postId) => {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set('post', postId);
+            return next;
+        });
+    };
+
+    return (
+        <div className="pt-3 border-t">
+            <p className="text-xs font-semibold text-muted-foreground tracking-widest uppercase mb-2">
+                More from this era
+            </p>
+            {loading ? (
+                <div className="flex gap-2 overflow-hidden">
+                    {[1,2,3,4].map(i => (
+                        <div key={i} className="flex-shrink-0 w-20 h-20 rounded-md bg-muted animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {related.map(p => (
+                        <button
+                            key={p.id}
+                            onClick={() => openPost(p.id)}
+                            className="flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border hover:opacity-80 transition-opacity"
+                            title={p.description}
+                        >
+                            {p.files?.[0] ? (
+                                <img src={p.files[0]} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-muted flex items-center justify-center text-[10px] text-muted-foreground p-1 text-center">
+                                    {p.description?.slice(0, 30)}
+                                </div>
+                            )}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
 
 const PostDetailView = ({ post, open, onClose }) => {
     const {
@@ -51,6 +123,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     } = usePostInteractions(post.id);
 
     const navigate = useNavigate();
+    const [, setSearchParams] = useSearchParams();
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
     const [isCommentsLoading, setIsCommentsLoading] = useState(false);
@@ -447,6 +520,8 @@ const PostDetailView = ({ post, open, onClose }) => {
                                     </div>
                                 ))}
                             </div>
+                            {/* Related posts shelf */}
+                            <RelatedPostsShelf post={post} />
                         </div> {/* End of p-4 flex-grow div */}
 
                         {/* Comment Input Section (sticky to bottom) */}

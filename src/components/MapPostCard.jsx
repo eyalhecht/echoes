@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Heart, Bookmark } from "lucide-react";
+import { Heart, Bookmark, Calendar } from "lucide-react";
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
 import { usePostInteractions } from "../hooks/usePostInteractions";
 import SharePost from "./SharePost.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function formatDate(firebaseTimestamp) {
     if (!firebaseTimestamp?._seconds) return "";
@@ -21,43 +21,41 @@ function formatDate(firebaseTimestamp) {
     return format(date, "MMM dd");
 }
 
-export default function MapPostCard({ post, isSelected, onCardClick }) {
+export default function MapPostCard({ post, isSelected, onCardClick, onCardHover, onCardHoverEnd }) {
     const navigate = useNavigate();
-    const [imageHeight, setImageHeight] = useState(280);
-    const [imageLoaded, setImageLoaded] = useState(false);
+    const [, setSearchParams] = useSearchParams();
 
     const { liked, bookmarked, handleLikeToggle, handleBookmarkToggle } =
         usePostInteractions(post.id);
 
-    const { userDisplayName, userProfilePicUrl, description, files, userId, createdAt } = post;
-
-    const handleImageLoad = (e) => {
-        const aspect = e.target.naturalHeight / e.target.naturalWidth;
-        setImageHeight(Math.max(200, Math.min(220 * aspect, 350)));
-        setImageLoaded(true);
-    };
+    const { userDisplayName, userProfilePicUrl, description, files, userId, createdAt, year, AiMetadata } = post;
+    const displayYear = year?.[0] || AiMetadata?.date_estimate;
 
     return (
         <Card
+            data-testid="post-card"
+            data-selected={isSelected ? "true" : "false"}
             onClick={() => {
-                window.history.pushState({}, '', `?post=${post.id}`);
+                setSearchParams(prev => {
+                    const next = new URLSearchParams(prev);
+                    next.set('post', post.id);
+                    return next;
+                });
                 onCardClick?.(post);
             }}
+            onMouseEnter={() => onCardHover?.(post.id)}
+            onMouseLeave={() => onCardHoverEnd?.()}
             className={cn(
                 "overflow-hidden border rounded-xl transition hover:shadow-md cursor-pointer",
                 isSelected && "ring-4 ring-primary"
             )}
         >
-            <div className="relative w-full bg-muted" style={{ height: imageHeight }}>
+            <div className="relative w-full aspect-[4/3] bg-muted">
                 {files?.[0] ? (
                     <img
                         src={files[0]}
                         alt=""
-                        onLoad={handleImageLoad}
-                        className={cn(
-                            "w-full h-full object-cover transition-opacity",
-                            imageLoaded ? "opacity-100" : "opacity-70"
-                        )}
+                        className="w-full h-full object-cover"
                     />
                 ) : (
                     <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -91,7 +89,7 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                 </div>
             </div>
 
-            <CardContent className="p-3 space-y-3">
+            <CardContent className="p-3 space-y-2">
                 <div className="flex items-center gap-2">
                     <Avatar className="h-7 w-7">
                         <AvatarImage src={userProfilePicUrl} />
@@ -108,10 +106,16 @@ export default function MapPostCard({ post, isSelected, onCardClick }) {
                             {formatDate(createdAt)}
                         </span>
                     </div>
+                    {displayYear && (
+                        <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                            <Calendar className="h-3 w-3" />
+                            {displayYear}
+                        </span>
+                    )}
                 </div>
 
                 {description && (
-                    <p className="text-sm text-foreground line-clamp-3">{description}</p>
+                    <p className="text-sm text-foreground line-clamp-2">{description}</p>
                 )}
             </CardContent>
         </Card>

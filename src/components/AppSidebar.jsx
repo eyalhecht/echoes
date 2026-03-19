@@ -52,7 +52,6 @@ import {
 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate, useLocation } from 'react-router-dom'
-import useUiStore from "../stores/useUiStore.js"
 import { useAuthStore } from "../stores/useAuthStore.js"
 import { useState } from "react"
 import { callApiGateway} from "@/firebaseConfig.js";
@@ -63,7 +62,6 @@ export function AppSidebar() {
     const location = useLocation()
     const currentUser = useAuthStore(state => state.user)
     const { loading } = useAuthStore()
-    const setExploreQuery = useUiStore((state) => state.setExploreQuery)
     const { open, isMobile, setOpenMobile } = useSidebar()
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -176,7 +174,7 @@ export function AppSidebar() {
             name: 'Explore',
             icon: Search,
             path: '/explore',
-            callback: () => setExploreQuery('')
+            callback: null
         },
         {
             name: 'Map',

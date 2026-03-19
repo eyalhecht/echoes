@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useSearchParams } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar.jsx";
 import { SearchBar } from "@/components/SearchBar.jsx";
@@ -17,91 +17,47 @@ import useUiStore from "../stores/useUiStore.js";
 import GuestBanner from "./GuestBanner.jsx";
 import WelcomeModal from "./WelcomeModal.jsx";
 
-// Custom hook to listen for URL changes including pushState/replaceState
-function useURLSearchParams() {
-    const [searchParams, setSearchParams] = useState(
-        () => new URLSearchParams(window.location.search)
-    );
-
-    useEffect(() => {
-        const handlePopState = () => {
-            setSearchParams(new URLSearchParams(window.location.search));
-        };
-
-        // Listen for back/forward button
-        window.addEventListener('popstate', handlePopState);
-
-        // Override pushState and replaceState to trigger updates
-        const originalPushState = window.history.pushState;
-        const originalReplaceState = window.history.replaceState;
-
-        window.history.pushState = function(...args) {
-            originalPushState.apply(window.history, args);
-            setSearchParams(new URLSearchParams(window.location.search));
-        };
-
-        window.history.replaceState = function(...args) {
-            originalReplaceState.apply(window.history, args);
-            setSearchParams(new URLSearchParams(window.location.search));
-        };
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-            window.history.pushState = originalPushState;
-            window.history.replaceState = originalReplaceState;
-        };
-    }, []);
-
-    return searchParams;
-}
-
 function MainContent() {
     const { theme, setTheme } = useTheme();
-    const searchParams = useURLSearchParams(); // Use our custom hook instead
+    const [searchParams, setSearchParams] = useSearchParams();
     const { getPost, fetchPost } = useUiStore();
-    const [modalPostId, setModalPostId] = useState(null);
     const [modalPost, setModalPost] = useState(null);
     const [isLoadingModalPost, setIsLoadingModalPost] = useState(false);
 
-    // Listen for URL parameter changes
+    const postId = searchParams.get('post');
+
     useEffect(() => {
-        const postId = searchParams.get('post');
-        if (postId) {
-            setModalPostId(postId);
-            
-            // Try to find post in store first
-            const existingPost = getPost(postId);
-            if (existingPost) {
-                setModalPost(existingPost);
-            } else {
-                // Fetch post if not in store
-                setIsLoadingModalPost(true);
-                fetchPost(postId)
-                    .then((fetchedPost) => {
-                        setModalPost(fetchedPost);
-                    })
-                    .catch((error) => {
-                        console.error('Failed to fetch post for modal:', error);
-                        // Close modal on error
-                        setModalPostId(null);
-                        setModalPost(null);
-                    })
-                    .finally(() => {
-                        setIsLoadingModalPost(false);
-                    });
-            }
-        } else {
-            setModalPostId(null);
+        if (!postId) {
             setModalPost(null);
+            return;
         }
-    }, [searchParams, getPost, fetchPost]); // Now depends on searchParams instead of location.search
+
+        const existingPost = getPost(postId);
+        if (existingPost) {
+            setModalPost(existingPost);
+            return;
+        }
+
+        setIsLoadingModalPost(true);
+        fetchPost(postId)
+            .then((fetchedPost) => setModalPost(fetchedPost))
+            .catch((error) => {
+                console.error('Failed to fetch post for modal:', error);
+                setSearchParams(prev => {
+                    const next = new URLSearchParams(prev);
+                    next.delete('post');
+                    return next;
+                });
+            })
+            .finally(() => setIsLoadingModalPost(false));
+    }, [postId, getPost, fetchPost, setSearchParams]);
 
     const handleCloseModal = () => {
-        // Remove post parameter from URL without navigating
-        window.history.replaceState({}, '', window.location.pathname);
-        
-        setModalPostId(null);
-        setModalPost(null);
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.delete('post');
+            return next;
+        }, { replace: true });
     };
 
     return (
@@ -148,7 +104,7 @@ function MainContent() {
 
             <WelcomeModal />
 
-            {modalPostId && modalPost && !isLoadingModalPost && (
+            {postId && modalPost && !isLoadingModalPost && (
                 <PostDetailView
                     post={modalPost}
                     open={true}
