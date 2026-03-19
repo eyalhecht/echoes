@@ -5,60 +5,66 @@
 @layer base {
   :root {
     /* ── Echoes raw palette — single source of truth ───────────────── */
-    --echoes-cream: 35 81% 96%;
-    --echoes-brown: 22 51% 16%;
-    --echoes-amber: 31 64% 47%;
-    --echoes-sage:  127 16% 55%;
-    --echoes-muted: 26 25% 43%;
+    --echoes-cream:     36 35% 88%;     /* sand — warm background base     */
+    --echoes-parchment: 38 50% 95%;     /* lighter card / elevated surface  */
+    --echoes-brown:     16 55% 14%;     /* deep mahogany — primary / text   */
+    --echoes-amber:     38 85% 40%;     /* antique gold — accent            */
+    --echoes-teal:      185 52% 28%;    /* patina teal — secondary accent   */
+    --echoes-sage:      127 28% 48%;    /* true sage — success / nature     */
+    --echoes-muted:     28 18% 52%;     /* warm gray — secondary text       */
 
     /* ── shadcn semantic tokens → Echoes palette ───────────────────── */
     --background:                 var(--echoes-cream);
     --foreground:                 var(--echoes-brown);
-    --card:                       var(--echoes-cream);
+    --card:                       var(--echoes-parchment);
     --card-foreground:            var(--echoes-brown);
-    --popover:                    var(--echoes-cream);
+    --popover:                    var(--echoes-parchment);
     --popover-foreground:         var(--echoes-brown);
     --primary:                    var(--echoes-brown);
-    --primary-foreground:         var(--echoes-cream);
+    --primary-foreground:         var(--echoes-parchment);
     --secondary:                  var(--echoes-amber);
-    --secondary-foreground:       var(--echoes-cream);
-    --muted:                      35 40% 93%;
+    --secondary-foreground:       var(--echoes-parchment);
+    --muted:                      36 30% 91%;
     --muted-foreground:           var(--echoes-muted);
     --accent:                     var(--echoes-amber);
-    --accent-foreground:          var(--echoes-cream);
-    --destructive:                0 84.2% 60.2%;
+    --accent-foreground:          var(--echoes-parchment);
+    --destructive:                0 72% 45%;
     --destructive-foreground:     0 0% 98%;
-    --border:                     31 40% 85%;
-    --input:                      31 40% 85%;
+    --border:                     16 30% 78%;
+    --input:                      16 30% 78%;
     --ring:                       var(--echoes-amber);
     --chart-1:                    var(--echoes-amber);
-    --chart-2:                    var(--echoes-sage);
+    --chart-2:                    var(--echoes-teal);
     --chart-3:                    var(--echoes-brown);
     --chart-4:                    var(--echoes-cream);
     --chart-5:                    var(--echoes-muted);
-    --radius:                     0.5rem;
+    --radius:                     0.375rem;
     --sidebar-background:         var(--echoes-cream);
     --sidebar-foreground:         var(--echoes-brown);
     --sidebar-primary:            var(--echoes-brown);
-    --sidebar-primary-foreground: var(--echoes-cream);
+    --sidebar-primary-foreground: var(--echoes-parchment);
     --sidebar-accent:             var(--echoes-amber);
-    --sidebar-accent-foreground:  var(--echoes-cream);
-    --sidebar-border:             31 40% 85%;
+    --sidebar-accent-foreground:  var(--echoes-parchment);
+    --sidebar-border:             16 30% 78%;
     --sidebar-ring:               var(--echoes-amber);
   }
+
   .dark {
     /* ── Echoes dark palette ────────────────────────────────────────── */
-    --echoes-cream: 22 35% 8%;      /* dark warm background            */
-    --echoes-brown: 35 55% 88%;     /* light warm foreground           */
-    --echoes-amber: 31 65% 58%;     /* slightly brighter amber         */
-    --echoes-sage:  127 18% 58%;    /* slightly lighter sage           */
-    --echoes-muted: 26 20% 58%;     /* lighter muted for dark bg       */
+    --echoes-cream:     20 28% 7%;      /* near-black warm background      */
+    --echoes-parchment: 20 25% 12%;     /* elevated card surface (dark)    */
+    --echoes-brown:     38 55% 88%;     /* warm parchment text             */
+    --echoes-amber:     38 85% 58%;     /* brighter antique gold           */
+    --echoes-teal:      185 55% 48%;    /* lighter teal for dark contrast  */
+    --echoes-sage:      127 28% 58%;    /* lighter sage                    */
+    --echoes-muted:     28 15% 55%;     /* dim warm gray                   */
 
     /* ── Hardcoded tokens that don't reference --echoes-* ──────────── */
-    --muted:        22 30% 14%;     /* dark surface / subtle bg        */
-    --border:       22 25% 20%;     /* dark border                     */
-    --input:        22 25% 20%;     /* dark input                      */
-    --sidebar-border: 22 25% 20%;
+    --card:         var(--echoes-parchment);
+    --muted:        20 22% 14%;
+    --border:       20 20% 22%;
+    --input:        20 20% 22%;
+    --sidebar-border: 20 20% 22%;
     --destructive:  0 62.8% 45%;
   }
 }
@@ -69,5 +75,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'DM Sans', system-ui, sans-serif;
   }
 }

@@ -8,11 +8,13 @@
 //   style={{ background: alpha('--echoes-amber', 0.15) }}
 
 export const palette = {
-    cream: 'hsl(var(--echoes-cream))',
-    brown: 'hsl(var(--echoes-brown))',
-    amber: 'hsl(var(--echoes-amber))',
-    sage:  'hsl(var(--echoes-sage))',
-    muted: 'hsl(var(--echoes-muted))',
+    cream:     'hsl(var(--echoes-cream))',
+    parchment: 'hsl(var(--echoes-parchment))',
+    brown:     'hsl(var(--echoes-brown))',
+    amber:     'hsl(var(--echoes-amber))',
+    teal:      'hsl(var(--echoes-teal))',
+    sage:      'hsl(var(--echoes-sage))',
+    muted:     'hsl(var(--echoes-muted))',
 };
 
 /** Returns a color token at a given opacity, e.g. alpha('--echoes-amber', 0.25) */
