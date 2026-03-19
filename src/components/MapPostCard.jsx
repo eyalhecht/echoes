@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getEraColor, getEraLabelForYear } from "@/lib/eraColors";
 import { Heart, Bookmark, Calendar } from "lucide-react";
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
 import { usePostInteractions } from "../hooks/usePostInteractions";
@@ -30,6 +31,8 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
 
     const { userDisplayName, userProfilePicUrl, description, files, userId, createdAt, year, AiMetadata } = post;
     const displayYear = year?.[0] || AiMetadata?.date_estimate;
+    const eraLabel = getEraLabelForYear(year?.[0]);
+    const eraColors = eraLabel ? getEraColor(eraLabel) : null;
 
     return (
         <Card
@@ -46,9 +49,10 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
             onMouseEnter={() => onCardHover?.(post.id)}
             onMouseLeave={() => onCardHoverEnd?.()}
             className={cn(
-                "overflow-hidden border rounded-xl transition hover:shadow-md cursor-pointer",
-                isSelected && "ring-4 ring-primary"
+                "overflow-hidden border rounded-xl transition hover:shadow-lifted cursor-pointer",
+                isSelected && "ring-2 ring-echoes-amber"
             )}
+            style={eraColors ? { borderTopColor: eraColors.bg, borderTopWidth: 3 } : {}}
         >
             <div className="relative w-full aspect-[4/3] bg-muted">
                 {files?.[0] ? (
@@ -70,7 +74,7 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
                         className="bg-background/80 backdrop-blur-sm rounded-full"
                         onClick={(e) => { e.stopPropagation(); handleLikeToggle(); }}
                     >
-                        <Heart className={cn("h-4 w-4", liked && "fill-red-500 text-red-500")} />
+                        <Heart className={cn("h-4 w-4", liked ? "fill-echoes-amber text-echoes-amber" : "text-muted-foreground")} />
                     </Button>
                     <Button
                         variant="ghost"
@@ -78,7 +82,7 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
                         className="bg-background/80 backdrop-blur-sm rounded-full"
                         onClick={(e) => { e.stopPropagation(); handleBookmarkToggle(); }}
                     >
-                        <Bookmark className={cn("h-4 w-4", bookmarked && "fill-primary text-primary")} />
+                        <Bookmark className={cn("h-4 w-4", bookmarked ? "fill-echoes-teal text-echoes-teal" : "text-muted-foreground")} />
                     </Button>
                     <div onClick={(e) => e.stopPropagation()}>
                         <SharePost
@@ -106,9 +110,9 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
                             {formatDate(createdAt)}
                         </span>
                     </div>
-                    {displayYear && (
-                        <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                            <Calendar className="h-3 w-3" />
+                    {displayYear && eraColors && (
+                        <span className="ml-auto flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded-tight"
+                              style={{ background: eraColors.light, color: eraColors.bg, border: `1px solid ${eraColors.border}`, fontFamily: "'Lora', Georgia, serif", fontStyle: 'italic' }}>
                             {displayYear}
                         </span>
                     )}

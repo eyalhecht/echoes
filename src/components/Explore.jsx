@@ -8,6 +8,7 @@ import TrendingContent from "./TrendingContent.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Map } from "lucide-react";
+import { getEraColor, getEraLabelForYear } from "@/lib/eraColors";
 
 const SUGGESTED_SEARCHES = [
     'Berlin Wall',
@@ -280,20 +281,23 @@ export function Explore() {
                                 <span className="text-[10px] font-semibold text-muted-foreground tracking-widest uppercase self-center mr-1">
                                     Era
                                 </span>
-                                {availableEras.map(era => (
-                                    <button
-                                        key={era.label}
-                                        onClick={() => setSelectedEra(prev => prev === era.label ? null : era.label)}
-                                        className={cn(
-                                            "px-2.5 py-1 rounded-full text-xs font-medium border transition-colors",
-                                            selectedEra === era.label
-                                                ? "bg-foreground text-background border-foreground"
-                                                : "bg-background text-muted-foreground border-border hover:border-foreground hover:text-foreground"
-                                        )}
-                                    >
-                                        {era.label}
-                                    </button>
-                                ))}
+                                {availableEras.map(era => {
+                                    const colors = getEraColor(era.label);
+                                    const isActive = selectedEra === era.label;
+                                    return (
+                                        <button
+                                            key={era.label}
+                                            onClick={() => setSelectedEra(prev => prev === era.label ? null : era.label)}
+                                            className="px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+                                            style={isActive
+                                                ? { background: colors.bg, color: colors.text, border: `1px solid ${colors.bg}` }
+                                                : { background: colors.light, color: colors.bg, border: `1px solid ${colors.border}` }
+                                            }
+                                        >
+                                            {era.label}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         )}
 
@@ -409,60 +413,66 @@ export function Explore() {
                     ) : filteredPosts.length > 0 ? (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {filteredPosts.map((post) => (
-                                    <div
-                                        key={post.id}
-                                        className="rounded-lg border overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                                        onClick={() => openPost(post.id)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' || e.key === ' ') openPost(post.id);
-                                        }}
-                                        tabIndex={0}
-                                    >
-                                        {post.files?.[0] && (
-                                            <div className="aspect-square bg-muted overflow-hidden">
-                                                <img
-                                                    src={post.files[0]}
-                                                    alt=""
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            </div>
-                                        )}
-                                        <div className="p-3 space-y-2">
-                                            <p className="text-sm font-medium line-clamp-2">
-                                                {highlightText(post.description, query)}
-                                            </p>
-
-                                            {/* Year + historical period badges */}
-                                            {(post.year?.[0] || post.AiMetadata?.historical_period) && (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {post.year?.[0] && (
-                                                        <span className="text-[10px] font-mono font-semibold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 px-1.5 py-0.5 rounded">
-                                                            {post.year[0]}
-                                                        </span>
-                                                    )}
-                                                    {post.AiMetadata?.historical_period && (
-                                                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded truncate max-w-[140px]">
-                                                            {post.AiMetadata.historical_period}
-                                                        </span>
-                                                    )}
+                                {filteredPosts.map((post) => {
+                                    const eraLabel = getEraLabelForYear(post.year?.[0]);
+                                    const eraColors = eraLabel ? getEraColor(eraLabel) : null;
+                                    return (
+                                        <div
+                                            key={post.id}
+                                            className="rounded-lg border overflow-hidden hover:shadow-lifted transition-shadow cursor-pointer bg-card"
+                                            style={eraColors ? { borderTopColor: eraColors.bg, borderTopWidth: 3 } : {}}
+                                            onClick={() => openPost(post.id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') openPost(post.id);
+                                            }}
+                                            tabIndex={0}
+                                        >
+                                            {post.files?.[0] && (
+                                                <div className="aspect-square bg-muted overflow-hidden">
+                                                    <img
+                                                        src={post.files[0]}
+                                                        alt=""
+                                                        className="h-full w-full object-cover"
+                                                    />
                                                 </div>
                                             )}
+                                            <div className="p-3 space-y-2">
+                                                <p className="text-sm font-medium line-clamp-2">
+                                                    {highlightText(post.description, query)}
+                                                </p>
 
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                <Avatar className="h-4 w-4">
-                                                    <AvatarImage src={post.userProfilePicUrl} />
-                                                    <AvatarFallback className="text-xs">
-                                                        {post.userDisplayName?.[0]?.toUpperCase() || 'U'}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <span className="truncate">{post.userDisplayName}</span>
-                                                <span>·</span>
-                                                <span>{post.likesCount || 0} likes</span>
+                                                {/* Year + historical period badges */}
+                                                {(post.year?.[0] || post.AiMetadata?.historical_period) && (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {post.year?.[0] && eraColors && (
+                                                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-tight"
+                                                                  style={{ background: eraColors.light, color: eraColors.bg, border: `1px solid ${eraColors.border}`, fontFamily: "'Lora', Georgia, serif", fontStyle: 'italic' }}>
+                                                                {post.year[0]}
+                                                            </span>
+                                                        )}
+                                                        {post.AiMetadata?.historical_period && (
+                                                            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-tight truncate max-w-[140px]">
+                                                                {post.AiMetadata.historical_period}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                    <Avatar className="h-4 w-4">
+                                                        <AvatarImage src={post.userProfilePicUrl} />
+                                                        <AvatarFallback className="text-xs">
+                                                            {post.userDisplayName?.[0]?.toUpperCase() || 'U'}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <span className="truncate">{post.userDisplayName}</span>
+                                                    <span>·</span>
+                                                    <span>{post.likesCount || 0} likes</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Infinite scroll sentinel */}

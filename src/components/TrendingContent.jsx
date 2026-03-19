@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import useUiStore from '../stores/useUiStore';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { getEraColor } from '@/lib/eraColors';
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const PAGE_SIZE = 12;
@@ -88,7 +89,8 @@ function HeroCard({ post }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
             {/* Trending pill */}
-            <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg tracking-wide">
+            <div className="absolute top-4 left-4 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-tight shadow-lg tracking-wide"
+                 style={{ background: '#C4860A', color: '#fff' }}>
                 <Flame className="h-3 w-3" />
                 #1 Trending
             </div>
@@ -119,7 +121,8 @@ function HeroCard({ post }) {
                     {post.year?.[0] && (
                         <>
                             <span className="text-white/40">·</span>
-                            <span className="font-mono text-orange-300 text-xs font-semibold tracking-wider">
+                            <span className="text-xs font-medium tracking-wider"
+                                  style={{ fontFamily: "'Lora', Georgia, serif", fontStyle: 'italic', color: '#E8A824' }}>
                                 {post.year[0]}
                             </span>
                         </>
@@ -287,20 +290,23 @@ export default function TrendingContent() {
                             >
                                 All
                             </button>
-                            {availableEras.map(era => (
-                                <button
-                                    key={era.label}
-                                    onClick={() => setSelectedEra(prev => prev === era.label ? null : era.label)}
-                                    className={cn(
-                                        "flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors",
-                                        selectedEra === era.label
-                                            ? "bg-foreground text-background border-foreground"
-                                            : "bg-background text-muted-foreground border-border hover:border-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    {era.label}
-                                </button>
-                            ))}
+                            {availableEras.map(era => {
+                                const colors = getEraColor(era.label);
+                                const isActive = selectedEra === era.label;
+                                return (
+                                    <button
+                                        key={era.label}
+                                        onClick={() => setSelectedEra(prev => prev === era.label ? null : era.label)}
+                                        className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
+                                        style={isActive
+                                            ? { background: colors.bg, color: colors.text, border: `1px solid ${colors.bg}` }
+                                            : { background: colors.light, color: colors.bg, border: `1px solid ${colors.border}` }
+                                        }
+                                    >
+                                        {era.label}
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
 
@@ -317,7 +323,8 @@ export default function TrendingContent() {
                             {visibleGridPosts.map((post, index) => (
                                 <div key={post.id} className="break-inside-avoid mb-4 relative">
                                     {index < 2 && !selectedEra && (
-                                        <div className="absolute -top-2 -left-2 z-10 flex items-center gap-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md">
+                                        <div className="absolute -top-2 -left-2 z-10 flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shadow-md"
+                                             style={{ background: '#C4860A', color: '#fff' }}>
                                             <Flame className="h-2.5 w-2.5" />
                                             #{index + 2}
                                         </div>
