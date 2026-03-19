@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Heart, Bookmark } from "lucide-react";
+import { Heart, Bookmark, Calendar } from "lucide-react";
 import { formatDistanceToNowStrict, isToday, isYesterday, format } from "date-fns";
 import { usePostInteractions } from "../hooks/usePostInteractions";
 import SharePost from "./SharePost.jsx";
@@ -28,7 +28,8 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
     const { liked, bookmarked, handleLikeToggle, handleBookmarkToggle } =
         usePostInteractions(post.id);
 
-    const { userDisplayName, userProfilePicUrl, description, files, userId, createdAt } = post;
+    const { userDisplayName, userProfilePicUrl, description, files, userId, createdAt, year, AiMetadata } = post;
+    const displayYear = year?.[0] || AiMetadata?.date_estimate;
 
     return (
         <Card
@@ -105,6 +106,12 @@ export default function MapPostCard({ post, isSelected, onCardClick, onCardHover
                             {formatDate(createdAt)}
                         </span>
                     </div>
+                    {displayYear && (
+                        <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                            <Calendar className="h-3 w-3" />
+                            {displayYear}
+                        </span>
+                    )}
                 </div>
 
                 {description && (

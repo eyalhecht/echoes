@@ -7,17 +7,24 @@ import { Spinner } from "@/components/ui/spinner";
 import { callApiGateway } from '../firebaseConfig.js';
 import MapPostCard from './MapPostCard.jsx';
 import MapPhotoMarkerOverlay from './MapPhotoMarker.jsx';
+import { MAP_STYLE_LIGHT, MAP_STYLE_DARK } from './mapStyle.js';
 import useUiStore from '../stores/useUiStore.js';
+import { useIsMobile } from '../hooks/use-mobile.jsx';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const DEFAULT_CENTER = { lat: 40.7589, lng: -73.9851 };
 const mapContainerStyle = { width: '100%', height: '100%' };
+function getMapStyle() {
+    return document.documentElement.classList.contains('dark') ? MAP_STYLE_DARK : MAP_STYLE_LIGHT;
+}
+
 const mapOptions = {
     disableDefaultUI: true,
     zoomControl: true,
     streetViewControl: false,
     mapTypeControl: false,
     fullscreenControl: false,
+    styles: getMapStyle(),
 };
 
 const ERA_OPTIONS = [
@@ -29,6 +36,7 @@ const ERA_OPTIONS = [
 ];
 
 const MapPostsView = () => {
+    const isMobile = useIsMobile();
     const [loading, setLoading] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [hoveredPostId, setHoveredPostId] = useState(null);
@@ -179,102 +187,98 @@ const MapPostsView = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return (
-        <div className="h-[90vh] mx-2 flex flex-col">
-            <div className="flex-1 rounded-lg overflow-hidden border">
-                <ResizablePanelGroup direction="horizontal" className="h-full">
-                    <ResizablePanel defaultSize={45} minSize={25} maxSize={75}>
-                        <div className="h-full flex flex-col">
-                            {/* Panel header */}
-                            <div className="p-3 bg-muted/50 border-b flex flex-col gap-2">
-                                <div className="flex flex-row gap-2.5 items-center">
-                                    <div className="flex-1 min-w-0">
-                                        {searchQuery ? (
-                                            <div>
-                                                <h2 className="text-sm font-semibold truncate">
-                                                    &ldquo;{searchQuery}&rdquo;
-                                                </h2>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} with location
-                                                </p>
-                                            </div>
-                                        ) : (
-                                            <h2 className="text-sm font-semibold">
-                                                {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} in area
-                                            </h2>
-                                        )}
-                                    </div>
-                                    {loading && <Spinner size="sm" />}
-                                    {searchQuery && !loading && (
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 flex-shrink-0"
-                                            onClick={() => navigate('/map')}
-                                            title="Clear search"
-                                        >
-                                            <X className="h-3.5 w-3.5" />
-                                        </Button>
-                                    )}
-                                </div>
-
-                                {/* Era filter — only shown when posts have year data */}
-                                {hasYearData && (
-                                    <div className="flex gap-1 flex-wrap">
-                                        {ERA_OPTIONS.map((era, i) => (
-                                            <button
-                                                key={era.label}
-                                                onClick={() => setEraIndex(i)}
-                                                className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
-                                                    eraIndex === i
-                                                        ? 'bg-primary text-primary-foreground border-primary'
-                                                        : 'bg-background text-muted-foreground border-border hover:border-foreground/30'
-                                                }`}
-                                            >
-                                                {era.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+    // Shared card panel content
+    const cardPanelContent = (
+        <div className="h-full flex flex-col">
+            {/* Panel header */}
+            <div className="p-3 bg-muted/50 border-b flex flex-col gap-2">
+                <div className="flex flex-row gap-2.5 items-center">
+                    <div className="flex-1 min-w-0">
+                        {searchQuery ? (
+                            <div>
+                                <h2 className="text-sm font-semibold truncate">
+                                    &ldquo;{searchQuery}&rdquo;
+                                </h2>
+                                <p className="text-xs text-muted-foreground">
+                                    {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} with location
+                                </p>
                             </div>
+                        ) : (
+                            <h2 className="text-sm font-semibold">
+                                {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} in area
+                            </h2>
+                        )}
+                    </div>
+                    {loading && <Spinner size="sm" />}
+                    {searchQuery && !loading && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 flex-shrink-0"
+                            onClick={() => navigate('/map')}
+                            title="Clear search"
+                        >
+                            <X className="h-3.5 w-3.5" />
+                        </Button>
+                    )}
+                </div>
 
-                            {/* Card list */}
-                            <div className="flex-1 overflow-y-auto p-3 bg-muted/30">
-                                {!loading && filteredPosts.length === 0 ? (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <MapPin className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                                        <h3 className="text-base font-medium mb-1">No posts found</h3>
-                                        <p className="text-sm">
-                                            {eraIndex !== 0
-                                                ? 'Try a different era filter or pan the map'
-                                                : 'Pan the map and tap "Search this area"'}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-3">
-                                        {filteredPosts.map((post) => (
-                                            <div
-                                                key={post.id}
-                                                ref={(el) => { if (el) cardRefs.current[post.id] = el; }}
-                                            >
-                                                <MapPostCard
-                                                    post={post}
-                                                    isSelected={selectedPost?.id === post.id}
-                                                    onCardClick={handleCardClick}
-                                                    onCardHover={setHoveredPostId}
-                                                    onCardHoverEnd={() => setHoveredPostId(null)}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                {/* Era filter — only shown when posts have year data */}
+                {hasYearData && (
+                    <div className="flex gap-1 flex-wrap">
+                        {ERA_OPTIONS.map((era, i) => (
+                            <button
+                                key={era.label}
+                                onClick={() => setEraIndex(i)}
+                                className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
+                                    eraIndex === i
+                                        ? 'bg-primary text-primary-foreground border-primary'
+                                        : 'bg-background text-muted-foreground border-border hover:border-foreground/30'
+                                }`}
+                            >
+                                {era.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Card list */}
+            <div className="flex-1 overflow-y-auto p-3 bg-muted/30">
+                {!loading && filteredPosts.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                        <MapPin className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                        <h3 className="text-base font-medium mb-1">No posts found</h3>
+                        <p className="text-sm">
+                            {eraIndex !== 0
+                                ? 'Try a different era filter or pan the map'
+                                : 'Pan the map and tap "Search this area"'}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-3">
+                        {filteredPosts.map((post) => (
+                            <div
+                                key={post.id}
+                                ref={(el) => { if (el) cardRefs.current[post.id] = el; }}
+                            >
+                                <MapPostCard
+                                    post={post}
+                                    isSelected={selectedPost?.id === post.id}
+                                    onCardClick={handleCardClick}
+                                    onCardHover={setHoveredPostId}
+                                    onCardHoverEnd={() => setHoveredPostId(null)}
+                                />
                             </div>
-                        </div>
-                    </ResizablePanel>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 
-                    <ResizableHandle withHandle />
-
-                    <ResizablePanel defaultSize={55} minSize={25} maxSize={75}>
+    // Shared map panel content
+    const mapPanelContent = (
                         <div className="h-full relative">
                             <GoogleMap
                                 mapContainerStyle={mapContainerStyle}
@@ -322,7 +326,34 @@ const MapPostsView = () => {
                                 <Navigation className="h-4 w-4" />
                             </Button>
                         </div>
-                    </ResizablePanel>
+    );
+
+    return (
+        <div className="h-[90vh] mx-2 flex flex-col">
+            <div className="flex-1 rounded-lg overflow-hidden border">
+                {/* On mobile: map on top, cards below. On desktop: cards left, map right. */}
+                <ResizablePanelGroup direction={isMobile ? "vertical" : "horizontal"} className="h-full">
+                    {isMobile ? (
+                        <>
+                            <ResizablePanel defaultSize={60} minSize={30} maxSize={80}>
+                                {mapPanelContent}
+                            </ResizablePanel>
+                            <ResizableHandle withHandle />
+                            <ResizablePanel defaultSize={40} minSize={20} maxSize={70}>
+                                {cardPanelContent}
+                            </ResizablePanel>
+                        </>
+                    ) : (
+                        <>
+                            <ResizablePanel defaultSize={45} minSize={25} maxSize={75}>
+                                {cardPanelContent}
+                            </ResizablePanel>
+                            <ResizableHandle withHandle />
+                            <ResizablePanel defaultSize={55} minSize={25} maxSize={75}>
+                                {mapPanelContent}
+                            </ResizablePanel>
+                        </>
+                    )}
                 </ResizablePanelGroup>
             </div>
         </div>
