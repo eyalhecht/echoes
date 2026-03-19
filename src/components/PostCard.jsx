@@ -148,7 +148,8 @@ function PostCard({ post }) {
                     >
                         <div className="relative">
                             {formatYear(year) && imageLoaded && (
-                                <div className="absolute bottom-2 right-2 text-gray-700 text-xs italic bg-white/80 px-3 py-1 rounded-md shadow-sm border border-gray-200 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0">
+                                <div className="absolute bottom-2 left-2 text-echoes-amber text-[11px] bg-echoes-brown/75 px-2.5 py-1 rounded-tight backdrop-blur-sm transition-opacity duration-300 animate-in fade-in-0"
+                                     style={{ fontFamily: "'Lora', Georgia, serif", fontStyle: 'italic' }}>
                                     {formatYear(year)}
                                 </div>
                             )}
@@ -270,11 +271,11 @@ function PostCard({ post }) {
                     <div className="flex-1 ml-3">
                         <button
                             onClick={() => handleNameClick(userId)}
-                            className="text-sm font-semibold hover:underline text-left"
+                            className="text-[15px] font-medium hover:underline text-left leading-tight"
                         >
                             {userDisplayName || 'Anonymous User'}
                         </button>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
                             {formatFirebaseTimestamp(createdAt)}
                         </p>
                     </div>
@@ -420,7 +421,7 @@ function PostCard({ post }) {
                                         variant="ghost"
                                         size="icon"
                                         onClick={handleLikeToggle}
-                                        className={`h-8 w-8 ${liked ? 'text-red-500' : ''}`}
+                                        className={`h-8 w-8 ${liked ? 'text-echoes-amber' : 'text-muted-foreground hover:text-foreground'}`}
                                         disabled={isLikeUpdating}
                                     >
                                         <Heart className={`h-5 w-5 ${liked ? 'fill-current' : ''}`} />
@@ -440,7 +441,7 @@ function PostCard({ post }) {
                                         variant="ghost"
                                         size="icon"
                                         onClick={handleToggleComments}
-                                        className="h-8 w-8"
+                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                                     >
                                         <MessageCircle className="h-5 w-5" />
                                     </Button>
@@ -459,7 +460,7 @@ function PostCard({ post }) {
                                         variant="ghost"
                                         size="icon"
                                         onClick={handleBookmarkToggle}
-                                        className={`h-8 w-8 ${bookmarked ? 'text-blue-600' : ''}`}
+                                        className={`h-8 w-8 ${bookmarked ? 'text-echoes-teal' : 'text-muted-foreground hover:text-foreground'}`}
                                         disabled={isBookmarkUpdating}
                                     >
                                         <Bookmark className={`h-5 w-5 ${bookmarked ? 'fill-current' : ''}`} />
