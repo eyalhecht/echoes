@@ -195,6 +195,11 @@ const MapPostsView = () => {
         setShowSearchPill(true);
     }, []);
 
+    const handleMarkerClick = useCallback((post) => {
+        setSelectedPost(post);
+        cardRefs.current[post.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, []);
+
     const handleClusterClick = useCallback((cluster) => {
         if (cluster.posts.length === 1) {
             handleMarkerClick(cluster.posts[0]);
@@ -226,11 +231,6 @@ const MapPostsView = () => {
         if (searchQuery) setSearchParams({});
         fetchPosts({ lat: center.lat(), lng: center.lng() }, clampedRadius);
     }, [fetchPosts, searchQuery, setSearchParams]);
-
-    const handleMarkerClick = useCallback((post) => {
-        setSelectedPost(post);
-        cardRefs.current[post.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, []);
 
     const handleCardClick = useCallback((post) => {
         setSelectedPost(post);
