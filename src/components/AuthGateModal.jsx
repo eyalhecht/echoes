@@ -2,7 +2,7 @@ import React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { X } from 'lucide-react';
-import { palette, alpha } from '../styles/theme';
+import { palette } from '../styles/theme';
 import LoginCard from './LoginCard.jsx';
 import useUiStore from '../stores/useUiStore.js';
 
@@ -15,7 +15,7 @@ export default function AuthGateModal() {
                 {/* Overlay */}
                 <DialogPrimitive.Overlay
                     className="fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-                    style={{ background: `${alpha('--echoes-amber', 0.08)} `, backdropFilter: 'blur(4px)', backgroundColor: 'rgba(0,0,0,0.6)' }}
+                    style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
                 />
 
                 {/* Content — transparent wrapper, just for positioning + close key handling */}

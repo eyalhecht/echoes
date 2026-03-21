@@ -26,6 +26,11 @@ const GoogleIcon = () => (
 export default function LoginCard({ subtitle, onSuccess, showBackLink = true, dark = false }) {
     const navigate = useNavigate();
     const { loading, error } = useAuthStore();
+
+    const handleNavigate = (path) => {
+        onSuccess?.();
+        navigate(path);
+    };
     const [loadingProvider, setLoadingProvider] = useState(null);
 
     const handleGoogleLogin = async () => {
@@ -77,7 +82,7 @@ export default function LoginCard({ subtitle, onSuccess, showBackLink = true, da
                 {/* Header */}
                 <div className="text-center mb-10">
                     <button
-                        onClick={() => navigate('/about')}
+                        onClick={() => handleNavigate('/about')}
                         className="text-2xl font-bold mb-5 block w-full"
                         style={{ color: palette.brown, letterSpacing: '-0.02em' }}
                     >
@@ -137,11 +142,11 @@ export default function LoginCard({ subtitle, onSuccess, showBackLink = true, da
                         <p className="text-sm" style={{ color: palette.muted }}>
                             Need more info?{' '}
                             <button
-                                onClick={() => navigate('/about')}
+                                onClick={() => handleNavigate('/about')}
                                 className="font-semibold transition-colors"
                                 style={{ color: palette.amber }}
-                                onMouseEnter={e => e.target.style.color = palette.brown}
-                                onMouseLeave={e => e.target.style.color = palette.amber}
+                                onMouseEnter={e => e.currentTarget.style.color = palette.brown}
+                                onMouseLeave={e => e.currentTarget.style.color = palette.amber}
                             >
                                 Back to homepage
                             </button>
