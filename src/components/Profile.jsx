@@ -7,17 +7,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LogOut } from 'lucide-react';
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "../stores/useAuthStore.js";
+import useUiStore from "../stores/useUiStore.js";
 import { callApiGateway } from "../firebaseConfig.js";
 import PostCard from "./PostCard.jsx";
 import FollowersFollowingModal from "./FollowersFollowingModal.jsx"; // Import the new modal
 import { useNavigate, useParams } from 'react-router-dom';
 
 const Profile = () => {
-    const { userId: targetUserId } = useParams(); // Get userId from URL params
-    const effectiveUserId = targetUserId || currentUser?.uid;
+    const { userId: targetUserId } = useParams();
     const isMobile = useMediaQuery('(max-width: 768px)');
     const navigate = useNavigate();
     const currentUser = useAuthStore(state => state.user);
+    const effectiveUserId = targetUserId || currentUser?.uid;
 
     const toggleFollow = async (userId, isFollowing) => {
         return await callApiGateway({
@@ -42,6 +43,14 @@ const Profile = () => {
     const [followingModalOpen, setFollowingModalOpen] = useState(false);
 
     const isCurrentUserProfile = currentUser?.uid === effectiveUserId;
+
+    // Redirect if no user to show
+    useEffect(() => {
+        if (!effectiveUserId) {
+            navigate('/home', { replace: true });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [effectiveUserId]);
 
     // --- Fetch Profile Data ---
     useEffect(() => {
@@ -144,7 +153,6 @@ const Profile = () => {
             const nearBottom = scrollTop + windowHeight >= documentHeight - 200;
 
             if (nearBottom && hasMorePosts && !loadingMorePosts && !userPostsLoading) {
-                console.log('Profile scroll triggered load more posts');
                 loadMorePosts(false);
             }
         };
@@ -164,7 +172,7 @@ const Profile = () => {
 
     const handleToggleFollow = async () => {
         if (!currentUser?.uid) {
-            alert('You must be logged in to follow/unfollow.');
+            useUiStore.getState().showAuthGate('Sign in to follow people and stay updated on their historical discoveries.');
             return;
         }
         if (!profileData || followActionLoading) return;

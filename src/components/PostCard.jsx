@@ -232,7 +232,7 @@ function PostCard({ post }) {
     }, [postId]);
 
     const handleAddComment = async () => {
-        if (!currentUser) { navigate('/login'); return; }
+        if (!currentUser) { useUiStore.getState().showAuthGate('Sign in to join the conversation and leave comments.'); return; }
         if (!newCommentText.trim()) {
             setCommentError("Comment cannot be empty.");
             return;

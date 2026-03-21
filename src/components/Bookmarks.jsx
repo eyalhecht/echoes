@@ -90,7 +90,6 @@ function Bookmarks() {
             const reachesLastThird = (scrollTop + windowHeight) >= lastThirdStart;
 
             if (reachesLastThird && bookmarksHasMore && !bookmarksLoading) {
-                console.log('Scroll triggered load more bookmarks');
                 loadMoreBookmarks();
             }
         };

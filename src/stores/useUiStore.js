@@ -2,6 +2,12 @@ import { create } from 'zustand';
 import { callApiGateway } from '../firebaseConfig';
 
 const useUiStore = create((set, get) => ({
+    // Auth gate modal
+    authGateOpen: false,
+    authGateMessage: '',
+    showAuthGate: (message) => set({ authGateOpen: true, authGateMessage: message }),
+    hideAuthGate: () => set({ authGateOpen: false, authGateMessage: '' }),
+
     posts: [],
     postsLoading: false,
     postsError: null,

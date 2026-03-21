@@ -23,7 +23,6 @@ function Home() {
     const loadMorePosts = useCallback(async () => {
         if (!hasMore || postsLoading) return; // Safety check
 
-        console.log('Loading more posts...', { lastDocId, hasMore, postsLoading });
         setPostsLoading(true);
         try {
             const response = await callApiGateway({
@@ -81,7 +80,6 @@ function Home() {
             const reachesLastThird = (scrollTop + windowHeight) >= lastThirdStart;
 
             if (reachesLastThird && hasMore && !postsLoading) {
-                console.log('Scroll triggered load more');
                 loadMorePosts();
             }
         };

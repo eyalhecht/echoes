@@ -209,6 +209,7 @@ const PostDetailView = ({ post, open, onClose }) => {
     };
 
     const handleNameClick = (userId) => {
+        onClose();
         navigate(`/profile/${userId}`);
     };
 

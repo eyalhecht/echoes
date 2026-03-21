@@ -82,13 +82,9 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 
 export {
   Dialog,
-  
-  
-  
-  
   DialogContent,
   DialogHeader,
-  
+  DialogFooter,
   DialogTitle,
-  
+  DialogDescription,
 }
