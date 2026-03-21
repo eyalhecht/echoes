@@ -16,6 +16,7 @@ import PostDetailView from "./PostDetailView.jsx";
 import useUiStore from "../stores/useUiStore.js";
 import GuestBanner from "./GuestBanner.jsx";
 import WelcomeModal from "./WelcomeModal.jsx";
+import AuthGateModal from "./AuthGateModal.jsx";
 
 function MainContent() {
     const { theme, setTheme } = useTheme();
@@ -103,6 +104,7 @@ function MainContent() {
             </div>
 
             <WelcomeModal />
+            <AuthGateModal />
 
             {postId && modalPost && !isLoadingModalPost && (
                 <PostDetailView

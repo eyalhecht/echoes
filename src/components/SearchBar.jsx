@@ -7,11 +7,14 @@ import { callApiGateway } from "../firebaseConfig.js";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useAuthStore } from '../stores/useAuthStore.js';
+import useUiStore from '../stores/useUiStore.js';
 
 export function SearchBar() {
     const navigate = useNavigate();
     const location = useLocation();
     const isMobile = useIsMobile();
+    const { isAuthenticated } = useAuthStore();
     const [searchParams, setSearchParams] = useSearchParams();
     const isOnExplorePage = location.pathname === '/explore';
 
@@ -40,7 +43,7 @@ export function SearchBar() {
 
     // Debounced URL update when typing on explore page
     useEffect(() => {
-        if (!isOnExplorePage) return;
+        if (!isOnExplorePage || !isAuthenticated) return;
         const timer = setTimeout(() => {
             setSearchParams(prev => {
                 const currentQ = prev.get('q') ?? '';
@@ -58,7 +61,7 @@ export function SearchBar() {
 
     // Debounced user search for dropdown (any page)
     useEffect(() => {
-        if (inputValue.length < 2) {
+        if (!isAuthenticated || inputValue.length < 2) {
             setResults({ users: [] });
             setShowDropdown(false);
             return;
@@ -104,11 +107,13 @@ export function SearchBar() {
             setInputValue('');
             inputRef.current?.blur();
         } else if (e.key === 'Enter' && inputValue.trim().length > 0) {
+            e.preventDefault();
             navigateToExplore();
         }
     };
 
     const navigateToExplore = () => {
+        if (!isAuthenticated) { useUiStore.getState().showAuthGate('Sign in to search Echoes and discover historical photos, stories, and people.'); return; }
         setShowDropdown(false);
         if (isMobile) setIsExpanded(false);
         if (!isOnExplorePage) {

@@ -7,7 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile.jsx";
 import TrendingContent from "./TrendingContent.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Map } from "lucide-react";
+import { Map as MapIcon } from "lucide-react";
 
 const SUGGESTED_SEARCHES = [
     'Berlin Wall',
@@ -263,7 +263,7 @@ export function Explore() {
                                     onClick={() => navigate(`/map?q=${encodeURIComponent(query)}`)}
                                     className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                                 >
-                                    <Map className="h-3 w-3" />
+                                    <MapIcon className="h-3 w-3" />
                                     View on Map
                                 </button>
                             )}

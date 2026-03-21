@@ -414,11 +414,11 @@ const MapPostsView = () => {
                         </>
                     ) : (
                         <>
-                            <ResizablePanel defaultSize={45} minSize={25} maxSize={75}>
+                            <ResizablePanel defaultSize={25} minSize={25} maxSize={75}>
                                 {cardPanelContent}
                             </ResizablePanel>
                             <ResizableHandle withHandle />
-                            <ResizablePanel defaultSize={55} minSize={25} maxSize={75}>
+                            <ResizablePanel defaultSize={75} minSize={25} maxSize={75}>
                                 {mapPanelContent}
                             </ResizablePanel>
                         </>

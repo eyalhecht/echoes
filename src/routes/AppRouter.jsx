@@ -49,6 +49,7 @@ function AppRouter() {
         <Route path="/home" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/map" element={<MapPostsView />} />
+        <Route path="/profile/:userId?" element={<Profile />} />
       </Route>
 
       {/* Protected Routes with Layout wrapper */}
@@ -59,7 +60,6 @@ function AppRouter() {
           </ProtectedRoute>
         }
       >
-        <Route path="/profile/:userId?" element={<Profile />} />
         <Route path="/upload" element={<UploadPost />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
 
